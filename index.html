@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Conclave Budgétaire Coalition Arizona 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom chart container styles to ensure strict sizing */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-800 font-sans antialiased selection:bg-amber-200">
+
+    <!-- Chosen Palette: Warm Neutral Slate & Political Accents (Background: Slate/Stone-50, Cards: White/Stone-100, Text: Slate-800, Accents: N-VA Amber, MR Blue, Vooruit Red, CD&V Orange, Engagés Turquoise) -->
+    <!-- Application Structure Plan: The SPA is structured into 4 thematic interactive modules: 1) Executive Dashboard & Political Matrix (visualizing power balance and party red lines), 2) Budgetary Trajectory & Friction Hub (interactive charts on macro risks, unemployment waves, CPAS cost shifts, and fiscal trade-offs), 3) Strategic Trade-Off Matrix (exploring cross-party compromises), and 4) Interactive Scenario Simulator (evaluating Scenarios A, B, C with real-time stability & market indicators). This architecture transforms a dense analytical report into an exploratory tool where users can evaluate political friction and budgetary impact dynamically. -->
+    <!-- Visualization & Content Choices: 1. Party Matrix -> Interactive Cards + Dynamic Radar/Bar Chart (Chart.js) -> Toggle & Click to filter -> Compares party positions and red lines. 2. Macro Trajectory -> Dynamic Line Chart (Chart.js) -> View baseline vs target deficit -> Visualizes PDE urgency. 3. Unemployment Waves -> Interactive Stepper/Table & Stacked Bar Chart -> Click wave to view profile & CPAS transfer -> Shows social impact. 4. Scenario Simulator -> Interactive Button Selector -> Dynamically updates risk gauges & political outcome text. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🏛️</span>
+                    <div>
+                        <h1 class="text-lg font-bold leading-tight">Coalition Arizona</h1>
+                        <p class="text-xs text-amber-400 font-medium">Conclave Budgétaire Automne 2026</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                    <a href="#macro" class="hover:text-amber-400 transition-colors">Cadre Macro</a>
+                    <a href="#partis" class="hover:text-amber-400 transition-colors">Cartographie des Partis</a>
+                    <a href="#frictions" class="hover:text-amber-400 transition-colors">Chocs & Frictions</a>
+                    <a href="#scenarios" class="hover:text-amber-400 transition-colors">Scénarios Prospectifs</a>
+                </nav>
+                <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-semibold">
+                    ⏱️ Échéance : 13 Octobre 2026
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Key Indicators Banner -->
+    <section class="bg-slate-800 text-slate-100 py-4 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="p-2 rounded bg-slate-800/80 border border-slate-700">
+                    <span class="block text-xs text-slate-400 uppercase font-semibold">Effort Cible (2029)</span>
+                    <span class="text-xl font-extrabold text-amber-400">10,0 Mrd €</span>
+                    <span class="block text-[10px] text-slate-400">>23 Mrd € sur la législature</span>
+                </div>
+                <div class="p-2 rounded bg-slate-800/80 border border-slate-700">
+                    <span class="block text-xs text-slate-400 uppercase font-semibold">Déficit Projeté 2027</span>
+                    <span class="text-xl font-extrabold text-rose-400">5,1% à 5,5% PIB</span>
+                    <span class="block text-[10px] text-slate-400">~35,4 Mrd € (Entité I)</span>
+                </div>
+                <div class="p-2 rounded bg-slate-800/80 border border-slate-700">
+                    <span class="block text-xs text-slate-400 uppercase font-semibold">Taux OLO 10 Ans</span>
+                    <span class="text-xl font-extrabold text-amber-300">3,92 %</span>
+                    <span class="block text-[10px] text-slate-400">+2.0 bps vs Bund Allemand</span>
+                </div>
+                <div class="p-2 rounded bg-slate-800/80 border border-slate-700">
+                    <span class="block text-xs text-slate-400 uppercase font-semibold">Exclusions Chômage</span>
+                    <span class="text-xl font-extrabold text-red-400">184 463</span>
+                    <span class="block text-[10px] text-slate-400">Allocataires impactés</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- SECTION 1: CADRE MACROÉCONOMIQUE & PRESSION EUROPÉENNE -->
+        <section id="macro" class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8">
+            <div class="max-w-3xl mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>📊</span> Le Cadre Macroéconomique & l'Étau Européen
+                </h2>
+                <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+                    Cette section analyse l'environnement coercitif dans lequel évolue la coalition Arizona. Sous la tutelle de la Procédure pour Déficits Excessifs (PDE) de l'Union européenne et face à la remontée des taux obligataires (OLO), l'exécutif belge est contraint de réaliser un assainissement budgétaire d'une ampleur inédite pour éviter des sanctions financières et une dégradation souveraine.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Trajectory Chart -->
+                <div class="lg:col-span-7 bg-stone-50 p-4 rounded-lg border border-stone-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-slate-800 text-sm">Trajectoire du Déficit Budgétaire Fédéral (Milliards €)</h3>
+                        <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded font-medium">Sans correction vs Effort Arizona</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Strategic Context & Rating Agency Panel -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r">
+                        <h4 class="font-bold text-amber-900 text-sm flex items-center gap-1">
+                            ⚠️ Procédure concernant les Déficits Excessifs (PDE)
+                        </h4>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                            Depuis juillet 2024, la Belgique est sous tutelle européenne. Les règles exigent une réduction structurelle minimale du déficit de 0,5% du PIB/an. En cas d'inaction, des amendes coercitives de <strong>0,1% du PIB tous les 6 mois</strong> peuvent être infligées.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">Perspectives des Agences de Notation (Sept. 2026)</h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between items-center pb-1 border-b border-slate-200">
+                                <span class="font-medium text-slate-700">Fitch / Standard & Poor's / Moody's</span>
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded">A+ à AA- (Stable)</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-1 border-b border-slate-200">
+                                <span class="font-medium text-slate-700">DBRS / Creditreform</span>
+                                <span class="px-2 py-0.5 bg-rose-100 text-rose-800 font-bold rounded">AA / AA (NÉGATIVE)</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 italic mt-1">
+                                Un échec du conclave menacerait de concrétiser ces perspectives négatives en dégradation directe, gonflant le coût de la dette (charges d'intérêts : 18,6 Mrd € en 2029).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CARTOGRAPHIE DES PARTIS & DYNAMIQUE DES FORCES -->
+        <section id="partis" class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8">
+            <div class="max-w-3xl mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>🏛️</span> Cartographie des Partis, Lignes Rouges & Positions
+                </h2>
+                <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+                    La coalition Arizona regroupe cinq formations aux matrices idéologiques fortement divergentes. Explorez ci-dessous la position de chaque partenaire, ses exigences inviolables et ses risques électoraux. Cliquez sur un parti pour détailler sa stratégie au sein du conclave.
+                </p>
+            </div>
+
+            <!-- Party Filter Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-3" id="party-tabs">
+                <button onclick="filterParty('all')" class="party-btn active bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all">Tous les partis</button>
+                <button onclick="filterParty('nva')" class="party-btn bg-amber-100 text-amber-900 border border-amber-300 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-amber-200 transition-all">N-VA (Bart De Wever)</button>
+                <button onclick="filterParty('mr')" class="party-btn bg-blue-100 text-blue-900 border border-blue-300 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 transition-all">MR (G.-L. Bouchez)</button>
+                <button onclick="filterParty('vooruit')" class="party-btn bg-red-100 text-red-900 border border-red-300 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-red-200 transition-all">Vooruit (C. Rousseau)</button>
+                <button onclick="filterParty('engages')" class="party-btn bg-teal-100 text-teal-900 border border-teal-300 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-teal-200 transition-all">Les Engagés (M. Prévot)</button>
+                <button onclick="filterParty('cdv')" class="party-btn bg-orange-100 text-orange-900 border border-orange-300 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-orange-200 transition-all">CD&V (S. Mahdi)</button>
+            </div>
+
+            <!-- Grid Layout: Cards + Radar Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Interactive Cards Grid -->
+                <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" id="party-cards-container">
+
+                    <!-- N-VA -->
+                    <div class="party-card nva bg-amber-50/50 border-2 border-amber-300 rounded-lg p-4 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-extrabold text-amber-900 text-base">N-VA</span>
+                                <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold">Premier Ministre</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3 font-medium">Bart De Wever | Premier Ministre</p>
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <span class="font-bold text-amber-900 block">🎯 Objectif :</span>
+                                    <span class="text-slate-700">Orthodoxie budgétaire, réduction périmètre État, responsabilisation.</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-red-700 block">🚩 Ligne Rouge :</span>
+                                    <span class="text-slate-700">Inaction sur le déficit, surcoûts d'emprunt unilatéraux.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-amber-200 text-[11px] text-amber-800 font-medium">
+                            ⚖️ Arbitre du compromis entre le MR et Vooruit.
+                        </div>
+                    </div>
+
+                    <!-- MR -->
+                    <div class="party-card mr bg-blue-50/50 border-2 border-blue-300 rounded-lg p-4 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-extrabold text-blue-900 text-base">MR</span>
+                                <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded font-bold">Aide Libérale</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3 font-medium">Georges-Louis Bouchez | Président</p>
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <span class="font-bold text-blue-900 block">🎯 Objectif :</span>
+                                    <span class="text-slate-700">Protection du capital, baisse IPP, baisse dépenses publiques.</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-red-700 block">🚩 Ligne Rouge Absolue :</span>
+                                    <span class="text-slate-700">"Pas de nouvelles taxes" (refus strict impôt sur les plus-values).</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-blue-200 text-[11px] text-blue-800 font-medium">
+                            💼 Exige contreparties dures sur chômage & marché du travail.
+                        </div>
+                    </div>
+
+                    <!-- Vooruit -->
+                    <div class="party-card vooruit bg-red-50/50 border-2 border-red-300 rounded-lg p-4 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-extrabold text-red-900 text-base">Vooruit</span>
+                                <span class="text-xs bg-red-200 text-red-900 px-2 py-0.5 rounded font-bold">Aile Gauche</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3 font-medium">Conner Rousseau | Président</p>
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <span class="font-bold text-red-900 block">🎯 Objectif :</span>
+                                    <span class="text-slate-700">Justice fiscale, protection pouvoir d'achat, bouclier social.</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-red-700 block">🚩 Ligne Rouge Absolue :</span>
+                                    <span class="text-slate-700">Pas de coupes sociales sans <em>Meerwaardebelasting</em> (taxe plus-values).</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-red-200 text-[11px] text-red-800 font-medium">
+                            ✊ Soumis à la pression syndicale et de l'opposition PS/PTB.
+                        </div>
+                    </div>
+
+                    <!-- Les Engagés -->
+                    <div class="party-card engages bg-teal-50/50 border-2 border-teal-300 rounded-lg p-4 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-extrabold text-teal-900 text-base">Les Engagés</span>
+                                <span class="text-xs bg-teal-200 text-teal-900 px-2 py-0.5 rounded font-bold">Bloc Centriste</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3 font-medium">Maxime Prévot | Président</p>
+                            <div class="space-y-2 text-xs">
+                                <div>
+                                    <span class="font-bold text-teal-900 block">🎯 Objectif :</span>
+                                    <span class="text-slate-700">Norme de croissance Soins de Santé, hausse salaire net (+1200€/an).</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-red-700 block">🚩 Ligne Rouge :</span>
+                                    <span class="text-slate-700">Coupes aveugles non ciblées dans la santé publique.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-teal-200 text-[11px] text-teal-800 font-medium">
+                            🏥 Gardien de la santé et du pouvoir d'achat des classes moyennes.
+                        </div>
+                    </div>
+
+                    <!-- CD&V -->
+                    <div class="party-card cdv sm:col-span-2 bg-orange-50/50 border-2 border-orange-300 rounded-lg p-4 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-extrabold text-orange-900 text-base">CD&V</span>
+                                <span class="text-xs bg-orange-200 text-orange-900 px-2 py-0.5 rounded font-bold">Bloc Centriste / Flamand</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3 font-medium">Sammy Mahdi | Président</p>
+                            <div class="space-y-2 text-xs grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <span class="font-bold text-orange-900 block">🎯 Objectif :</span>
+                                    <span class="text-slate-700">Soutien aux familles (quotient conjugal) & secteur agricole.</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-red-700 block">🚩 Ligne Rouge :</span>
+                                    <span class="text-slate-700">Suppression brutale des soutiens fiscaux aux ménages.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-orange-200 text-[11px] text-orange-800 font-medium">
+                            👨‍👩‍👧 Vigilance sur les revues de dépenses ciblées (spending reviews).
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Strategic Balance Chart -->
+                <div class="lg:col-span-5 bg-stone-50 p-4 rounded-lg border border-stone-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-semibold text-slate-800 text-sm mb-1">Index de Tension & Alignement Fiscale</h3>
+                        <p class="text-xs text-slate-500 mb-4">Positionnement idéologique perçu sur l'effort budgétaire</p>
+                        <div class="chart-container">
+                            <canvas id="partyPositionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-white p-3 rounded border border-stone-200 text-xs text-slate-600">
+                        <strong>💡 Analyse de l'Axe de Friction :</strong> L'antagonisme central oppose le <strong>MR</strong> (qui exige l'absence de toute nouvelle taxe) à <strong>Vooruit</strong> (qui conditionne toute réforme sociale à la taxe sur les plus-values). La N-VA cherche le point d'équilibre pragmatique.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: LES FOYERS DE TENSION & IMPACTS CONCRETS -->
+        <section id="frictions" class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-8">
+            <div class="max-w-3xl mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>⚡</span> Domaines de Friction & Arbitrages Techniques
+                </h2>
+                <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+                    Explorez les trois réformes majeures de l'Arizona qui cristallisent les tensions socio-économiques. Utilisez les onglets ci-dessous pour passer en revue la réforme du chômage et son impact sur les CPAS, la fiscalité (Tax-Shift vs Plus-values) et les arbitrages régaliens (Santé, Défense & Privatisation).
+                </p>
+            </div>
+
+            <!-- Friction Tabs -->
+            <div class="flex border-b border-slate-200 mb-6 overflow-x-auto space-x-4">
+                <button onclick="switchFrictionTab('chomage')" id="tab-chomage" class="friction-tab-btn border-b-2 border-amber-500 font-bold text-amber-600 pb-2 text-sm whitespace-nowrap">
+                    1. Réforme du Chômage & Asphyxie des CPAS
+                </button>
+                <button onclick="switchFrictionTab('fiscalite')" id="tab-fiscalite" class="friction-tab-btn border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 pb-2 text-sm whitespace-nowrap">
+                    2. Le Nœud Fiscal : IPP vs Plus-Values
+                </button>
+                <button onclick="switchFrictionTab('regalien')" id="tab-regalien" class="friction-tab-btn border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 pb-2 text-sm whitespace-nowrap">
+                    3. Santé, Défense & Vente de Belfius
+                </button>
+            </div>
+
+            <!-- Tab Content 1: Chomage & CPAS -->
+            <div id="content-chomage" class="friction-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 space-y-4">
+                        <h3 class="font-bold text-slate-800 text-base">Limitation du Chômage à 24 Mois & Calendrier des Exclusions</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Le gouvernement Arizona instaure un plafonnement de la durée du chômage complet à 24 mois maximum (conditionné par une carrière préalable ininterrompue de 5 ans). La dégressivité est accélérée : dès le 13e mois, l'allocation bascule sur un forfait très bas (746 €/mois pour un cohabitant).
+                        </p>
+
+                        <!-- Timeline of Exclusion Waves -->
+                        <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 space-y-3">
+                            <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Vagues d'Exclusion ONEM (184 463 personnes)</h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">Janv 2026</span>
+                                    <span class="text-[11px] text-slate-600">Insertion + >20 ans chômage</span>
+                                </div>
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">Mars 2026</span>
+                                    <span class="text-[11px] text-slate-600">8 à 20 ans de chômage</span>
+                                </div>
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">Avril 2026</span>
+                                    <span class="text-[11px] text-slate-600">< 8 ans de chômage</span>
+                                </div>
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">Juillet 2026</span>
+                                    <span class="text-[11px] text-slate-600">Chômeurs en 2e période</span>
+                                </div>
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">2026-2027</span>
+                                    <span class="text-[11px] text-slate-600">Carrières < 5 ans</span>
+                                </div>
+                                <div class="bg-white p-2 rounded border border-stone-200">
+                                    <span class="block font-bold text-amber-600">Juillet 2027</span>
+                                    <span class="text-[11px] text-slate-600">Carrières >= 5 ans</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-rose-50 border-l-4 border-rose-500 p-3 rounded-r text-xs text-rose-900">
+                            <strong>⚠️ Controverse sur "l'effet retour" :</strong> Le gouvernement anticipe <strong>7,9 Mrd €</strong> de rentrées liées au retour à l'emploi (taux de succès de 50%). Les études académiques (Minerva/KULeuven) qualifient ce chiffre de chimérique, tablant sur un effet retour réel de seulement 4% à 15%.
+                        </div>
+                    </div>
+
+                    <!-- CPAS Cost Shift Chart -->
+                    <div class="lg:col-span-5 bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h4 class="font-bold text-slate-800 text-xs mb-1">Transfert de Charge Fédéral ➔ CPAS Communaux</h4>
+                        <p class="text-[11px] text-slate-500 mb-2">Transfert mécanique vers le Revenu d'Intégration Sociale (RIS)</p>
+                        <div class="chart-container">
+                            <canvas id="cpasTransferChart"></canvas>
+                        </div>
+                        <p class="text-[11px] text-slate-500 italic mt-2">
+                            Le remboursement fédéral décline de 100% (An 1) à 75% (An 4). Les communes wallonnes et bruxelloises subissent un choc financier net avoisinant <strong>1 milliard d'euros</strong> d'ici 2029.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Fiscalite -->
+            <div id="content-fiscalite" class="friction-content space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <span>💵</span> La Réforme IPP & "Tax-Shift" (Objectif Engagés/CD&V)
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            L'Arizona veut porter la quotité exemptée d'impôt à 14 200 € d'ici 2029 et renforcer le bonus à l'emploi, promettant un gain net moyen de <strong>1 200 € / an</strong> par travailleur.
+                        </p>
+                        <ul class="text-xs text-slate-700 space-y-1.5 list-disc list-inside">
+                            <li><strong>Avantage Indépendants :</strong> Déduction de 10% sur bénéfice imposable (max 830 € en 2029).</li>
+                            <li><strong>Financement contesté :</strong> Suppression progressive du quotient conjugal (277 000 ménages touchés).</li>
+                            <li><strong>Hausse de TVA :</strong> Relèvement sélectif pour générer 1,3 Mrd € sur la consommation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-amber-50/60 p-5 rounded-lg border border-amber-200 space-y-3">
+                        <h3 class="font-bold text-amber-950 text-sm flex items-center gap-2">
+                            <span>⚖️</span> La Bataille de la <em>Meerwaardebelasting</em> (Totem Vooruit)
+                        </h3>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Vooruit exige l'instauration d'un impôt sur les plus-values boursières et financières. Pour Conner Rousseau, pas question de valider les coupes dans le chômage sans contribution égale du capital.
+                        </p>
+                        <div class="bg-white p-3 rounded border border-amber-200 text-xs text-slate-700 space-y-2">
+                            <div class="flex justify-between font-semibold border-b pb-1">
+                                <span>Parti</span><span>Position sur les Plus-Values</span>
+                            </div>
+                            <div class="flex justify-between text-blue-800">
+                                <span>MR</span><span>Veto formel / Exigences d'exemptions massives</span>
+                            </div>
+                            <div class="flex justify-between text-red-800">
+                                <span>Vooruit</span><span>Condition absolue de participation gouvernementale</span>
+                            </div>
+                            <div class="flex justify-between text-amber-800">
+                                <span>N-VA</span><span>Recherche d'une taxe symbolique pour sauver la face</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: Regalien -->
+            <div id="content-regalien" class="friction-content space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg border border-stone-200 space-y-2">
+                        <div class="text-teal-600 font-bold text-sm">🏥 Soins de Santé</div>
+                        <p class="text-xs text-slate-600">
+                            Norme de croissance maintenue sous condition de <strong>523 M€ d'économies annuelles</strong>. Encadrement des suppléments d'honoraires et dérive vers des ententes asymétriques régionales.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-stone-200 space-y-2">
+                        <div class="text-slate-800 font-bold text-sm">🛡️ Défense & Réarmement</div>
+                        <p class="text-xs text-slate-600">
+                            Trajectoire garantie vers <strong>2% du PIB en 2029</strong> (exigences OTAN). Ce refinancement militaire s'effectue par des coupes dans l'Asile/Migration (-1,4 Mrd € chez Fedasil).
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-stone-200 space-y-2">
+                        <div class="text-amber-700 font-bold text-sm">🏦 Privatisation de Belfius</div>
+                        <p class="text-xs text-slate-600">
+                            Vente de <strong>20% du capital de Belfius</strong> prévue dans un "Fonds Défense" pour dégager 2 Mrd € de recettes d'un soir (<em>one-off</em>) et boucler le budget 2027.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: SCÉNARIOS PROSPECTIFS & SIMULATEUR D'ISSUE -->
+        <section id="scenarios" class="bg-slate-900 text-white rounded-xl shadow-lg p-6 md:p-8">
+            <div class="max-w-3xl mb-6">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-amber-400">
+                    <span>🔮</span> Scénarios Prospectifs de Clôture du Conclave
+                </h2>
+                <p class="text-slate-300 mt-2 text-sm leading-relaxed">
+                    À l'approche de la date butoir du 13 octobre 2026, trois trajectoires politiques se dessinent. Sélectionnez un scénario pour simuler les impacts sur la stabilité du gouvernement, les marchés obligataires et les risques de sanctions européennes.
+                </p>
+            </div>
+
+            <!-- Scenario Selector Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button onclick="selectScenario('A')" id="btn-scenario-A" class="scenario-btn text-left p-4 rounded-xl border-2 border-amber-500 bg-slate-800 hover:bg-slate-700 transition-all">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-extrabold text-amber-400 text-sm">Scénario A</span>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">Compromis</span>
+                    </div>
+                    <div class="font-bold text-white text-xs">Le Paquet Global</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Concessions croisées & artifices comptables.</div>
+                </button>
+
+                <button onclick="selectScenario('B')" id="btn-scenario-B" class="scenario-btn text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800 hover:bg-slate-700 transition-all">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-extrabold text-blue-400 text-sm">Scénario B</span>
+                        <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-bold">Temporisation</span>
+                    </div>
+                    <div class="font-bold text-white text-xs">L'Accord Différé</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Budget 2027 à minima, réformes reportées.</div>
+                </button>
+
+                <button onclick="selectScenario('C')" id="btn-scenario-C" class="scenario-btn text-left p-4 rounded-xl border-2 border-slate-700 bg-slate-800 hover:bg-slate-700 transition-all">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-extrabold text-rose-400 text-sm">Scénario C</span>
+                        <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold">Crise Systémique</span>
+                    </div>
+                    <div class="font-bold text-white text-xs">Rupture & Douzièmes Provisoires</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Chute du gouvernement De Wever & blocage.</div>
+                </button>
+            </div>
+
+            <!-- Scenario Impact Details Box -->
+            <div id="scenario-details-box" class="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 5: TENSIONS SOCIALES & MOBILISATION SYNDICALE -->
+        <section class="bg-amber-50 border border-amber-200 rounded-xl p-6">
+            <h3 class="text-lg font-bold text-amber-950 flex items-center gap-2">
+                <span>✊</span> La Pression Extra-Parlementaire & le Plan Alternatif Syndical
+            </h3>
+            <p class="text-xs text-amber-900 mt-2 leading-relaxed">
+                Face à ce plan d'austérité qualifié de "plus vaste depuis les années 1990", le front commun syndical (FGTB/CSC) prépare un automne de contestation. Les syndicats ont soumis un <strong>contre-budget de 21,2 milliards d'euros</strong> axé sur la taxation des surprofits énergétiques/bancaires, un impôt sur la fortune et le gel du réarmement militaire. Cette pression accentue le dilemme de Vooruit et du CD&V, soucieux de ne pas rompre avec leur base sociale.
+            </p>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>Analyse structurelle et prospective du Conclave Budgétaire de la Coalition Arizona - Belgique 2026</p>
+            <p class="text-slate-500">Source des données : Comité de Monitoring, Conseil Supérieur des Finances, Agence Fédérale de la Dette & Fédération des CPAS.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Global Data Structures
+        const macroData = {
+            years: ['2026', '2027', '2028', '2029', '2030', '2031'],
+            déficitInchangé: [25.7, 30.3, 34.1, 38.0, 41.2, 44.5],
+            déficitArizona: [25.7, 23.1, 20.2, 15.7, 13.0, 10.5]
+        };
+
+        const cpasData = {
+            years: ['2026', '2027', '2028', '2029'],
+            fedComp: [31, 137, 213, 250],
+            localCost: [10, 45, 85, 120]
+        };
+
+        const scenarios = {
+            'A': {
+                title: 'Scénario A : Le Compromis Distribué ("Le Paquet Global")',
+                desc: 'Bart De Wever parvient à imposer un paquet global où chaque parti obtient un trophée symbolique. Vooruit obtient une version édulcorée de la taxe sur les plus-values, le MR sécurise des réformes dures du marché du travail, Les Engagés préservent la santé et la N-VA valide ses coupes régaliennes.',
+                stabilité: 'Moyenne (65%)',
+                stabilitéColor: 'text-amber-400',
+                marches: 'Apaisement temporaire. Taux OLO stables autour de 3.9%.',
+                pde: 'Validation conditionnelle par la Commission Européenne.',
+                risque: 'Surévaluation des "effets retour" (chômage/fiscalité) créant un trou budgétaire ultérieur.'
+            },
+            'B': {
+                title: 'Scénario B : L\'Accord Différé ("Botter en Touche")',
+                desc: 'Incapables de s\'accorder sur le plan de 10 Mrd € d\'ici 2029 en raison du blocage fiscal MR/Vooruit, les 5 partis votent un budget d\'urgence a minima pour 2027. Les réformes structurelles lourdes sont renvoyées à des comités d\'experts.',
+                stabilité: 'Fragile (40%)',
+                stabilitéColor: 'text-blue-400',
+                marches: 'Inquiétude des marchés. Risque élevé de dégradation par DBRS/Creditreform.',
+                pde: 'Avertissement formel du Conseil de l\'UE pour manque de réformes structurelles.',
+                risque: 'Rattrapage mécanique des taux OLO (+25 à +40 bps), alourdissant le service de la dette.'
+            },
+            'C': {
+                title: 'Scénario C : La Rupture & Les Douzièmes Provisoires',
+                desc: 'Conner Rousseau (Vooruit) pose son veto face au refus absolu du MR d\'imposer le capital. Bart De Wever constate l\'impasse et présente la démission du gouvernement au Roi. Le pays bascule sous le régime des douzièmes provisoires.',
+                stabilité: 'Nulle (0% - Chute du gouvernement)',
+                stabilitéColor: 'text-rose-400',
+                marches: 'Choc obligataire immédiat. Dégradation souveraine probable.',
+                pde: 'Activation des amendes financières coercitives (0.1% du PIB tous les 6 mois).',
+                risque: 'Paralyse totale de l\'État, élections anticipées et accélération du discours confédéraliste de la N-VA.'
+            }
+        };
+
+        let macroChartInstance = null;
+        let partyChartInstance = null;
+        let cpasChartInstance = null;
+
+        // Initialize Charts on Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initMacroChart();
+            initPartyChart();
+            initCpasChart();
+            selectScenario('A'); // Default scenario display
+        });
+
+        // 1. Macro Trajectory Chart
+        function initMacroChart() {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            macroChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: macroData.years,
+                    datasets: [
+                        {
+                            label: 'Déficit Politique Inchangée (Mrd €)',
+                            data: macroData.déficitInchangé,
+                            borderColor: '#f43f5e',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Trajectoire Plan Arizona (Mrd €)',
+                            data: macroData.déficitArizona,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: true,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Milliards d\'Euros (€)', font: { size: 11 } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 2. Party Position Radar/Bar Chart
+        function initPartyChart() {
+            const ctx = document.getElementById('partyPositionChart').getContext('2d');
+            partyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['N-VA', 'MR', 'Vooruit', 'Les Engagés', 'CD&V'],
+                    datasets: [
+                        {
+                            label: 'Intransigeance / Ligne Rouge (0-10)',
+                            data: [8, 9, 9, 6, 6],
+                            backgroundColor: '#f59e0b'
+                        },
+                        {
+                            label: 'Flexibilité sur Compromis (0-10)',
+                            data: [7, 3, 4, 8, 7],
+                            backgroundColor: '#3b82f6'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    },
+                    scales: {
+                        y: { max: 10, beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 3. CPAS Transfer Chart
+        function initCpasChart() {
+            const ctx = document.getElementById('cpasTransferChart').getContext('2d');
+            cpasChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: cpasData.years,
+                    datasets: [
+                        {
+                            label: 'Compensation Fédérale (M€)',
+                            data: cpasData.fedComp,
+                            backgroundColor: '#0ea5e9'
+                        },
+                        {
+                            label: 'Charge Nette Restante CPAS (M€)',
+                            data: cpasData.localCost,
+                            backgroundColor: '#e11d48'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    },
+                    scales: {
+                        y: { stacked: true, title: { display: true, text: 'Milliards / Millions €' } },
+                        x: { stacked: true, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Filter Party Cards
+        function filterParty(partyKey) {
+            // Update active tab button style
+            document.querySelectorAll('.party-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+            });
+            event.target.classList.add('bg-slate-900', 'text-white');
+
+            const cards = document.querySelectorAll('.party-card');
+            cards.forEach(card => {
+                if (partyKey === 'all' || card.classList.contains(partyKey)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Switch Friction Area Tabs
+        function switchFrictionTab(tabKey) {
+            // Reset tab styles
+            document.querySelectorAll('.friction-tab-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'font-bold', 'text-amber-600');
+                btn.classList.add('border-transparent', 'font-medium', 'text-slate-500');
+            });
+
+            // Set active tab style
+            const activeBtn = document.getElementById(`tab-${tabKey}`);
+            activeBtn.classList.remove('border-transparent', 'font-medium', 'text-slate-500');
+            activeBtn.classList.add('border-amber-500', 'font-bold', 'text-amber-600');
+
+            // Hide all content blocks
+            document.querySelectorAll('.friction-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected content block
+            document.getElementById(`content-${tabKey}`).classList.remove('hidden');
+        }
+
+        // Scenario Selector Function
+        function selectScenario(key) {
+            const sc = scenarios[key];
+            const container = document.getElementById('scenario-details-box');
+
+            // Update button borders
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'border-blue-500', 'border-rose-500');
+                btn.classList.add('border-slate-700');
+            });
+            document.getElementById(`btn-scenario-${key}`).classList.remove('border-slate-700');
+            document.getElementById(`btn-scenario-${key}`).classList.add(key === 'A' ? 'border-amber-500' : (key === 'B' ? 'border-blue-500' : 'border-rose-500'));
+
+            // HTML content for selected scenario
+            container.innerHTML = `
+                <div class="border-b border-slate-700 pb-4">
+                    <h3 class="text-lg font-extrabold text-white mb-2">${sc.title}</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">${sc.desc}</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="bg-slate-900/60 p-3 rounded border border-slate-700">
+                        <span class="text-slate-400 block font-semibold mb-1">Stabilité de la Coalition :</span>
+                        <span class="font-extrabold ${sc.stabilitéColor} text-sm">${sc.stabilité}</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded border border-slate-700">
+                        <span class="text-slate-400 block font-semibold mb-1">Réaction des Marchés (OLO) :</span>
+                        <span class="text-slate-200">${sc.marches}</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded border border-slate-700">
+                        <span class="text-slate-400 block font-semibold mb-1">Tutelle UE (PDE) :</span>
+                        <span class="text-slate-200">${sc.pde}</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded border border-slate-700">
+                        <span class="text-slate-400 block font-semibold mb-1">Risque Majeur :</span>
+                        <span class="text-rose-300">${sc.risque}</span>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

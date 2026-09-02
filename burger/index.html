@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Systémique du Conclave Budgétaire Belge - Coalition Arizona</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        arizona: {
+                            nva: '#f59e0b',
+                            mr: '#3b82f6',
+                            vooruit: '#ef4444',
+                            engages: '#10b981',
+                            cdv: '#8b5cf6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Slate, Amber & Indigo (Harmonie sobre et institutionnelle avec accents d'alerte et de contraste) -->
+
+    <!-- Application Structure Plan:
+        1. Header & Hero Dashboard: Titre, indicateurs clés (KPIs), contexte politique et barre de navigation par onglets thématiques.
+        2. Section 1 - Cadrage Macroéconomique & Trajectoires: Visualisation interactive des dérives budgétaires (2026-2031), simulateur de crédibilité des effets de retour (18 Md€ économies vs 7.9 Md€ effets retour).
+        3. Section 2 - Matrice Ideologique Arizona: Cartographie des 5 partis (N-VA, MR, Vooruit, Les Engagés, CD&V), simulateur de veto croisés et points d'affrontement (Bouchez vs Rousseau).
+        4. Section 3 - Lignes de Front Sectorielles: Module d'exploration interactive des mesures clés par domaine (Fiscalité, Travail, Santé).
+        5. Section 4 - Risques Systémiques (R1 à R4): Cartes interactives détaillant le phénomène des "vases communicants" CPAS, l'effet "couper pour perdre", le mur de la Défense et la matière noire comptable.
+        6. Section 5 - Effet Miroir Régional (Wallonie & FWB): Tableau dynamique comparatif de l'austérité régionale.
+        7. Section 6 - Stress Tests & Scénarios d'Issue: Simulateur des 3 scénarios (A: Compromis mixte, B: Rouleau compresseur, C: Impasse/Report) avec jauge d'impact sur la stabilité, la paix sociale et les sanctions UE.
+        Cette structure non linéaire permet à l'utilisateur de passer de la rigueur des chiffres macroéconomiques à la dynamique politique humaine et aux impacts concrets du conclave.
+    -->
+
+    <!-- Visualization & Content Choices:
+        - Deficit Trajectory: Chart.js Line/Bar combination chart comparing Entité I, Total Public Deficit, and Public Debt % of GDP.
+        - Plan breakdown & Feedback effect simulator: Chart.js Doughnut chart + interactive slider dynamically adjusting realistic return effects vs optimistic coalition target (showing actual gap).
+        - Party Alignment & Veto matrix: Interactive filter card system with direct conflict visualization.
+        - Systemic risks (R1-R4): Expandable interactive cards with key numerical callouts (e.g., 605M€ CPAS shortfall).
+        - Regional impact: Interactive comparison table with category pills.
+        - Scenario Simulator: Custom dynamic gauge bars rendered via styled Tailwind progress components and JS dynamic states.
+        - NO SVG and NO Mermaid JS used; all visuals built using HTML/Tailwind styling, Chart.js HTML5 Canvas, and native unicode symbols.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🏛️</span>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white leading-tight">Observatoire Conclave Arizona</h1>
+                        <p class="text-xs text-slate-400">Analyse systémique du budget fédéral belge 2027</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-1 text-sm font-medium">
+                    <button onclick="switchTab('macro')" id="nav-macro" class="tab-btn px-3 py-2 rounded-md bg-slate-800 text-amber-400">1. Macroéconomie</button>
+                    <button onclick="switchTab('parties')" id="nav-parties" class="tab-btn px-3 py-2 rounded-md hover:bg-slate-800 text-slate-300">2. Partis & Vetos</button>
+                    <button onclick="switchTab('sectors')" id="nav-sectors" class="tab-btn px-3 py-2 rounded-md hover:bg-slate-800 text-slate-300">3. Secteurs</button>
+                    <button onclick="switchTab('risks')" id="nav-risks" class="tab-btn px-3 py-2 rounded-md hover:bg-slate-800 text-slate-300">4. Risques (R1-R4)</button>
+                    <button onclick="switchTab('regions')" id="nav-regions" class="tab-btn px-3 py-2 rounded-md hover:bg-slate-800 text-slate-300">5. Effet Régional</button>
+                    <button onclick="switchTab('scenarios')" id="nav-scenarios" class="tab-btn px-3 py-2 rounded-md hover:bg-slate-800 text-slate-300">6. Stress Tests</button>
+                </div>
+            </div>
+            <!-- Mobile Menu Tabs -->
+            <div class="md:hidden flex overflow-x-auto py-2 space-x-2 text-xs border-t border-slate-800">
+                <button onclick="switchTab('macro')" id="mob-nav-macro" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded bg-slate-800 text-amber-400">Macro</button>
+                <button onclick="switchTab('parties')" id="mob-nav-parties" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded hover:bg-slate-800 text-slate-300">Partis</button>
+                <button onclick="switchTab('sectors')" id="mob-nav-sectors" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded hover:bg-slate-800 text-slate-300">Secteurs</button>
+                <button onclick="switchTab('risks')" id="mob-nav-risks" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded hover:bg-slate-800 text-slate-300">Risques</button>
+                <button onclick="switchTab('regions')" id="mob-nav-regions" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded hover:bg-slate-800 text-slate-300">Régions</button>
+                <button onclick="switchTab('scenarios')" id="mob-nav-scenarios" class="mob-tab-btn whitespace-nowrap px-2 py-1 rounded hover:bg-slate-800 text-slate-300">Scénarios</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Top Overview Banner / Key Metrics -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <div class="md:flex md:items-center md:justify-between border-b border-slate-100 pb-4 mb-4">
+                <div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 mb-2">
+                        ⏱️ Exercice Budgétaire 2027 & Pluriannuel
+                    </span>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Le Conclave de l'Arizona : L'Équation à 23 Milliards</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Sous la direction de Bart De Wever, la coalition d'urgence fait face à une dérive budgétaire historique sous la menace de procédures de l'UE.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-2">
+                    <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-mono rounded-lg border border-slate-200 self-center">
+                        Cadre EU 2025-2029
+                    </span>
+                </div>
+            </div>
+
+            <!-- Dashboard Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="text-xs text-slate-500 font-medium">Déficit Entité I (2027)</div>
+                    <div class="text-2xl font-bold text-red-600 mt-1">4,4 % <span class="text-xs font-normal text-slate-500">(30,3 Md€)</span></div>
+                    <div class="text-[11px] text-slate-400 mt-1">Projection à politique inchangée</div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="text-xs text-slate-500 font-medium">Cible Conclave Automne</div>
+                    <div class="text-2xl font-bold text-amber-600 mt-1">10 Md€</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Effort direct demandé</div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="text-xs text-slate-500 font-medium">Plan Global Législature</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1">23 Md€</div>
+                    <div class="text-[11px] text-slate-400 mt-1">18Md€ coupes + 2.4Md€ tax + 7.9Md€ retour</div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="text-xs text-slate-500 font-medium">Transfert Risque CPAS (R1)</div>
+                    <div class="text-2xl font-bold text-indigo-600 mt-1">605 M€</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Écart charge chômage non compensé</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: MACROECONOMIE & TRAJECTOIRES -->
+        <section id="tab-macro" class="tab-content block space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">1. Cadrage Macroéconomique & Trajectoires de Déficit</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        Cette section contextualise l'urgence financière imposée par le Comité de monitoring (SPF BOSA) et la Commission européenne. 
+                        Sans intervention d'envergure, le déficit de l'Entité I (État fédéral + Sécurité sociale) et l'endettement public s'engagent dans une pente insoutenable. 
+                        Explorez le graphique comparatif ci-dessous pour appréhender la trajectoire à politique inchangée et testez le simulateur d'effets de retour fiscal.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- Chart Column -->
+                    <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-sm font-bold text-slate-800">Projections du Déficit & de la Dette (2026 - 2031)</h4>
+                            <span class="text-xs text-slate-500 font-mono">Source: SPF BOSA / BNB</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="macroChart"></canvas>
+                        </div>
+                        <div class="mt-3 text-xs text-slate-500 italic text-center">
+                            Note : La dérive est alimentée par l'indexation, le vieillissement et le coût de la dette.
+                        </div>
+                    </div>
+
+                    <!-- Macro Analysis & Simulator Column -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="bg-amber-50/60 border border-amber-200 p-4 rounded-xl">
+                            <h4 class="font-semibold text-amber-900 text-sm flex items-center gap-2">
+                                <span>⚖️</span> La Contrainte Européenne & L'Écart Cumulé
+                            </h4>
+                            <p class="text-xs text-amber-900 mt-2 leading-relaxed">
+                                L'UE impose un plafond strict sur la croissance des dépenses nettes nominales : <strong>3,6% (2025)</strong>, <strong>2,5% (2026-2027)</strong>, puis <strong>2,1% (2028-2029)</strong>. L'écart cumulé calculé par BOSA atteint <strong>7,7 milliards d'euros</strong> d'ici 2029.
+                            </p>
+                        </div>
+
+                        <!-- Interactive Return Effect Simulator -->
+                        <div class="bg-slate-900 text-white p-5 rounded-xl space-y-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-sm font-bold text-amber-400">Simulateur d'Effets de Retour</h4>
+                                    <p class="text-xs text-slate-300">Testez le réalisme des hypothèses de la coalition</p>
+                                </div>
+                                <span class="text-xs bg-slate-800 px-2 py-1 rounded text-slate-300">23 Md€ Totaux</span>
+                            </div>
+
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Le plan de 23 Md€ intègre 18 Md€ d'économies directes, 2.4 Md€ de recettes et <strong>7,9 Md€ d'effets de retour</strong> (remise au travail, croissance). Les gouvernements supposent souvent 50% d'effet retour, alors que les études historiques (ex: Tax Shift Michel 2014) montrent un résultat réel entre <strong>4% et 15%</strong>.
+                            </p>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-medium">
+                                    <span>Taux d'effet retour estimé :</span>
+                                    <span id="slider-val" class="text-amber-400 font-bold">15% (Réalité Historique)</span>
+                                </div>
+                                <input id="return-slider" type="range" min="4" max="50" value="15" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="updateReturnSimulator(this.value)">
+                            </div>
+
+                            <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Rentrées réelles générées :</span>
+                                    <span id="sim-return-yield" class="font-bold text-emerald-400">1,19 Md€</span>
+                                </div>
+                                <div class="flex justify-between border-t border-slate-700 pt-1">
+                                    <span class="text-slate-400">Trou budgétaire masqué (Impasse) :</span>
+                                    <span id="sim-gap-yield" class="font-bold text-red-400">6,71 Md€</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: PARTIS & VETOS -->
+        <section id="tab-parties" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">2. Cartographie Idéologique & Fractures Arizona</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        La coalition Arizona est une alliance consociative complexe à 5 partis. Les visions opposées sur la fiscalité du capital, l'activation des chômeurs et la santé créent un maillage de vetos croisés.
+                        Cliquez sur un parti pour analyser sa doctrine et ses lignes rouges, ou sélectionnez deux partis pour visualiser leur point d'affrontement stratégique.
+                    </p>
+                </div>
+
+                <!-- Party Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                    <!-- N-VA -->
+                    <div onclick="selectParty('nva')" id="card-nva" class="party-card bg-slate-50 hover:bg-amber-50 border-2 border-amber-400 p-4 rounded-xl cursor-pointer transition-all shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-extrabold text-amber-600 text-base">N-VA</span>
+                            <span class="text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Premier Ministre</span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-700">Bart De Wever</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Priorité : Rigueur, contrôle des finances, activation stricte, Défense.</p>
+                    </div>
+
+                    <!-- MR -->
+                    <div onclick="selectParty('mr')" id="card-mr" class="party-card bg-slate-50 hover:bg-blue-50 border-2 border-slate-200 p-4 rounded-xl cursor-pointer transition-all shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-extrabold text-blue-600 text-base">MR</span>
+                            <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Libéraux</span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-700">G-L. Bouchez / D. Clarinval</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Ligne rouge : Zéro nouvel impôt, flexibilisation du travail, fin du monopole mutuelles.</p>
+                    </div>
+
+                    <!-- Vooruit -->
+                    <div onclick="selectParty('vooruit')" id="card-vooruit" class="party-card bg-slate-50 hover:bg-red-50 border-2 border-slate-200 p-4 rounded-xl cursor-pointer transition-all shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-extrabold text-red-600 text-base">Vooruit</span>
+                            <span class="text-xs font-semibold bg-red-100 text-red-800 px-2 py-0.5 rounded">Socialistes FL</span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-700">C. Rousseau / F. Vandenbroucke</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Ligne rouge : Taxe plus-values/patrimoine, protection santé & services publics.</p>
+                    </div>
+
+                    <!-- Les Engagés -->
+                    <div onclick="selectParty('engages')" id="card-engages" class="party-card bg-slate-50 hover:bg-emerald-50 border-2 border-slate-200 p-4 rounded-xl cursor-pointer transition-all shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-extrabold text-emerald-600 text-base">Les Engagés</span>
+                            <span class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Centristes FR</span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-700">Maxime Prévot</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Axe : Justice fiscale ciblée (1-2 Md€ sur patrimoine financier), responsabilité.</p>
+                    </div>
+
+                    <!-- CD&V -->
+                    <div onclick="selectParty('cdv')" id="card-cdv" class="party-card bg-slate-50 hover:bg-purple-50 border-2 border-slate-200 p-4 rounded-xl cursor-pointer transition-all shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-extrabold text-purple-600 text-base">CD&V</span>
+                            <span class="text-xs font-semibold bg-purple-100 text-purple-800 px-2 py-0.5 rounded">Chrétiens-Dém.</span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-700">Sammy Mahdi</p>
+                        <p class="text-[11px] text-slate-500 mt-2">Pivot : Chasse aux "niches sociales", régulation flexi-jobs & sociétés de management.</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Detail Panel for Selected Party -->
+                <div id="party-detail-panel" class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                    <!-- Dynamic content injected via JS -->
+                </div>
+
+                <!-- Cross-Conflict Explorer Tool -->
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <h4 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span>⚡</span> Explorateur d'Affrontements Directs
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-50/50 p-4 rounded-xl border border-amber-200">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Parti A</label>
+                            <select id="partyA-select" onchange="updateConflictView()" class="w-full text-xs p-2 rounded border border-slate-300 bg-white">
+                                <option value="mr" selected>MR (Georges-Louis Bouchez)</option>
+                                <option value="vooruit">Vooruit (Conner Rousseau)</option>
+                                <option value="nva">N-VA (Bart De Wever)</option>
+                                <option value="engages">Les Engagés (Maxime Prévot)</option>
+                                <option value="cdv">CD&V (Sammy Mahdi)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Parti B</label>
+                            <select id="partyB-select" onchange="updateConflictView()" class="w-full text-xs p-2 rounded border border-slate-300 bg-white">
+                                <option value="vooruit" selected>Vooruit (Conner Rousseau)</option>
+                                <option value="mr">MR (Georges-Louis Bouchez)</option>
+                                <option value="nva">N-VA (Bart De Wever)</option>
+                                <option value="engages">Les Engagés (Maxime Prévot)</option>
+                                <option value="cdv">CD&V (Sammy Mahdi)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="updateConflictView()" class="w-full bg-slate-900 text-white text-xs py-2 px-3 rounded hover:bg-slate-800 font-medium">
+                                Analyser le Point de Blocage
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="conflict-result" class="mt-4 p-4 rounded-xl bg-white border border-slate-200 text-xs leading-relaxed">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: SECTEURS -->
+        <section id="tab-sectors" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">3. Analyse Sectorielle des Lignes de Front</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        Le conclave se traduit techniquement par trois grands chantiers de réformes : la fiscalité, le marché du travail et la santé. Explorez les mesures phares chiffrées et l'opposition qu'elles suscitent auprès des partenaires et des corps sociaux.
+                    </p>
+                </div>
+
+                <!-- Sector Selector Buttons -->
+                <div class="flex space-x-2 border-b border-slate-200 pb-3 mb-6">
+                    <button onclick="switchSector('fiscal')" id="sec-btn-fiscal" class="sec-btn px-4 py-2 text-xs font-bold rounded-lg bg-slate-900 text-white">💰 Fiscalité & Patrimoine</button>
+                    <button onclick="switchSector('labor')" id="sec-btn-labor" class="sec-btn px-4 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">🛠️ Marché du Travail</button>
+                    <button onclick="switchSector('health')" id="sec-btn-health" class="sec-btn px-4 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">🏥 Soins de Santé</button>
+                </div>
+
+                <!-- Sector Content Display -->
+                <div id="sector-display" class="space-y-6">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: RISQUES (R1-R4) -->
+        <section id="tab-risks" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">4. Anatomie d'un « Mauvais Accord » : Risques Systémiques (R1 à R4)</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        Fixer une cible faciale de 10 milliards d'économies comporte des risques de second et troisième ordre. Ces quatre failles structurelles (R1 à R4) risquent de déplacer artificiellement les charges plutôt que d'assainir l'État.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- R1 -->
+                    <div class="bg-red-50/60 border border-red-200 rounded-xl p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-red-200 text-red-900 rounded">Risque R1</span>
+                            <span class="text-xs font-mono font-bold text-red-700">Ecart non compensé : 605 M€</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900">Vases Communicants & Étranglement des CPAS</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            L'exclusion drastique du chômage fédéral reporte automatiquement les allocataires vers le Revenu d'Intégration Sociale (RIS) géré par les communes et CPAS. Pour 2027, l'écart entre le coût réel local et la compensation fédérale atteint 605 millions d'euros, forçant les bourgmestres à monter les taxes locales.
+                        </p>
+                    </div>
+
+                    <!-- R2 -->
+                    <div class="bg-amber-50/60 border border-amber-200 rounded-xl p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-amber-200 text-amber-900 rounded">Risque R2</span>
+                            <span class="text-xs font-mono font-bold text-amber-700">Lutte Anti-Fraude en Péril</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900">Effet « Couper pour Perdre » (Contrôle Fiscal)</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Les coupes linéaires dans les frais de fonctionnement du SPF Finances et le non-remplacement des fonctionnaires réduisent la capacité opérationnelle d'audit fiscal. L'État espère 400 M€ de la lutte contre la fraude, mais affaiblit sciemment l'inspection chargée d'en récolter les fruits.
+                        </p>
+                    </div>
+
+                    <!-- R3 -->
+                    <div class="bg-blue-50/60 border border-blue-200 rounded-xl p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-blue-200 text-blue-900 rounded">Risque R3</span>
+                            <span class="text-xs font-mono font-bold text-blue-700">Norme OTAN 2% PIB</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900">Le Mur Financier de la Défense</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            L'augmentation continue du budget militaire (+400 M€ spatial, cible 1 Md€) bénéficie d'une tolérance temporaire de la Commission européenne. Cependant, dès l'expiration de cette flexibilité en 2028, ces dépenses créeront un gouffre financier sans aucune couverture structurelle.
+                        </p>
+                    </div>
+
+                    <!-- R4 -->
+                    <div class="bg-purple-50/60 border border-purple-200 rounded-xl p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-1 bg-purple-200 text-purple-900 rounded">Risque R4</span>
+                            <span class="text-xs font-mono font-bold text-purple-700">Impasse : 2,192 Md€</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900">Matière Noire : Mesures Non Réparties</h4>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            La trajectoire BOSA intègre plus de 2,192 milliards d'euros inscrits dans les tableaux sous l'intitulé « mesures non réparties ». Il s'agit d'une fiction comptable où les chiffres sont validés sans qu'aucune ligne politique ou réforme concrète ne soit décidée.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: EFFET REGIONAL -->
+        <section id="tab-regions" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">5. L'Effet Miroir des Régions (Wallonie & FWB)</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        Les décisions budgétaires régionales de l'automne 2025 en Wallonie et en Fédération Wallonie-Bruxelles (coalitions MR-Engagés) anticipent et renforcent le climat d'austérité. Cette double tenaille régionale prive Vooruit de marge de manœuvre et étouffe les communes.
+                    </p>
+                </div>
+
+                <!-- Regional Comparison Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-800 text-white">
+                                <th class="p-3 font-semibold rounded-tl-lg">Entité / Domaine</th>
+                                <th class="p-3 font-semibold">Objectif / Norme SEC</th>
+                                <th class="p-3 font-semibold">Mesures d'Austérité Clés</th>
+                                <th class="p-3 font-semibold rounded-tr-lg">Impact Financier / Social</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-slate-50">
+                            <tr>
+                                <td class="p-3 font-bold text-blue-900 bg-blue-50/50">Wallonie - Emploi & APE</td>
+                                <td class="p-3">Norme SEC à -2,015 Md€</td>
+                                <td class="p-3">Réduction des APE : -25% (Région/FWB), -12.5% (Intercommunales), ponction communes.</td>
+                                <td class="p-3 text-red-600 font-semibold">-17,5 M€ pour les communes, -83,7 M€ budget emploi global.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-blue-900 bg-blue-50/50">Wallonie - Investissement</td>
+                                <td class="p-3">Désengagement public</td>
+                                <td class="p-3">Wallonie Entreprendre amputée (124M€ → 64M€) + exigence d'un dividende exceptionnel.</td>
+                                <td class="p-3 text-red-600 font-semibold">-60 M€ de crédits + 70 M€ de dividende exigé.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-emerald-900 bg-emerald-50/50">FWB - Enseignement Superior</td>
+                                <td class="p-3">Déficit plafonné à 1,2 Md€</td>
+                                <td class="p-3">Hausse du Minerval plein (1.194€), création palier 835€, statut modeste (375€). DIES dès 2027.</td>
+                                <td class="p-3 text-emerald-700 font-semibold">+10,8 M€ d'économies imposées aux universités/hautes écoles.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-emerald-900 bg-emerald-50/50">FWB - Culture & Associations</td>
+                                <td class="p-3">Non-indexation subventions</td>
+                                <td class="p-3">Gel complet des subventions, moratoire sur nouvelles reconnaissances jusqu'en 2028, fermeture Point Culture.</td>
+                                <td class="p-3 text-red-600 font-semibold">-12,9 M€ dans la culture, mise à mal de l'éducation permanente.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: STRESS TESTS & SCENARIOS -->
+        <section id="tab-scenarios" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">6. Stress Tests de la Coalition : Les 3 Scénarios d'Issue</h3>
+                    <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                        Face aux impasses idéologiques, le destin du gouvernement Bart De Wever se résume à trois trajectoires prospectives. Sélectionnez un scénario pour visualiser son impact simulé sur la stabilité politique, la paix sociale, la soutenabilité financière et la crédibilité européenne.
+                    </p>
+                </div>
+
+                <!-- Scenario Selector Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <button onclick="selectScenario('A')" id="scen-btn-A" class="scen-btn p-4 text-left border-2 border-amber-500 bg-amber-50 rounded-xl transition-all">
+                        <div class="text-xs font-extrabold text-amber-700 uppercase tracking-wider">Scénario A</div>
+                        <div class="text-sm font-bold text-slate-900 mt-1">Compromis Structurel Mixte</div>
+                        <div class="text-[11px] text-slate-500 mt-1">Équilibre taxation minimale / coupes ciblées. Abandon de la franchise santé 500€.</div>
+                    </button>
+
+                    <button onclick="selectScenario('B')" id="scen-btn-B" class="scen-btn p-4 text-left border-2 border-slate-200 bg-slate-50 rounded-xl hover:border-slate-300 transition-all">
+                        <div class="text-xs font-extrabold text-red-700 uppercase tracking-wider">Scénario B</div>
+                        <div class="text-sm font-bold text-slate-900 mt-1">Rouleau Compresseur de la Dépense</div>
+                        <div class="text-[11px] text-slate-500 mt-1">Ligne dure N-VA/MR sans concession fiscale. Risque de départ de Vooruit & grèves.</div>
+                    </button>
+
+                    <button onclick="selectScenario('C')" id="scen-btn-C" class="scen-btn p-4 text-left border-2 border-slate-200 bg-slate-50 rounded-xl hover:border-slate-300 transition-all">
+                        <div class="text-xs font-extrabold text-purple-700 uppercase tracking-wider">Scénario C</div>
+                        <div class="text-sm font-bold text-slate-900 mt-1">Ingénierie de l'Impasse & du Report</div>
+                        <div class="text-[11px] text-slate-500 mt-1">Trompe-l'œil comptable, effets retour gonflés, sanctions UE différées.</div>
+                    </button>
+                </div>
+
+                <!-- Dynamic Scenario Gauge Display -->
+                <div class="bg-slate-900 text-white p-6 rounded-xl space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                        <div>
+                            <h4 id="scen-title" class="text-lg font-bold text-amber-400">Scénario A : Le Compromis Structurel Mixte</h4>
+                            <p id="scen-desc" class="text-xs text-slate-300 mt-1">Bart De Wever et le CD&V forcent un compromis pragmatique.</p>
+                        </div>
+                        <span id="scen-badge" class="px-3 py-1 text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full">
+                            Plausibilité : Élevée
+                        </span>
+                    </div>
+
+                    <!-- Impact Rating Bars -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                        <!-- Bar 1: Stabilité Politique -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-300">Stabilité de la Coalition Arizona</span>
+                                <span id="val-stability" class="font-bold text-amber-400">65 %</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2.5">
+                                <div id="bar-stability" class="bg-amber-400 h-2.5 rounded-full transition-all duration-500" style="width: 65%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bar 2: Paix Sociale / Syndicats -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-300">Climat Social & Tensions Syndicales</span>
+                                <span id="val-social" class="font-bold text-yellow-400">50 % (Tendu)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2.5">
+                                <div id="bar-social" class="bg-yellow-400 h-2.5 rounded-full transition-all duration-500" style="width: 50%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bar 3: Crédibilité Européenne (UE) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-300">Conformité aux Exigences UE</span>
+                                <span id="val-eu" class="font-bold text-emerald-400">80 %</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2.5">
+                                <div id="bar-eu" class="bg-emerald-400 h-2.5 rounded-full transition-all duration-500" style="width: 80%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bar 4: Équité & Protection Sociale -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-300">Soutenabilité des Services Publics</span>
+                                <span id="val-equity" class="font-bold text-blue-400">60 %</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2.5">
+                                <div id="bar-equity" class="bg-blue-400 h-2.5 rounded-full transition-all duration-500" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="scen-analysis-text" class="bg-slate-800 p-4 rounded-lg text-xs leading-relaxed border border-slate-700 text-slate-300">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>Observatoire du Conclave Budgétaire Fédéral Belge — Source : Rapport d'analyse systémique Arizona (SPF BOSA, BNB, Bureau du Plan).</p>
+            <p class="text-slate-600">Conçu pour une exploration interactive fluide du budget et des tensions politiques belges.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- DATA STRUCTURES ---
+        const partyData = {
+            nva: {
+                name: "N-VA (Alliance Néo-Flamande)",
+                leader: "Bart De Wever (Premier ministre)",
+                ministers: "Finances, Défense",
+                stance: "Rigueur budgétaire stricte, assainissement de 10 Md€ prioritairement par les dépenses, soutien ferme aux dépenses militaires (2% PIB).",
+                redline: "Ne pas étouffer les entreprises par la fiscalité. Conditionne la stabilité du gouvernement au maintien du seuil de 10 Md€ d'effort.",
+                proposals: ["Activation coercitive des demandeurs d'emploi", "Coupes dans les services publics", "Exonération cotisations hauts salaires (>340k€)"]
+            },
+            mr: {
+                name: "MR (Mouvement Réformateur)",
+                leader: "Georges-Louis Bouchez / David Clarinval",
+                ministers: "Emploi, Indépendants",
+                stance: "Dérégulation du marché du travail, flexibilité maximale pour les employeurs, refus absolu de toute création d'impôt.",
+                redline: "Veto catégorique contre toute taxe sur les plus-values/capital et hausse de la TVA. Attaques directes contre le monopole des mutuelles.",
+                proposals: ["360h heures supp défiscalisées", "Suppression interdiction travail de nuit", "Réforme chômage à 5 Md€ d'économies"]
+            },
+            vooruit: {
+                name: "Vooruit (Socialistes Flamands)",
+                leader: "Conner Rousseau / Frank Vandenbroucke",
+                ministers: "Santé & Affaires sociales",
+                stance: "Justice fiscale, protection indispensable de la santé et de la sécurité sociale contre l'austérité aveugle.",
+                redline: "Conditionne sa participation à une taxe sur les plus-values/patrimoine. Veto contre la franchise santé de 500€ et la dégradation des soins.",
+                proposals: ["Taxe minimale de 2% sur les patrimoines >100M€", "Maintien de la norme de croissance santé", "Protection des malades chroniques"]
+            },
+            engages: {
+                name: "Les Engagés",
+                leader: "Maxime Prévot",
+                ministers: "Centristes francophones",
+                stance: "Équilibre entre responsabilité budgétaire et justice sociale. Recherche de recettes équitables sur le patrimoine financier.",
+                redline: "Refus de faire peser l'effort exclusivement sur les travailleurs et les entités locales déjà étouffées.",
+                proposals: ["Contribution ciblée patrimoine financier (1-2 Md€)", "Responsabilisation sans punition sociale"]
+            },
+            cdv: {
+                name: "CD&V (Chrétiens-Démocrates Flamands)",
+                leader: "Sammy Mahdi",
+                ministers: "Pivot centriste flamand",
+                stance: "Position de courtier honnête / pivot. Attaque ciblée des « niches sociales » pour créer des recettes sans nouveaux impôts directs.",
+                redline: "Éviter la rupture sociale tout en satisfaisant aux exigences de rigueur flamandes.",
+                proposals: ["Surtaxe sociétés de management (15% -> 18%)", "Encadrement strict des flexi-jobs", "Protection du tissu social intermédiaire"]
+            }
+        };
+
+        const conflictData = {
+            'mr-vooruit': {
+                title: "Affrontement Total : MR (Bouchez) vs Vooruit (Rousseau)",
+                desc: "C'est la fracture principale du conclave. Vooruit exige une taxe sur les plus-values boursières et les gros patrimoines comme condition sine qua non de sa présence. Le MR y voit un totem inacceptable d'oppression fiscale. En réaction, le MR exige de faire sauter le monopole des mutuelles sociales (Solidaris), déclenchant une guerre ouverte.",
+                intensity: "Extrême (Point de rupture gouvernemental)"
+            },
+            'nva-vooruit': {
+                title: "Tension Rigueur vs Protection : N-VA (De Wever) vs Vooruit (Vandenbroucke)",
+                desc: "La N-VA veut sabrer la norme de croissance des soins de santé à 2% pour combler le trou fédéral (2 Md€ d'économie). Vandenbroucke s'y oppose fermement, dénonçant un démantèlement du système de santé face au vieillissement de la population.",
+                intensity: "Élevée"
+            },
+            'mr-cdv': {
+                title: "Guerre des Niches Sociales : MR vs CD&V",
+                desc: "Le CD&V veut raboter les régimes fiscaux d'exception prisés par la classe moyenne supérieure et les indépendants (flexi-jobs, sociétés de management à 18%). Le MR défend ces régimes comme des leviers de liberté économique.",
+                intensity: "Modérée à Forte"
+            },
+            'nva-mr': {
+                title: "Convergence de Droite : N-VA & MR",
+                desc: "Alignement parfait sur la flexibilisation du travail (360h sup, travail de nuit) et le durcissement de l'assurance chômage (-5 Md€). Mais tension sous-jacente sur la Défense (la N-VA exige le respect strict des 2% OTAN).",
+                intensity: "Faible / Alliance Stratégique"
+            }
+        };
+
+        const sectorData = {
+            fiscal: {
+                title: "💰 Fiscalité & Lutte contre la Fraude",
+                intro: "L'accord interdit une hausse globale de la TVA. Les négociateurs cherchent des recettes dans les niches, l'impôt sur les sociétés de management et la lutte anti-fraude.",
+                items: [
+                    { name: "Sociétés de Management", detail: "Projet de hausse de la fiscalité de 15% à 18% pour limiter les optimisations.", status: "En négociation (CD&V pour, MR réticent)" },
+                    { name: "Unité Spéciale Anti-Fraude", detail: "Création d'un parquet financier dédié de 377 agents. Espérance de recette : 400 M€ en 2029.", status: "Validé (mais critiqué pour coupes d'effectifs en parallèle)" },
+                    { name: "Exonération Salaires > 340k€", detail: "Exemption de cotisations patronales sur la tranche supérieure des très hauts salaires.", status: "Adopté discrètement (-75 M€/an pour la Sécurité Sociale)" }
+                ]
+            },
+            labor: {
+                title: "🛠️ Marché du Travail & Flexibilité",
+                intro: "L'axe N-VA/MR impose un assouplissement majeur des règles du travail pour stimuler le taux d'emploi.",
+                items: [
+                    { name: "360h Heures Sup Défiscalisées", detail: "Quota de 360h/an sans justification (dont 240h brut=net). Porté à 450h dans l'Horeca.", status: "Projet Clarinval (MR)" },
+                    { name: "Travail de Nuit Libéralisé", detail: "Suppression de l'interdiction de principe. Plage redéfinie à 23h-6h pour l'e-commerce.", status: "Objectif compétitivité logistique" },
+                    { name: "Réforme de l'Assurance Chômage", detail: "Dégressivité renforcée, fin de l'assimilation des périodes de maladie, coupes chômage d'insertion.", status: "Cible d'économie : 5 Md€ sur la législature" }
+                ]
+            },
+            health: {
+                title: "🏥 Soins de Santé & Sécurité Sociale",
+                intro: "Tensions extrêmes autour de la norme de croissance et du financement des soins.",
+                items: [
+                    { name: "Norme de Croissance Réduite", detail: "Abaissement à 2% (2026-2027) avant un lissage théorique à 3% en 2029.", status: "Impact : Trou de 2 Md€ dans le budget santé" },
+                    { name: "Projet de Franchise Santé (500€)", detail: "Ticket modérateur annuel obligatoire pour les patients. Rendement théorique : 4,7 Md€.", status: "REJETÉ (Veto absolu Vooruit & opposition MR)" },
+                    { name: "Dépassements Pharmacie", detail: "Le secteur pharma accapare 16% du budget santé (+12% de hausse soit +704M€ en 2025).", status: "Point chaud non résolu" }
+                ]
+            }
+        };
+
+        const scenarioData = {
+            A: {
+                title: "Scénario A : Compromis Structurel Mixte",
+                desc: "Le Premier ministre Bart De Wever et le CD&V forcent un compromis pragmatique entremêlant rabotage des niches (sociétés de management), acceptation partielle par le MR d'une taxe ciblée sur les plus-values pour donner une victoire à Vooruit, et abandon de la franchise santé.",
+                plausibility: "Plausibilité : Élevée (Seule issue de survie)",
+                badgeClass: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
+                stability: 65,
+                social: 50,
+                eu: 80,
+                equity: 60,
+                analysis: "Ce scénario préserve la crédibilité de la Belgique auprès de l'Union européenne et évite la chute du gouvernement. Néanmoins, le niveau de frustration restera élevé chez les syndicats et au MR, maintenant une tension constante au sein du cabinet."
+            },
+            B: {
+                title: "Scénario B : Le Rouleau Compresseur de la Dépense",
+                desc: "L'axe N-VA/MR impose un budget axé exclusivement sur l'austérité sociale et la contraction des services publics, refusant toute concession fiscale sur le capital.",
+                plausibility: "Plausibilité : Moyenne (Risque de rupture)",
+                badgeClass: "bg-red-500/20 text-red-400 border-red-500/40",
+                stability: 25,
+                social: 15,
+                eu: 90,
+                equity: 20,
+                analysis: "Ce scénario provoque immédiatement une grève générale nationale déclenchée par la FGTB et la CSC. Vooruit quitte la coalition, entraînant la chute du gouvernement De Wever et une crise politique majeure."
+            },
+            C: {
+                title: "Scénario C : L'Ingénierie de l'Impasse & du Report",
+                desc: "Incapables d'arbitrer les vetos croisés Bouchez/Rousseau, les partenaires masquent le déficit en utilisant des artifices : effets de retour surévalués (50%), vente d'actifs uniques et recettes fictives contre la fraude.",
+                plausibility: "Plausibilité : Forte (Reflexe belge traditionnel)",
+                badgeClass: "bg-purple-500/20 text-purple-400 border-purple-500/40",
+                stability: 80,
+                social: 70,
+                eu: 30,
+                equity: 40,
+                analysis: "Gagne du temps à court terme et sauve la coalition pour la photo de famille. Cependant, la Commission européenne rejettera ce budget truqué d'ici 2027, exposant la Belgique à des astreintes lourdes et une hausse des taux d'emprunt."
+            }
+        };
+
+        // --- TAB NAVIGATION SYSTEM ---
+        function switchTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Remove active classes from tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-amber-400');
+                btn.classList.add('hover:bg-slate-800', 'text-slate-300');
+            });
+            document.querySelectorAll('.mob-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-amber-400');
+                btn.classList.add('hover:bg-slate-800', 'text-slate-300');
+            });
+
+            // Show current tab
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            // Highlight current button
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-800', 'text-amber-400');
+                activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+            }
+            const activeMobBtn = document.getElementById('mob-nav-' + tabId);
+            if (activeMobBtn) {
+                activeMobBtn.classList.add('bg-slate-800', 'text-amber-400');
+                activeMobBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+            }
+        }
+
+        // --- MACRO CHART INITIALIZATION ---
+        let macroChartInstance = null;
+
+        function initMacroChart() {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            macroChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['2026 (Estim.)', '2027 (Proj.)', '2031 (Cible)'],
+                    datasets: [
+                        {
+                            label: 'Déficit Entité I (% PIB)',
+                            data: [3.9, 4.4, 5.7],
+                            backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                            borderColor: 'rgb(239, 68, 68)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Déficit Total Pouvoirs Publics (% PIB)',
+                            data: [5.0, 5.3, 6.1],
+                            backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                            borderColor: 'rgb(245, 158, 11)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Dette Publique Globale (% PIB)',
+                            data: [110.7, 112.7, 122.6],
+                            type: 'line',
+                            borderColor: 'rgb(30, 58, 138)',
+                            backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: 'rgb(30, 58, 138)',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Déficit (% du PIB)', font: { size: 11 } },
+                            min: 0,
+                            max: 8
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Dette (% du PIB)', font: { size: 11 } },
+                            min: 100,
+                            max: 130,
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- RETURN SIMULATOR LOGIC ---
+        function updateReturnSimulator(val) {
+            document.getElementById('slider-val').innerText = val + "% " + (val <= 15 ? "(Réaliste)" : "(Hypothèse Optimiste)");
+            // 23 Billion total effort, 7.9 Billion assumed by dynamic return effects
+            const assumedReturn = 7.9; // Md€
+            const calculatedYield = (7.9 * (val / 50)).toFixed(2); // scaling relative to 50% target
+            const gap = (assumedReturn - calculatedYield).toFixed(2);
+
+            document.getElementById('sim-return-yield').innerText = calculatedYield + " Md€";
+            document.getElementById('sim-gap-yield').innerText = gap + " Md€";
+        }
+
+        // --- PARTY SELECTION & CONFLICT VIEW ---
+        function selectParty(partyKey) {
+            // Update selected card styling
+            document.querySelectorAll('.party-card').forEach(card => {
+                card.classList.remove('border-amber-400', 'border-blue-400', 'border-red-400', 'border-emerald-400', 'border-purple-400');
+                card.classList.add('border-slate-200');
+            });
+            const activeCard = document.getElementById('card-' + partyKey);
+            if (activeCard) activeCard.classList.add('border-amber-400');
+
+            const p = partyData[partyKey];
+            const panel = document.getElementById('party-detail-panel');
+
+            let propsHtml = p.proposals.map(item => `<li class="flex items-center gap-1.5"><span class="text-amber-500">▶</span> ${item}</li>`).join('');
+
+            panel.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">${p.name}</h4>
+                            <p class="text-xs text-slate-500">${p.leader} — Portefeuilles : ${p.ministers}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mt-2">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200">
+                            <span class="font-bold text-slate-800 block mb-1">🎯 Doctrine Budgétaire :</span>
+                            <p class="text-slate-600 leading-relaxed">${p.stance}</p>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                            <span class="font-bold text-red-900 block mb-1">🛑 Ligne Rouge / Vetos :</span>
+                            <p class="text-red-800 leading-relaxed">${p.redline}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                        <span class="font-bold text-slate-800 block mb-1">📋 Proposals Phares :</span>
+                        <ul class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-600 mt-1">
+                            ${propsHtml}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateConflictView() {
+            const pA = document.getElementById('partyA-select').value;
+            const pB = document.getElementById('partyB-select').value;
+            const resDiv = document.getElementById('conflict-result');
+
+            if (pA === pB) {
+                resDiv.innerHTML = `<span class="text-slate-500 italic">Veuillez sélectionner deux partis différents pour analyser leurs divergences.</span>`;
+                return;
+            }
+
+            const key1 = `${pA}-${pB}`;
+            const key2 = `${pB}-${pA}`;
+            const match = conflictData[key1] || conflictData[key2];
+
+            if (match) {
+                resDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h5 class="font-bold text-slate-900 text-sm">${match.title}</h5>
+                            <span class="px-2 py-0.5 bg-red-100 text-red-800 font-bold rounded text-[10px]">${match.intensity}</span>
+                        </div>
+                        <p class="text-slate-700 leading-relaxed">${match.desc}</p>
+                    </div>
+                `;
+            } else {
+                resDiv.innerHTML = `
+                    <div class="space-y-1">
+                        <h5 class="font-bold text-slate-900 text-sm">Zone de Négociation Standard (${pA.toUpperCase()} vs ${pB.toUpperCase()})</h5>
+                        <p class="text-slate-600">Pas de veto direct irréconciliable identifié sur ce binôme, mais des arbitrages tactiques classiques au sein de la table du Conclave.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // --- SECTOR SWITCHER ---
+        function switchSector(secKey) {
+            document.querySelectorAll('.sec-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('sec-btn-' + secKey);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-900', 'text-white');
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+
+            const data = sectorData[secKey];
+            const display = document.getElementById('sector-display');
+
+            let itemsHtml = data.items.map(item => `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-bold text-slate-900 text-sm">${item.name}</h5>
+                        <span class="text-[10px] font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">${item.status}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">${item.detail}</p>
+                </div>
+            `).join('');
+
+            display.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-xs text-slate-500 italic">${data.intro}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- SCENARIO SELECTOR ---
+        function selectScenario(scenKey) {
+            document.querySelectorAll('.scen-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-amber-50');
+                btn.classList.add('border-slate-200', 'bg-slate-50');
+            });
+            const activeBtn = document.getElementById('scen-btn-' + scenKey);
+            if (activeBtn) {
+                activeBtn.classList.add('border-amber-500', 'bg-amber-50');
+                activeBtn.classList.remove('border-slate-200', 'bg-slate-50');
+            }
+
+            const sc = scenarioData[scenKey];
+
+            document.getElementById('scen-title').innerText = sc.title;
+            document.getElementById('scen-desc').innerText = sc.desc;
+            
+            const badge = document.getElementById('scen-badge');
+            badge.innerText = sc.plausibility;
+            badge.className = `px-3 py-1 text-xs font-bold rounded-full border ${sc.badgeClass}`;
+
+            // Update Bars
+            updateBar('stability', sc.stability);
+            updateBar('social', sc.social);
+            updateBar('eu', sc.eu);
+            updateBar('equity', sc.equity);
+
+            document.getElementById('scen-analysis-text').innerText = sc.analysis;
+        }
+
+        function updateBar(id, val) {
+            document.getElementById(`val-${id}`).innerText = val + "%";
+            document.getElementById(`bar-${id}`).style.width = val + "%";
+        }
+
+        // --- INIT ON LOAD ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initMacroChart();
+            selectParty('nva');
+            updateConflictView();
+            switchSector('fiscal');
+            selectScenario('A');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Étude de Faisabilité : Nouveau Parti Politique Belge (2026)</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome (pour icônes font/unicode - Sans aucun SVG) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Merriweather -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f6f9',
+                            100: '#e5e9f0',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        sand: {
+                            50: '#fdfbf7',
+                            100: '#f7f4ed',
+                            200: '#ece5d8',
+                            800: '#4a4036',
+                        },
+                        amberAccent: '#d97706',
+                        emeraldAccent: '#059669',
+                        coralAccent: '#e11d48'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-sand-50 text-slate-800 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 custom-scrollbar">
+
+    <!-- Chosen Palette: Warm Editorial Harmony (Fond Sable Chaud #fdfbf7, Cartes Blanches, Accents Indigo, Ambre et Émeraude) -->
+    
+    <!-- Application Structure Plan:
+        1. Sticky Header & KPI Ticker: Barre de navigation globale et chiffres clés du paysage politique belge 2026.
+        2. Hero & Contextual Brief: Introduction interactive à l'ère Bart De Wever (2025-2026) et objectifs de l'application.
+        3. Dashboard 1 : Contexte Macro & Gouvernements (Sélecteur interactif Vivaldi vs Arizona + Indicateurs Macroéconomiques).
+        4. Dashboard 2 : La Particratie & Le Trésor Partisan (Graphiques Chart.js de la répartition des dotations et patrimoine net 156M€ + Calculateur du fossé financier).
+        5. Dashboard 3 : L'Épreuve des Urnes & Simulateur D'Hondt (Simulateur interactif en temps réel du seuil électoral de 5% et du calcul des sièges D'Hondt).
+        6. Dashboard 4 : Champ Médiatique, Cordon Sanitaire & Meta Ads (Analyse des dépenses publicitaires et de la fermeture numérique post-2025).
+        7. Dashboard 5 : Anatomie des Élections 2024 (Étude comparative interactive : Pourquoi les listes citoyennes échouent et comment le PTB a percé en 15 ans).
+        8. Dashboard 6 : Feuille de Route "Belgique Idéale" (Positionnement "Progressisme Pragmatique", simulateur de financement participatif par la foule, et plan d'action en 3 phases).
+        
+        Cette structure non-linéaire permet d'alterner entre théorie de la particratie, données financières chiffrées, simulation mathématique pratique et ingénierie politique stratégique.
+    -->
+
+    <!-- Visualization & Content Choices:
+        - Gouvernements Vivaldi vs Arizona -> Tableau & switch dynamique JS -> Comparaison immédiate des coalitions et ministères.
+        - Revenus & Patrimoine des partis -> Chart.js Bar Chart empilé & Donut Chart -> Visualiser la domination financière publique vs cotisations.
+        - Simulateur D'Hondt & Seuil 5% -> Script JS interactif personnalisé avec inputs et tableau de répartition -> Comprendre mathématiquement la prime à la majorité.
+        - Dépenses Meta Ads -> Chart.js Horizontal Bar Chart -> Illustrer la course aux armements numériques.
+        - Analyse 2024 (Listes citoyennes vs PTB) -> Layout de cartes comparatives interactives -> Démontrer l'importance de la sédimentation locale.
+        - Simulateur de Crowdfunding Guérilla -> Sliders interactifs en JS -> Évaluer la faisabilité budgétaire sans dotation étatique.
+        - CONFIRMATION : Aucun graphisme SVG n'est utilisé. Aucune bibliothèque Mermaid JS n'est utilisée. Icônes générées via FontAwesome (webfont textuel) ou caractères Unicode.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-indigo-900 text-amber-400 font-extrabold px-3 py-1.5 rounded-lg text-lg tracking-wider">POLITIK<span class="text-white">.BE</span></span>
+                    <span class="hidden md:inline-block text-xs uppercase tracking-widest text-slate-500 font-semibold border-l border-slate-300 pl-3">Étude de Faisabilité Parti Politique 2026</span>
+                </div>
+                <nav class="hidden lg:flex space-x-6 text-sm font-medium text-slate-600">
+                    <a href="#contexte" class="hover:text-indigo-700 transition">Gouvernement De Wever</a>
+                    <a href="#particratie" class="hover:text-indigo-700 transition">Particratie & Cash</a>
+                    <a href="#verrous" class="hover:text-indigo-700 transition">Simulateur D'Hondt</a>
+                    <a href="#elections2024" class="hover:text-indigo-700 transition">Analyse 2024</a>
+                    <a href="#strategie" class="hover:text-indigo-700 transition">Le Parti Idéal</a>
+                </nav>
+                <div>
+                    <a href="#simulateur-financement" class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm px-3 py-2 rounded-md shadow-sm transition flex items-center space-x-1">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Simulateur Guérilla</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top KPI Bar -->
+    <section class="bg-slate-900 text-white border-b border-slate-800 py-2.5 px-4 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-slate-300">Contexte Réel : <strong class="text-white">Gouvernement Bart De Wever (Arizona) en fonction</strong></span>
+            </div>
+            <div class="flex items-center space-x-6 text-slate-300 overflow-x-auto py-1">
+                <div>Dotations Partis 2025 : <span class="text-amber-400 font-bold">86,5 M€</span></div>
+                <div>Patrimoine Partis : <span class="text-amber-400 font-bold">156 M€</span></div>
+                <div>Seuil Législatif : <span class="text-amber-400 font-bold">5,0 %</span></div>
+                <div>Déficit Public 2024 : <span class="text-rose-400 font-bold">4,4 % PIB</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- HERO SECTION -->
+        <section class="bg-white rounded-2xl p-6 sm:p-10 border border-stone-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center space-x-2 bg-indigo-50 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    <i class="fa-solid fa-microscope"></i>
+                    <span>Rapport d'Expertise & Modélisation Stratégique</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-slate-900 tracking-tight leading-tight">
+                    Peut-on encore créer un nouveau parti politique en Belgique ?
+                </h1>
+                <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed">
+                    Entre le verrou de la <strong>particratie financée à 80% par l'État</strong>, le piège mathématique du <strong>seuil de 5% avec la méthode D'Hondt</strong> et le glacis médiatique, l'accès aux institutions semble impossible pour un nouvel entrant. Explorez ce rapport interactif pour comprendre les obstacles et découvrir la trajectoire d'un parti pour une <em>"Belgique idéale"</em>.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="#particratie" class="bg-indigo-900 hover:bg-indigo-800 text-white font-medium text-sm px-4 py-2.5 rounded-lg transition shadow-sm">
+                        Découvrir les barrières financières
+                    </a>
+                    <a href="#verrous" class="bg-stone-100 hover:bg-stone-200 text-slate-800 font-medium text-sm px-4 py-2.5 rounded-lg transition">
+                        Tester le simulateur d'élection
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: CONTEXTE SYSTEMIQUE & GOUVERNEMENTAL -->
+        <section id="contexte" class="space-y-6">
+            <div class="border-l-4 border-indigo-800 pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-indigo-900 font-bold">1. Analyse Systémique de l'État Belge</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">Du Gouvernement De Croo à la Coalition Arizona De Wever</h3>
+            </div>
+            
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                Cette section présente l'architecture gouvernementale fédérale et les contraintes macroéconomiques sévères qui encadrent l'action publique en Belgique. Comprendre la transition de la vaste coalition "Vivaldi" vers la coalition recentrée "Arizona" permet d'identifier l'espace idéologique aujourd'tuit vacant.
+            </p>
+
+            <!-- Grid Contexte Macro + Switcher Gouvernement -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Macro Indicators Card (4 cols) -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-6">
+                    <h4 class="font-bold text-slate-900 text-lg border-b border-stone-100 pb-3 flex items-center justify-between">
+                        <span>Indicateurs Clés (2025-2026)</span>
+                        <i class="fa-solid fa-chart-line text-indigo-600"></i>
+                    </h4>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <div class="text-xs text-slate-500 font-medium">Croissance Moyenne PIB (2025-2030)</div>
+                            <div class="text-xl font-bold text-slate-900">1,2 % <span class="text-xs font-normal text-slate-500">(Bureau du Plan)</span></div>
+                        </div>
+
+                        <div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
+                            <div class="text-xs text-rose-700 font-medium">Déficit Public & Procédure EDP</div>
+                            <div class="text-xl font-bold text-rose-900">4,4 % du PIB</div>
+                            <div class="text-xs text-rose-600 mt-1">Procédure Européenne pour Déficit Excessif activée.</div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <div class="text-xs text-slate-500 font-medium">Dette Publique Fédérale</div>
+                            <div class="text-xl font-bold text-slate-900">519,2 Mds €</div>
+                            <div class="text-xs text-slate-500 mt-1">Charges d'intérêts : > 10 milliards €/an.</div>
+                        </div>
+
+                        <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                            <div class="text-xs text-amber-800 font-medium">Objectifs de Réformes Structurelles</div>
+                            <ul class="text-xs text-amber-900 space-y-1 mt-2 list-disc list-inside">
+                                <li>Taux d'emploi visé : 80 %</li>
+                                <li>Relance nucléaire (PFEC 2025)</li>
+                                <li>Norme OTAN 2 % Défense (2025)</li>
+                                <li>Réductions d'abattements fiscaux</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coalition Switcher & Tables (8 cols) -->
+                <div class="lg:col-span-8 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                        <h4 class="font-bold text-slate-900 text-lg">Comparaison des Recompositions Fédérales</h4>
+                        
+                        <!-- Toggle Buttons -->
+                        <div class="inline-flex rounded-lg bg-stone-100 p-1 text-xs font-medium">
+                            <button id="btn-arizona" onclick="switchGov('arizona')" class="px-4 py-2 rounded-md bg-indigo-900 text-white font-semibold transition shadow-sm">
+                                Govt De Wever (2025-2026)
+                            </button>
+                            <button id="btn-vivaldi" onclick="switchGov('vivaldi')" class="px-4 py-2 rounded-md text-slate-600 hover:text-slate-900 transition">
+                                Govt De Croo (2020-2025)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Arizona View -->
+                    <div id="view-arizona" class="space-y-4">
+                        <div class="p-4 bg-indigo-50/60 rounded-lg border border-indigo-100 text-sm">
+                            <p class="font-semibold text-indigo-950">Gouvernement Bart De Wever ("Arizona") — Prestation de serment : 3 février 2025</p>
+                            <p class="text-indigo-800 mt-1 text-xs">
+                                Coalition à 5 partis (N-VA, MR, Les Engagés, Vooruit, CD&V). Confiance votée par 81 voix contre 66 à la Chambre. Orienté vers une rigueur budgétaire, un tournant néolibéral et une réforme fiscale ciblée.
+                            </p>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-stone-100 text-slate-700 font-semibold border-b border-stone-200">
+                                        <th class="p-2.5">Portefeuille Ministériel</th>
+                                        <th class="p-2.5">Titulaire</th>
+                                        <th class="p-2.5">Parti</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-100 text-slate-700">
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium text-indigo-950">Premier Ministre</td><td class="p-2.5">Bart De Wever</td><td class="p-2.5 font-bold text-yellow-700">N-VA</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Emploi & Économie</td><td class="p-2.5">David Clarinval</td><td class="p-2.5 font-bold text-blue-600">MR</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Affaires Étrangères</td><td class="p-2.5">Maxime Prévot</td><td class="p-2.5 font-bold text-teal-600">Les Engagés</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Affaires Sociales & Santé</td><td class="p-2.5">Frank Vandenbroucke</td><td class="p-2.5 font-bold text-rose-600">Vooruit</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Budget</td><td class="p-2.5">Vincent Van Peteghem</td><td class="p-2.5 font-bold text-orange-600">CD&V</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Finances & Pensions</td><td class="p-2.5">Jan Jambon</td><td class="p-2.5 font-bold text-yellow-700">N-VA</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Défense & Commerce Extérieur</td><td class="p-2.5">Theo Francken</td><td class="p-2.5 font-bold text-yellow-700">N-VA</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Vivaldi View (Hidden by default) -->
+                    <div id="view-vivaldi" class="space-y-4 hidden">
+                        <div class="p-4 bg-stone-100 rounded-lg text-sm">
+                            <p class="font-semibold text-slate-900">Gouvernement Alexander De Croo ("Vivaldi") — Octobre 2020 - Février 2025</p>
+                            <p class="text-slate-600 mt-1 text-xs">
+                                Coalition à 7 partis (PS, Vooruit, MR, Open VLD, Ecolo, Groen, CD&V). Gestion des crises Covid-19 et énergétique, marquée par des tensions idéologiques internes paralysant les grandes réformes.
+                            </p>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-stone-100 text-slate-700 font-semibold border-b border-stone-200">
+                                        <th class="p-2.5">Portefeuille Ministériel</th>
+                                        <th class="p-2.5">Titulaire</th>
+                                        <th class="p-2.5">Parti</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-100 text-slate-700">
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Premier Ministre</td><td class="p-2.5">Alexander De Croo</td><td class="p-2.5 font-bold text-blue-500">Open VLD</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Économie & Travail</td><td class="p-2.5">Pierre-Yves Dermagne</td><td class="p-2.5 font-bold text-red-600">PS</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Mobilité</td><td class="p-2.5">Georges Gilkinet</td><td class="p-2.5 font-bold text-green-600">Ecolo</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Finances</td><td class="p-2.5">Vincent Van Peteghem</td><td class="p-2.5 font-bold text-orange-600">CD&V</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Santé & Affaires Sociales</td><td class="p-2.5">Frank Vandenbroucke</td><td class="p-2.5 font-bold text-rose-600">Vooruit</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, Fonction Publique</td><td class="p-2.5">Petra De Sutter</td><td class="p-2.5 font-bold text-emerald-600">Groen</td></tr>
+                                    <tr class="hover:bg-stone-50"><td class="p-2.5 font-medium">Vice-PM, PME & Agriculture</td><td class="p-2.5">David Clarinval</td><td class="p-2.5 font-bold text-blue-600">MR</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 2: PARTICRATIE & FINANCEMENT PUBLIC -->
+        <section id="particratie" class="space-y-6">
+            <div class="border-l-4 border-amber-600 pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-amber-700 font-bold">2. Le Verrouillage Financier & Institutionnel</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">La Particratie Belge : Un Oligopole Subventionné</h3>
+            </div>
+
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                Créé initialement par la loi du 4 juillet 1989 pour limiter les dépenses électorales et la corruption, le système de financement public a verrouillé la vie politique. Les partis politiques belges tirent près de <strong>80 % de leurs revenus de dotations étatiques</strong>, cumulant un trésor de guerre de plus de 156 millions d'euros de patrimoine net.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Chart Container (7 cols) -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                        <h4 class="font-bold text-slate-900">Revenus des Principaux Partis Belges (2024, en M€)</h4>
+                        <span class="text-xs text-slate-500">Source: Bilans Financiers / CRISP</span>
+                    </div>
+
+                    <!-- Canvas Wrapper WITH MANDATORY RESPONSIVE STYLING -->
+                    <div class="chart-container">
+                        <canvas id="financeChart"></canvas>
+                    </div>
+
+                    <p class="text-xs text-slate-500 italic text-center">
+                        Note: Les partis traditionnels reposent ultra-majoritairement sur les subventions directes, rendant toute concurrence asymétrique pour un parti sans siège.
+                    </p>
+                </div>
+
+                <!-- Strategic Financial Analysis (5 cols) -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-5">
+                    <h4 class="font-bold text-slate-900 text-lg border-b border-stone-100 pb-3">
+                        Cartographie du Trésor Partisan
+                    </h4>
+
+                    <div class="space-y-3 text-xs sm:text-sm">
+                        <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                            <span class="font-bold text-amber-900">86,5 Millions € en 2025</span>
+                            <p class="text-amber-800 mt-0.5">Montant total des dotations publiques accordées aux partis parlementaires en 2025, malgré des annonces d'abattement de 5,32%.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <span class="font-bold text-slate-900">La N-VA au sommet de la Richesse</span>
+                            <p class="text-slate-600 mt-0.5">
+                                La N-VA domine avec <strong>14,5 M€ de revenus</strong> annuels (dont 84,4% de subventions directes) et un <strong>patrimoine net record de 26,3 M€</strong>.
+                            </p>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <span class="font-bold text-slate-900">Le Cas Unique du PTB</span>
+                            <p class="text-slate-600 mt-0.5">
+                                Le PTB affiche 13,6 M€ de revenus, mais se distingue par une part très élevée de <strong>contributions de ses mandataires (23,1%)</strong> et de cotisations de membres (17,8%).
+                            </p>
+                        </div>
+
+                        <div class="p-3 bg-rose-50 rounded-lg border border-rose-200 text-rose-900">
+                            <span class="font-bold">Le Garrot de la Loi de 1989</span>
+                            <p class="text-xs mt-0.5">
+                                Les dons privés au-delà de 500 € étant strictement encadrés ou interdits pour les entreprises, un nouveau parti sans élu perçoit <strong>0 € de dotation public</strong> et ne peut compter que sur des micro-cotisations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: LES VERROUS ELECTORAUX & SIMULATEUR D'HONDT -->
+        <section id="verrous" class="space-y-6">
+            <div class="border-l-4 border-indigo-600 pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-indigo-700 font-bold">3. Ingénierie Électorale & Mode de Scrutin</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">Le Parcours du Combattant : Parrainage, Seuil 5% & Méthode D'Hondt</h3>
+            </div>
+
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                Au-delà de la muraille financière, le système électoral belge impose trois filtres successifs : l'obtention de signatures de parrainage (sur la plateforme souvent décriée "Martine"), le franchissement du <strong>seuil électoral de 5%</strong>, et la répartition des sièges via la <strong>méthode D'Hondt</strong> qui favorise systématiquement les grands partis.
+            </p>
+
+            <!-- Cards Grid: The 3 Barriers -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-sm mb-3">1</div>
+                    <h4 class="font-bold text-slate-900">Filtre 1 : Le Parrainage</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Pour déposer une liste électorale, il faut récolter <strong>3 signatures de parlementaires sortants</strong> (réservé aux scissions) OU <strong>500 signatures d'électeurs</strong> par circonscription provinciale. La plateforme numérique "Martine" fait l'objet de critiques répétées pour ses lourdeurs administratives.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-sm mb-3">2</div>
+                    <h4 class="font-bold text-slate-900">Filtre 2 : Le Seuil de 5%</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Introduit pour éviter l'émiettement, le seuil de 5% annule tout suffrage sous ce pourcentage. Il génère un <strong>effet psychologique de "vote utile"</strong> qui dissuade l'électeur d'accorder sa confiance à un parti émergent par peur de gâcher sa voix. Validé par la Cour Constitutionnelle.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-sm mb-3">3</div>
+                    <h4 class="font-bold text-slate-900">Filtre 3 : La Méthode D'Hondt</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Adopté en 1899, ce système de calcul par diviseurs successifs (1, 2, 3, 4...) donne une <strong>prime mathématique à la majorité</strong>. Même en franchissant les 5%, un nouveau parti obtiendra proportionnellement moins de sièges que les grandes formations.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- INTERACTIVE D'HONDT & THRESHOLD SIMULATOR -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-indigo-200 shadow-md space-y-6">
+                <div class="border-b border-stone-200 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-xl font-serif font-bold text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-calculator text-indigo-700"></i>
+                            <span>Simulateur Électoral Interactif : Effet du Seuil de 5% & Calcul D'Hondt</span>
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Modifiez les voix ou le nombre de sièges pour observer comment le seuil et les diviseurs D'Hondt éliminent les challengers.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 bg-indigo-50 p-2 rounded-lg text-xs font-semibold">
+                        <span>Appliquer Seuil 5% ?</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-seuil" class="sr-only peer" checked onchange="calculateSeats()">
+                            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-700"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Inputs Form (5 cols) -->
+                    <div class="lg:col-span-5 space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Nombre de Sièges à pourvoir dans la circonscription :</label>
+                            <input type="number" id="input-sieges" value="15" min="3" max="30" class="w-full p-2 border border-stone-300 rounded-md font-bold text-slate-900" onchange="calculateSeats()">
+                            <span class="text-slate-400 text-[10px]">Exemple : Bruxelles = 16, Brabant Wallon = 5, Anvers = 24.</span>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <div class="font-bold text-slate-800">Nombre de voix obtenues par parti :</div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <span class="w-24 font-semibold text-slate-700">Grand Parti A:</span>
+                                <input type="number" id="v-partiA" value="45000" class="w-full p-2 border border-stone-300 rounded-md" onchange="calculateSeats()">
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <span class="w-24 font-semibold text-slate-700">Moyen Parti B:</span>
+                                <input type="number" id="v-partiB" value="30000" class="w-full p-2 border border-stone-300 rounded-md" onchange="calculateSeats()">
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <span class="w-24 font-semibold text-slate-700">Moyen Parti C:</span>
+                                <input type="number" id="v-partiC" value="20000" class="w-full p-2 border border-stone-300 rounded-md" onchange="calculateSeats()">
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <span class="w-24 font-semibold text-slate-700">Petit Parti D:</span>
+                                <input type="number" id="v-partiD" value="8000" class="w-full p-2 border border-stone-300 rounded-md" onchange="calculateSeats()">
+                            </div>
+
+                            <div class="flex items-center space-x-2 bg-amber-50 p-2 rounded-md border border-amber-200">
+                                <span class="w-24 font-bold text-amber-900">Nouveau Parti:</span>
+                                <input type="number" id="v-partiE" value="5500" class="w-full p-2 border border-amber-300 rounded-md font-bold text-amber-950" onchange="calculateSeats()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Results Table & Analysis (7 cols) -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                            <h5 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-3">Répartition Mathématique des Sièges</h5>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-white border-b border-stone-200 font-semibold text-slate-600">
+                                            <th class="p-2">Parti</th>
+                                            <th class="p-2">Voix (%)</th>
+                                            <th class="p-2">Statut Seuil 5%</th>
+                                            <th class="p-2 text-right">Sièges Attribués</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sim-results-body" class="divide-y divide-stone-200">
+                                        <!-- JS dynamic insertion -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="sim-commentary" class="p-4 rounded-xl text-xs leading-relaxed border">
+                            <!-- Dynamic commentary via JS -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: CHAMP MEDIATIQUE & NUMERIQUE -->
+        <section id="medias" class="space-y-6">
+            <div class="border-l-4 border-emerald-600 pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-emerald-700 font-bold">4. L'Asymétrie de l'Attention</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">Glacis Médiatique & Capitalisme de Plateforme (Meta Ads)</h3>
+            </div>
+
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                Un parti sans représentation parlementaire subit la règle de proportionnalité du temps d'antenne dans les médias traditionnels. Parallèlement, la domination sur les réseaux sociaux nécessite des sommes colossales que la décision de Meta de restreindre la publicité politique en 2025 rend encore plus complexe pour les challengers.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Explanation Cards (5 cols) -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+                            <span>Le "Cordon Sanitaire" et les Médias</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Historiquement forgé contre l'extrême droite, le cordon sanitaire médiatique francophone (RTBF, RTL) a créé une culture journalistique très frileuse face à la nouveauté. Faute de sièges sortants, une initiative citoyenne modérée est reléguée à la même invisibilité que les partis extrémistes.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-ban text-rose-600"></i>
+                            <span>Le Virage Meta d'Octobre 2025</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            En interdisant ou restreignant fortement les publicités politiques ciblées dès la fin 2025, Meta désavantage dramatiquement les nouveaux partis. Privé de la publicité payante pour acquérir de la notoriété, le challenger devient entièrement tributaire de la distribution "organique", contrôlée par les partis établis fort de leurs centaines de milliers d'abonnés.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Meta Ads Chart Container (7 cols) -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                        <h4 class="font-bold text-slate-900 text-sm">Dépenses Publicitaires sur les Plateformes Meta (2023-2024, en €)</h4>
+                        <span class="text-xs text-slate-500">Source: Meta Ad Library</span>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="metaChart"></canvas>
+                    </div>
+
+                    <p class="text-xs text-slate-500 italic text-center">
+                        La Belgique est le 3e pays européen le plus ciblé. Les partis établis ont injecté environ 6 millions d'euros en une seule année pré-électorale.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 5: ANATOMIE DES ELECTIONS DE 2024 -->
+        <section id="elections2024" class="space-y-6">
+            <div class="border-l-4 border-coralAccent pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-rose-700 font-bold">5. Enseignements Empiriques du Scrutin de Juin 2024</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">Le Naufrage des Listes Citoyennes vs L'Exception PTB</h3>
+            </div>
+
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                L'analyse des résultats de 2024 offre un contraste saisissant : d'un côté, la disparition complète des candidatures citoyennes improvisées ; de l'autre, la consolidation spectaculaire du PTB-PVDA, devenu la 4e force politique du pays avec 763 340 suffrages.
+            </p>
+
+            <!-- Comparative Tabs / Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Failure Case Studies -->
+                <div class="bg-rose-50/50 p-6 rounded-2xl border border-rose-200 space-y-4">
+                    <div class="flex items-center space-x-2 text-rose-900 font-bold text-lg border-b border-rose-200 pb-3">
+                        <i class="fa-solid fa-circle-xmark text-rose-600"></i>
+                        <span>L'Échec des Initiatives "Démocratie Directe"</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-white p-3 rounded-lg border border-rose-100 shadow-sm">
+                            <span class="font-bold text-slate-900">Voor U (Els Ampe) — 0,62 % (43 346 voix)</span>
+                            <p class="text-slate-600 mt-1">
+                                Rassemblement libertarien et entrepreneurial sans ancrage territorial. Démontre l'impossibilité de percer sur la seule notoriété d'une figure sans structure militante.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-rose-100 shadow-sm">
+                            <span class="font-bold text-slate-900">Blanco — 0,65 % (Circonscriptions ciblées)</span>
+                            <p class="text-slate-600 mt-1">
+                                Proposition unique de laisser des sièges vides pour représenter le vote blanc. Malgré un concept percutant et 3 parrainages de députés, est resté très loin du seuil de 5%.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-rose-100 shadow-sm">
+                            <span class="font-bold text-slate-900">Collectif Citoyen — 0,51 % (35 706 voix)</span>
+                            <p class="text-slate-600 mt-1">
+                                Mouvement prônant l'horizontalité et le rejet des clivages. Rejet massif par les électeurs qui privilégient les enjeux socio-économiques concrets.
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-rose-900 font-semibold italic">
+                        Conclusion : Le rejet de la particratie ne produit pas automatiquement un vote pour la "démocratie participative" abstraite.
+                    </p>
+                </div>
+
+                <!-- PTB Success Model -->
+                <div class="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-200 space-y-4">
+                    <div class="flex items-center space-x-2 text-emerald-900 font-bold text-lg border-b border-emerald-200 pb-3">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                        <span>Les 4 Piliers de la Percée Stratégique du PTB</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm flex items-start space-x-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">1</span>
+                            <div>
+                                <strong class="text-slate-900">Sédimentation Temporelle (15+ ans)</strong>
+                                <p class="text-slate-600 mt-0.5">Congrès fondateur en 2008. Premières victoires communales en 2012 (Anvers, Liège), régionales en 2014, fédérales en 2019/2024.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm flex items-start space-x-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">2</span>
+                            <div>
+                                <strong class="text-slate-900">Armée Militante & Action Directe</strong>
+                                <p class="text-slate-600 mt-0.5">20 000 bénévoles mobilisés. Proximité physique via "Médecine pour le Peuple" (soins gratuits) créant une confiance pré-électorale.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm flex items-start space-x-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">3</span>
+                            <div>
+                                <strong class="text-slate-900">Ciblage Sociologique Hyper-Précis</strong>
+                                <p class="text-slate-600 mt-0.5">Domination dans les métropoles à haute densité, communes multiculturelles et tranches des 20% des revenus les plus bas.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-emerald-100 shadow-sm flex items-start space-x-3">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">4</span>
+                            <div>
+                                <strong class="text-slate-900">Hégémonie Thématique (Agenda-Setting)</strong>
+                                <p class="text-slate-600 mt-0.5">Focalisation obsessive sur des slogans ultra-visuels ("Taxe des millionnaires") forçant l'agenda politique global.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-emerald-900 font-semibold italic">
+                        Conclusion : Seule l'ingénierie socio-politique ancrée sur le long terme permet d'enfoncer le système D'Hondt.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 6: MODELE STRATEGIQUE POUR LE NOUVEAU PARTI -->
+        <section id="strategie" class="space-y-8">
+            <div class="border-l-4 border-indigo-900 pl-4">
+                <h2 class="text-xs uppercase tracking-widest text-indigo-900 font-bold">6. Modèle Stratégique & Feuille de Route</h2>
+                <h3 class="text-2xl font-serif font-bold text-slate-900">Quel Parti pour une "Belgique Idéale" ?</h3>
+            </div>
+
+            <p class="text-slate-600 leading-relaxed max-w-4xl">
+                Face aux impasses constatées, la faisabilité d'une nouvelle force politique repose sur un positionnement doctrinal novateur — le <strong>Progressisme Pragmatique</strong> — combiné à une stratégie de financement participatif par la foule et une séquence électorale ciblée.
+            </p>
+
+            <!-- Ideological Pillars -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-900 text-amber-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-flag"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base">Fédéralisme Coopératif Bilingue</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Dépasser les querelles communautaires avec une structure organiquement bilingue et unie. Répondre à la lassitude institutionnelle des citoyens en prônant la rationalisation des compétences sanitaires et énergétiques au niveau national.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-900 text-emerald-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base">Synthèse Socio-Écologique</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Rompre avec l'écologie punitive. Allier réindustrialisation verte, mix énergétique nucléaire/renouvelables (conforme au PFEC 2025) et justice fiscale soulageant la classe moyenne face aux coupes de la coalition De Wever.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-900 text-rose-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base">Rationalisation Démocratique</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Plaidoyer direct pour la réduction de 50 % du financement public des partis politiques et l'instauration d'une circonscription électorale fédérale unique pour briser le verrou provincial.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- CROWDFUNDING GUERILLA SIMULATOR -->
+            <div id="simulateur-financement" class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h4 class="text-xl font-serif font-bold text-amber-400 flex items-center space-x-2">
+                        <i class="fa-solid fa-coins"></i>
+                        <span>Simulateur de Guérilla Financière (Crowdfunding de Masse)</span>
+                    </h4>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Privé des 86,5 M€ de subventions publiques, le nouveau parti doit lever des micro-contributions régulières pour financer un secrétariat permanent et sa production média.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Sliders (6 cols) -->
+                    <div class="lg:col-span-6 space-y-6">
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-2">
+                                <span>Nombre d'adhérents / contributeurs mensuels :</span>
+                                <span id="val-adherents" class="text-amber-400 font-bold text-sm">15 000</span>
+                            </div>
+                            <input type="range" id="slider-adherents" min="1000" max="100000" step="1000" value="15000" class="w-full accent-amber-500 cursor-pointer" oninput="updateCrowdfunding()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-2">
+                                <span>Cotisation / don moyen par mois (€) :</span>
+                                <span id="val-cotisation" class="text-amber-400 font-bold text-sm">10 €</span>
+                            </div>
+                            <input type="range" id="slider-cotisation" min="2" max="50" step="1" value="10" class="w-full accent-amber-500 cursor-pointer" oninput="updateCrowdfunding()">
+                        </div>
+
+                        <div class="p-3 bg-slate-800/80 rounded-lg border border-slate-700 text-xs text-slate-300">
+                            <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
+                            Conforme au plafond d'anonymat et de déductibilité de la loi de 1989.
+                        </div>
+                    </div>
+
+                    <!-- Computed Budget Box (6 cols) -->
+                    <div class="lg:col-span-6 bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4 text-center">
+                        <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Budget d'Opération Annuel Estimé</div>
+                        <div id="res-budget-annuel" class="text-4xl font-extrabold text-amber-400">1 800 000 €</div>
+                        <div class="text-xs text-slate-300">soit <strong id="res-budget-mensuel" class="text-white">150 000 €</strong> / mois</div>
+
+                        <div id="res-equivalences" class="text-xs text-slate-300 pt-3 border-t border-slate-700 space-y-2 text-left">
+                            <!-- Dynamic equivalences insertion -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- STRATEGIC ROADMAP TIMELINE -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                <h4 class="text-xl font-serif font-bold text-slate-900 border-b border-stone-100 pb-3">
+                    Séquençage Électoral en 3 Phases (2026-2030+)
+                </h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                    
+                    <!-- Phase 1 -->
+                    <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 space-y-3 relative">
+                        <div class="inline-block bg-indigo-900 text-white font-bold text-xs px-2.5 py-1 rounded">
+                            Phase 1 : 2026 - 2029
+                        </div>
+                        <h5 class="font-bold text-slate-900 text-sm">Implantation Hyper-Locale</h5>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside">
+                            <li>Cibler les communes urbaines jeunes et denses lors des élections locales de 2030.</li>
+                            <li>Collecter les parrainages locaux (5 à 100 électeurs faciles à obtenir).</li>
+                            <li>Décrocher une dizaine de sièges de conseillers communaux pour la légitimité.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 space-y-3 relative">
+                        <div class="inline-block bg-indigo-900 text-white font-bold text-xs px-2.5 py-1 rounded">
+                            Phase 2 : 2029 - 2030
+                        </div>
+                        <h5 class="font-bold text-slate-900 text-sm">Réseau Militant & Média Propre</h5>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside">
+                            <li>Former un cadre de 5 000 à 10 000 bénévoles engagés.</li>
+                            <li>Organiser des coopératives énergétiques et du conseil fiscal citoyen (sur le modèle du PTB).</li>
+                            <li>Lancer un incubateur de médias digitaux (podcasts, enquêtes) pour contourner Meta.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 space-y-3 relative">
+                        <div class="inline-block bg-amber-600 text-white font-bold text-xs px-2.5 py-1 rounded">
+                            Phase 3 : Scrutin Fédéral
+                        </div>
+                        <h5 class="font-bold text-slate-900 text-sm">Offensive Provinciale Ciblée</h5>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside">
+                            <li>Concentrer 100% des ressources sur 2 ou 3 circonscriptions denses (ex: Bruxelles, Brabant Wallon, Anvers).</li>
+                            <li>Dépasser localement les 5% pour obtenir 2 à 3 députés fédéraux.</li>
+                            <li>Accéder enfin aux dotations de la Chambre pour pérenniser le mouvement.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-white border-t border-slate-800 mt-20 py-8 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <span class="font-bold text-amber-400">POLITIK.BE</span> — Application Interactive issue du Rapport d'Expertise 2026.
+            </div>
+            <div class="text-slate-400">
+                Conforme aux analyses du CRISP, du Bureau Fédéral du Plan et du Droit Constitutionnel Belge.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Government Switcher Logic
+        function switchGov(gov) {
+            const viewArizona = document.getElementById('view-arizona');
+            const viewVivaldi = document.getElementById('view-vivaldi');
+            const btnArizona = document.getElementById('btn-arizona');
+            const btnVivaldi = document.getElementById('btn-vivaldi');
+
+            if (gov === 'arizona') {
+                viewArizona.classList.remove('hidden');
+                viewVivaldi.classList.add('hidden');
+                btnArizona.className = "px-4 py-2 rounded-md bg-indigo-900 text-white font-semibold transition shadow-sm";
+                btnVivaldi.className = "px-4 py-2 rounded-md text-slate-600 hover:text-slate-900 transition";
+            } else {
+                viewArizona.classList.add('hidden');
+                viewVivaldi.classList.remove('hidden');
+                btnVivaldi.className = "px-4 py-2 rounded-md bg-indigo-900 text-white font-semibold transition shadow-sm";
+                btnArizona.className = "px-4 py-2 rounded-md text-slate-600 hover:text-slate-900 transition";
+            }
+        }
+
+        // 2. Chart.js Implementation: Party Finances
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: Party Finances
+            const ctxFinance = document.getElementById('financeChart').getContext('2d');
+            new Chart(ctxFinance, {
+                type: 'bar',
+                data: {
+                    labels: ['N-VA', 'PTB-PVDA', 'PS', 'Vlaams Belang', 'MR', 'CD&V', 'Ecolo'],
+                    datasets: [
+                        {
+                            label: 'Subventions Directes (M€)',
+                            data: [12.24, 7.38, 9.39, 9.65, 9.14, 7.00, 5.61],
+                            backgroundColor: '#1e3a8a'
+                        },
+                        {
+                            label: 'Contributions Mandataires (M€)',
+                            data: [0.70, 3.14, 2.08, 0.84, 0.34, 0.32, 1.83],
+                            backgroundColor: '#059669'
+                        },
+                        {
+                            label: 'Cotisations & Autres (M€)',
+                            data: [1.56, 3.08, 1.93, 0.64, 1.82, 1.18, 0.86],
+                            backgroundColor: '#d97706'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { 
+                            stacked: true,
+                            title: { display: true, text: 'Revenus en Millions € (2024)' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw.toFixed(2) + ' M€';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Meta Ad Spending
+            const ctxMeta = document.getElementById('metaChart').getContext('2d');
+            new Chart(ctxMeta, {
+                type: 'bar',
+                data: {
+                    labels: ['Vlaams Belang', 'N-VA', 'Les Engagés', 'MR', 'PS', 'PVDA-PTB'],
+                    datasets: [{
+                        label: 'Dépenses Meta Ads 12 mois (en K€)',
+                        data: [1680, 1500, 850, 720, 610, 590],
+                        backgroundColor: [
+                            '#d97706', '#1e3a8a', '#0d9488', '#2563eb', '#e11d48', '#dc2626'
+                        ]
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Montant dépensé (en milliers €)' }
+                        }
+                    }
+                }
+            });
+
+            // Run initial simulations
+            calculateSeats();
+            updateCrowdfunding();
+        });
+
+        // 3. Interactive D'Hondt & Threshold Simulator
+        function calculateSeats() {
+            const seats = parseInt(document.getElementById('input-sieges').value) || 15;
+            const applySeuil = document.getElementById('toggle-seuil').checked;
+
+            const parties = [
+                { name: 'Grand Parti A', v: parseInt(document.getElementById('v-partiA').value) || 0, color: 'text-indigo-900' },
+                { name: 'Moyen Parti B', v: parseInt(document.getElementById('v-partiB').value) || 0, color: 'text-blue-700' },
+                { name: 'Moyen Parti C', v: parseInt(document.getElementById('v-partiC').value) || 0, color: 'text-teal-700' },
+                { name: 'Petit Parti D', v: parseInt(document.getElementById('v-partiD').value) || 0, color: 'text-amber-700' },
+                { name: 'Nouveau Parti', v: parseInt(document.getElementById('v-partiE').value) || 0, color: 'text-rose-700 font-bold' }
+            ];
+
+            const totalVotes = parties.reduce((sum, p) => sum + p.v, 0);
+
+            // Calculate percentages and threshold
+            parties.forEach(p => {
+                p.pct = totalVotes > 0 ? (p.v / totalVotes) * 100 : 0;
+                p.passed = applySeuil ? p.pct >= 5.0 : true;
+                p.allocatedSeats = 0;
+            });
+
+            // D'Hondt Algorithm
+            const eligibleParties = parties.filter(p => p.passed);
+
+            if (eligibleParties.length > 0) {
+                for (let s = 0; s < seats; s++) {
+                    let maxQuotient = -1;
+                    let winnerIndex = -1;
+
+                    eligibleParties.forEach((p, idx) => {
+                        let quotient = p.v / (p.allocatedSeats + 1);
+                        if (quotient > maxQuotient) {
+                            maxQuotient = quotient;
+                            winnerIndex = idx;
+                        }
+                    });
+
+                    if (winnerIndex !== -1) {
+                        eligibleParties[winnerIndex].allocatedSeats++;
+                    }
+                }
+            }
+
+            // Render Results Table
+            const tbody = document.getElementById('sim-results-body');
+            tbody.innerHTML = '';
+
+            parties.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-stone-50';
+                tr.innerHTML = `
+                    <td class="p-2 font-medium ${p.color}">${p.name}</td>
+                    <td class="p-2">${p.v.toLocaleString()} (${p.pct.toFixed(2)}%)</td>
+                    <td class="p-2">
+                        ${p.passed 
+                            ? '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 font-semibold">Qualifié (≥5%)</span>' 
+                            : '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-100 text-rose-800 font-semibold">Éliminé (<5%)</span>'}
+                    </td>
+                    <td class="p-2 text-right font-bold text-sm ${p.allocatedSeats > 0 ? 'text-indigo-900' : 'text-slate-400'}">${p.allocatedSeats}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Render Commentary
+            const comm = document.getElementById('sim-commentary');
+            const newParty = parties.find(p => p.name === 'Nouveau Parti');
+
+            if (!newParty.passed && applySeuil) {
+                comm.className = "p-4 rounded-xl text-xs leading-relaxed border bg-rose-50 border-rose-200 text-rose-900";
+                comm.innerHTML = `
+                    <strong><i class="fa-solid fa-triangle-exclamation mr-1"></i> Élimination par le Seuil de 5% :</strong><br>
+                    Le Nouveau Parti obtient <strong>${newParty.pct.toFixed(2)}%</strong> des voix. Bien qu'il ait réuni ${newParty.v.toLocaleString()} électeurs, ses voix sont purement et simplement annulées. Leurs sièges potentiels ont été redistribués aux grands partis.
+                `;
+            } else if (newParty.passed && newParty.allocatedSeats === 0) {
+                comm.className = "p-4 rounded-xl text-xs leading-relaxed border bg-amber-50 border-amber-200 text-amber-900";
+                comm.innerHTML = `
+                    <strong><i class="fa-solid fa-circle-info mr-1"></i> Le Piège D'Hondt :</strong><br>
+                    Le Nouveau Parti a franchi le seuil avec <strong>${newParty.pct.toFixed(2)}%</strong>, mais la méthode des quotients D'Hondt favorise les partis ayant des gros volumes de voix. Aucun siège ne lui est attribué dans cette circonscription.
+                `;
+            } else {
+                comm.className = "p-4 rounded-xl text-xs leading-relaxed border bg-emerald-50 border-emerald-200 text-emerald-900";
+                comm.innerHTML = `
+                    <strong><i class="fa-solid fa-circle-check mr-1"></i> Victoire Électorale :</strong><br>
+                    Le Nouveau Parti franchit le seuil (${newParty.pct.toFixed(2)}%) et décroche <strong>${newParty.allocatedSeats} siège(s)</strong> ! Il fait son entrée au Parlement et débloque le financement public.
+                `;
+            }
+        }
+
+        // 4. Crowdfunding Simulator Logic
+        function updateCrowdfunding() {
+            const adh = parseInt(document.getElementById('slider-adherents').value);
+            const cot = parseInt(document.getElementById('slider-cotisation').value);
+
+            document.getElementById('val-adherents').innerText = adh.toLocaleString('fr-FR');
+            document.getElementById('val-cotisation').innerText = cot + ' €';
+
+            const mensuel = adh * cot;
+            const annuel = mensuel * 12;
+
+            document.getElementById('res-budget-annuel').innerText = annuel.toLocaleString('fr-FR') + ' €';
+            document.getElementById('res-budget-mensuel').innerText = mensuel.toLocaleString('fr-FR') + ' €';
+
+            // Equivalences
+            const permStaff = Math.floor(annuel / 60000); // 60k cost per FTE
+            const mediaProd = Math.floor(annuel / 15000); // 15k per campaign/doc
+
+            const equivDiv = document.getElementById('res-equivalences');
+            equivDiv.innerHTML = `
+                <div><i class="fa-solid fa-user-tie text-amber-400 mr-1.5"></i> Capacité d'embauche : <strong>${permStaff} permanents</strong> à temps plein.</div>
+                <div><i class="fa-solid fa-video text-amber-400 mr-1.5"></i> Capacité de production média : <strong>${mediaProd} campagnes vidéo d'envergure</strong>.</div>
+                <div><i class="fa-solid fa-scale-balanced text-amber-400 mr-1.5"></i> Équivalent à <strong>${((annuel / 8300000) * 100).toFixed(1)}% du budget d'Ecolo</strong> ou <strong>${((annuel / 14500000) * 100).toFixed(1)}% du budget de la N-VA</strong>.</div>
+            `;
+        }
+    </script>
+</body>
+</html>
+`

@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Rentrée Politique Belge 2026 | Observatoire Médiatique</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom styling for Chart Containers & Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF9F5;
+            color: #1E293B;
+        }
+
+        h1, h2, h3, .serif-font {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Strict Chart Container Constraint Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #1E293B;
+            color: #1E293B;
+            font-weight: 700;
+        }
+
+        .tab-inactive {
+            border-bottom: 3px solid transparent;
+            color: #64748B;
+        }
+
+        .tab-inactive:hover {
+            color: #1E293B;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-100 selection:text-amber-900">
+
+    <!-- TOP HEADER / BRANDING -->
+    <header class="bg-slate-900 text-slate-100 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🇧🇪</span>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight text-amber-400 block leading-none">OBSERVATOIRE POLÉMIQUE 2026</span>
+                        <span class="text-xs text-slate-400">Analyse Sémiologique & Cadrage Médiatique</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-xs text-slate-300">
+                    <div class="flex items-center space-x-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span>Coalition Arizona</span>
+                    </div>
+                    <div>Premier Ministre: <strong class="text-white">B. De Wever</strong></div>
+                    <div>Ajustement: <strong class="text-amber-400">10 Mds €</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="bg-slate-800 border-t border-slate-700/50">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto py-2 text-xs sm:text-sm font-medium no-scrollbar">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-700 transition">
+                        📊 Vue d'Ensemble
+                    </button>
+                    <button onclick="switchTab('focus')" id="nav-focus" class="nav-btn px-3 py-1.5 rounded-md text-slate-300 hover:bg-slate-700 transition">
+                        🔥 Focus Médiatiques
+                    </button>
+                    <button onclick="switchTab('regions')" id="nav-regions" class="nav-btn px-3 py-1.5 rounded-md text-slate-300 hover:bg-slate-700 transition">
+                        🏛️ Asymétries Régionales
+                    </button>
+                    <button onclick="switchTab('blindspots')" id="nav-blindspots" class="nav-btn px-3 py-1.5 rounded-md text-slate-300 hover:bg-slate-700 transition">
+                        🙈 Angles Morts
+                    </button>
+                    <button onclick="switchTab('ruptures')" id="nav-ruptures" class="nav-btn px-3 py-1.5 rounded-md text-slate-300 hover:bg-slate-700 transition">
+                        ⚡ Signaux de Rupture
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- KEY METRICS TICKER BAR -->
+    <section class="bg-amber-50 border-b border-amber-200/60 py-2 text-xs text-amber-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px]">Chiffres Clés 2026</span>
+                <span class="truncate">Déficit fédéral projeté: <strong>4,9% du PIB</strong> (6,3% en 2031)</span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-6">
+                <span>Concentration Presse Francophone: <strong class="text-rose-700">95% (Rossel-IPM)</strong></span>
+                <span>Sondage Bruxelles: <strong class="text-purple-700">PTB 24,9% (#1)</strong></span>
+                <span>Vacance Gouvernementale BXL: <strong>613 jours (Fin)</strong></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- MODULE 1: DASHBOARD / OVERVIEW -->
+        <section id="tab-dashboard" class="space-y-8">
+            <!-- Introductory Context Banner -->
+            <div class="bg-white p-6 sm:p-8 rounded-xl border border-slate-200/80 shadow-sm">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold text-amber-700 uppercase tracking-widest">Introduction & Contexte Stratégique</span>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 mb-3">Le Cadrage Médiatique de la Rentrée Fédérale Belge de Septembre 2026</h1>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                        Cette application décrypte la couverture médiatique nationale au seuil d'une législature sous haute tension budgétaire. Dirigée par Bart De Wever (N-VA) au sein de la coalition « Arizona », la Belgique fait face à l'exigence européenne de résorber son déficit via un assainissement de <strong>10 milliards d'euros</strong>. Entre surdramatisation politique et occultation de périls structurels, découvrez l'analyse des focus, des angles morts et des signaux de rupture sociétale.
+                    </p>
+                </div>
+
+                <!-- KPI Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-100">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/60">
+                        <div class="text-xs text-slate-500 font-medium">Ajustement Budgétaire</div>
+                        <div class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">10 Mds €</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">D'ici 2029 (UE)</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/60">
+                        <div class="text-xs text-slate-500 font-medium">Seuil Saut Index</div>
+                        <div class="text-xl sm:text-2xl font-bold text-rose-700 mt-1">4.000 €</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Brut/mois (Actifs)</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/60">
+                        <div class="text-xs text-slate-500 font-medium">Monopole Médiatique</div>
+                        <div class="text-xl sm:text-2xl font-bold text-amber-700 mt-1">95 %</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Presse quotidienne FR</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200/60">
+                        <div class="text-xs text-slate-500 font-medium">Croissance PIB 2026</div>
+                        <div class="text-xl sm:text-2xl font-bold text-indigo-700 mt-1">0,6 %</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Stagnation éco</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Analytical Pillars -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div onclick="switchTab('focus')" class="cursor-pointer bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2 bg-rose-50 text-rose-700 rounded-lg text-lg">🔥</span>
+                        <span class="text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">Surreprésenté</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition">Hyper-Focalisation</h3>
+                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                        Théâtralisation du conclave budgétaire, affrontement Bouchez/De Wever, pédagogie punitive du saut d'index et préparation de « l'automne chaud » syndical.
+                    </p>
+                    <div class="mt-4 text-xs font-semibold text-amber-700 flex items-center">
+                        Explorer les focus &rarr;
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div onclick="switchTab('blindspots')" class="cursor-pointer bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2 bg-amber-50 text-amber-700 rounded-lg text-lg">🙈</span>
+                        <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Invisibilisé</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition">Angles Morts</h3>
+                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                        Concentration historique Rossel-IPM (95% du marché), étouffement des finances communales/CPAS (1,7 Mds €) et péril de récession macroéconomique.
+                    </p>
+                    <div class="mt-4 text-xs font-semibold text-amber-700 flex items-center">
+                        Analyser les angles morts &rarr;
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div onclick="switchTab('ruptures')" class="cursor-pointer bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2 bg-purple-50 text-purple-700 rounded-lg text-lg">⚡</span>
+                        <span class="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">Profond</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition">Signaux de Rupture</h3>
+                    <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                        Éviction de la concertation sociale, raz-de-marée électoral du PTB à Bruxelles (24.9%), fin de l'État-providence universel et repli linguistique VRT.
+                    </p>
+                    <div class="mt-4 text-xs font-semibold text-amber-700 flex items-center">
+                        Découvrir les ruptures &rarr;
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Regional Snapshot Grid -->
+            <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-teal-400 uppercase tracking-wider">Asymétrie Fédérale</span>
+                        <h2 class="text-xl sm:text-2xl font-bold mt-1">Wallonie/FWB vs Bruxelles-Capitale</h2>
+                    </div>
+                    <button onclick="switchTab('regions')" class="self-start md:self-auto bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                        Comparer les Réformes
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="bg-slate-800/80 p-5 rounded-lg border border-slate-700">
+                        <div class="text-teal-400 font-bold mb-2 flex items-center">
+                            <span class="mr-2">🔴</span> Wallonie & FWB (MR-Engagés)
+                        </div>
+                        <p class="text-slate-300 text-xs leading-relaxed">
+                            Célérité réformatrice et rigueur assumée : coupes APE (83,7M€), fin de la gratuité des fournitures scolaires (post-P3), hausse des minervals universitaires (1.194€) et instauration du DIES (2.000€).
+                        </p>
+                    </div>
+                    <div class="bg-slate-800/80 p-5 rounded-lg border border-slate-700">
+                        <div class="text-amber-400 font-bold mb-2 flex items-center">
+                            <span class="mr-2">🟡</span> Bruxelles-Capitale (Heptapartite)
+                        </div>
+                        <p class="text-slate-300 text-xs leading-relaxed">
+                            Sortie de 613 jours de vacance, urgence financière : « Big Bang » administratif (25 organismes réduits à 4), gel des embauches, report de la LEZ à 2027 et interdiction des trottinettes en 2027.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: FOCUS MEDIATIQUES -->
+        <section id="tab-focus" class="hidden space-y-8">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-rose-700 uppercase tracking-widest">Section 1 · Analyse du Cadrage</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1 mb-2">L'Hyper-Focalisation Médiatique : Scénarisation de l'Urgence</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Cette section examine les objets ayant bénéficié d'une surreprésentation journalistique massive durant la rentrée 2026. Les rédactions privilégient la politique-spectacle : la querelle budgétaire binaire entre le MR et ses partenaires, les effets micro-économiques de la réforme de l'indexation, et la théâtralisation de la riposte syndicale.
+                </p>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Topic 1: Conclave Budgétaire -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="p-2 bg-rose-100 text-rose-800 rounded-lg text-lg">⚖️</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900">Le Conclave Fédéral et la fétichisation des "10 Milliards"</h3>
+                            <span class="text-xs text-slate-500">Cadrage binaire & Registre guerrier</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Le traitement de la rentrée oppose de manière théâtrale deux blocs au sein de la coalition Arizona :
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-2 pl-4 list-disc">
+                        <li><strong>Le Bloc Vooruit - CD&V - Les Engagés :</strong> Exige un équilibre fiscal via la taxation des plus-values et le démantèlement des niches fiscales (sociétés de management).</li>
+                        <li><strong>Le Mouvement Réformateur (MR / G.-L. Bouchez) :</strong> Pose un veto absolu contre toute nouvelle taxation, arguant de la saturation fiscale belge.</li>
+                        <li><strong>Bart De Wever (Premier ministre) :</strong> Dépeint en arbitre délicat, médiatisant ses insomnies et avertissant que « tout le monde va souffrir ».</li>
+                    </ul>
+                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 text-xs text-rose-900">
+                        <strong>Métaphores médiatiques dominantes :</strong> « Col hors catégorie », « Mois de tous les dangers », « Rentrée explosive », spectre permanent d'élections anticipées.
+                    </div>
+                </div>
+
+                <!-- Topic 2: Interactive Saut d'Index Calculator -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="p-2 bg-amber-100 text-amber-800 rounded-lg text-lg">🧮</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900">Simulateur : "Saut d'Index Partiel 2026"</h3>
+                            <span class="text-xs text-slate-500">Pédagogie de la perte & Anxiété de la classe moyenne</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600">
+                        Entrez votre revenu mensuel brut pour calculer le plafonnement de votre indexation (Loi-programme mai 2026, entrée en vigueur septembre 2026).
+                    </p>
+
+                    <!-- Calculator UI -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Statut socio-professionnel</label>
+                            <select id="calc-status" onchange="calculateIndexLoss()" class="w-full text-xs p-2 border border-slate-300 rounded bg-white">
+                                <option value="worker">Salarié / Actif (Seuil de protection: 4.000 €)</option>
+                                <option value="pensioner">Pensionné / Allocataire (Seuil de protection: 2.000 €)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Revenu Brut Mensuel (€)</label>
+                            <input type="number" id="calc-income" value="4500" oninput="calculateIndexLoss()" class="w-full text-xs p-2 border border-slate-300 rounded" placeholder="ex: 4500">
+                        </div>
+
+                        <!-- Results display -->
+                        <div class="pt-3 border-t border-slate-200 space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600">Indexation brute standard (2%):</span>
+                                <span id="res-standard" class="font-bold text-slate-800">90 € / mois</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600">Indexation autorisée (Plafonnée):</span>
+                                <span id="res-capped" class="font-bold text-emerald-700">80 € / mois</span>
+                            </div>
+                            <div class="flex justify-between text-xs pt-1 border-t border-slate-200">
+                                <span class="font-bold text-rose-700">Perte directe immédiate :</span>
+                                <span id="res-loss" class="font-bold text-rose-700">10 € / mois</span>
+                            </div>
+                            <div id="res-union-note" class="text-[11px] text-slate-500 italic mt-1 bg-amber-50 p-2 rounded">
+                                * Impact syndical estimé (FGTB/CSC) : Perte cumulative permanente avec effet cliquet (jusqu'à 45.400 € sur une carrière de cadre).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Topic 3: Front Social & Opposition -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center">
+                    <span class="mr-2">🪧</span> L'Offensive Syndicale et l'Organisation d'un « Automne Chaud »
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                        <strong class="text-slate-800 block mb-1">24 Septembre 2026</strong>
+                        <span class="text-slate-600">Manifestation européenne à Bruxelles (FGTB/CSC) sous le slogan « Enough is enough » contre la directive « EU Inc. » dérégulant le droit des sociétés.</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                        <strong class="text-slate-800 block mb-1">Révolution des Craies</strong>
+                        <span class="text-slate-600">Mobilisation CSC-Enseignement à Liège (10 sept) contre l'annualisation du temps de travail et la précarisation des statuts.</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                        <strong class="text-slate-800 block mb-1">Guérilla Parlementaire PTB</strong>
+                        <span class="text-slate-600">Attaques systématiques de Sofie Merckx contre l'annualisation (semaines de 48h) et l'achat de chasseurs F-35 vs coupes dans la santé.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 3: ASYMETRIES REGIONALES -->
+        <section id="tab-regions" class="hidden space-y-8">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-teal-700 uppercase tracking-widest">Section 2 · Fédéralisme Comparé</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1 mb-2">La Cartographie des Asymétries Régionales</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Le traitement médiatique varie drastiquement selon les entités fédérées. La presse célèbre la vélocité et l'orthodoxie budgétaire des gouvernements wallon et de la FWB (MR-Les Engagés), tandis qu'elle dramatise la lourdeur administrative de la Région bruxelloise, qui émerge de 613 jours de crise politique.
+                </p>
+            </div>
+
+            <!-- Regional Interactive Tabs -->
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="flex border-b border-slate-200 bg-slate-50">
+                    <button onclick="switchRegionSubtab('wallonie')" id="subnav-wallonie" class="flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-slate-900 text-slate-900">
+                        🔴 Wallonie & FWB (Adrien Dolimont)
+                    </button>
+                    <button onclick="switchRegionSubtab('bruxelles')" id="subnav-bruxelles" class="flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+                        🟡 Bruxelles-Capitale (Heptapartite)
+                    </button>
+                </div>
+
+                <!-- Subtab Wallonie -->
+                <div id="subtab-wallonie" class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-900 text-sm border-b pb-2">Wallonie : Rigueur Budgétaire (270M€ d'économies)</h3>
+                            <ul class="text-xs text-slate-600 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="text-amber-600 mr-2">•</span>
+                                    <span><strong>Aides APE (-83,7 M€) :</strong> Rationalisation drastique des Aides à la Promotion de l'Emploi pour réduire les effets d'aubaine.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-amber-600 mr-2">•</span>
+                                    <span><strong>CISP & Wallonie Entreprendre :</strong> Réduction de 60 M€ pour l'outil financier ; subventions CISP liées au taux d'insertion.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-amber-600 mr-2">•</span>
+                                    <span><strong>Allocations Familiales (18-25 ans) :</strong> Conditionnées aux études dès 2027 avec l'instauration d'un « pot de 12 mois ».</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-amber-600 mr-2">•</span>
+                                    <span><strong>Suppression des Provinces :</strong> Transfert des compétences vers les communes d'ici 2030.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-900 text-sm border-b pb-2">FWB : Filtre Éducatif (700M€ cumulés)</h3>
+                            <ul class="text-xs text-slate-600 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="text-rose-600 mr-2">•</span>
+                                    <span><strong>Fournitures Scolaires :</strong> Fin de l'extension de la gratuité au-delà de la 3e primaire (vives critiques de la Ligue des Familles).</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-rose-600 mr-2">•</span>
+                                    <span><strong>Minervals Universitaires :</strong> Hausse du tarif plein à 1.194 € (rattrapage inflation) et création du DIES (2.000 €) pour les non-UE.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-rose-600 mr-2">•</span>
+                                    <span><strong>Statut Enseignant :</strong> Alignement des congés maladie sur la fonction publique (60% après 15 jours) et restriction des DPPR (24 mois max).</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subtab Bruxelles -->
+                <div id="subtab-bruxelles" class="hidden p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-900 text-sm border-b pb-2">Le "Big Bang" Administratif Bruxellois</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Fin d'une vacance politique de <strong>613 jours</strong>. Pour combler un déficit abyssal, le gouvernement annonce la restructuration de la nébuleuse régionale (25 entités ramenées à 4 piliers) visant 250 à 300 M€ d'économies d'ici 2029.
+                            </p>
+                            <ul class="text-xs text-slate-600 space-y-2">
+                                <li><strong>Première fusion 2026 :</strong> Rapprochement de <em>perspective.brussels</em> et <em>urban.brussels</em>.</li>
+                                <li><strong>Gel des embauches :</strong> Prolongation du moratoire (total en 2026, ciblé à partir de 2027).</li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-900 text-sm border-b pb-2">Mobilité, Climat & Reconversion</h3>
+                            <ul class="text-xs text-slate-600 space-y-2">
+                                <li><strong>Zone LEZ reportée :</strong> Normes assouplies jusqu'en 2027 (Pass dérogatoire 350 €/an).</li>
+                                <li><strong>Trottinettes en libre-service :</strong> Interdiction totale confirmée pour janvier 2027.</li>
+                                <li><strong>Tunnel Belliard/Loi :</strong> 100 M€ débloqués via Beliris pour rénovation d'urgence en 2027.</li>
+                                <li><strong>Audi Forest :</strong> Reconversion industrielle sous incitants régionaux pour sauver 3.000 emplois.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 4: ANGLES MORTS -->
+        <section id="tab-blindspots" class="hidden space-y-8">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-amber-700 uppercase tracking-widest">Section 3 · Biais & Trous Noirs</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1 mb-2">Les Angles Morts du Cadrage Médiatique</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Alors que les projecteurs se concentrent sur les joutes verbales à la Rue de la Loi, des mutations structurelles majeures sont passées sous silence. Cette section met en lumière la concentration inédite de la presse francophone, la faillite programmée des pouvoirs locaux et l'illusion comptable face à la stagnation économique.
+                </p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="font-bold text-slate-700">Filtrer par thématique :</span>
+                <button onclick="filterBlindspots('all')" class="bs-filter-btn px-3 py-1 rounded-full bg-slate-900 text-white font-medium">Tous</button>
+                <button onclick="filterBlindspots('media')" class="bs-filter-btn px-3 py-1 rounded-full bg-slate-200 text-slate-700 font-medium">Presse / Monopole</button>
+                <button onclick="filterBlindspots('local')" class="bs-filter-btn px-3 py-1 rounded-full bg-slate-200 text-slate-700 font-medium">Pouvoirs Locaux</button>
+                <button onclick="filterBlindspots('macro')" class="bs-filter-btn px-3 py-1 rounded-full bg-slate-200 text-slate-700 font-medium">Macroéconomie</button>
+            </div>
+
+            <!-- Blindspots Cards & Visualizations -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Blindspot 1: Media Monopoly Chart -->
+                <div class="bs-card media-card bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+                    <div>
+                        <span class="text-xs font-bold text-rose-700 uppercase">Monopole Média</span>
+                        <h3 class="text-lg font-bold text-slate-900 mt-0.5">L'Invisibilisation de la Fusion Rossel-IPM</h3>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Le 3 juillet 2026, l'Autorité Belge de la Concurrence a validé la fusion Rossel-IPM. La nouvelle entité contrôle <strong>95% de la presse quotidienne francophone</strong> (Le Soir, La Libre, DH, L'Avenir, Sudinfo).
+                        </p>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="chartMediaPluralism"></canvas>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 italic bg-slate-50 p-2.5 rounded">
+                        <strong>Silence corporatiste :</strong> Les médias taisent la chute de la concession postale (175M€ → 48M€), les menaces de suppressions de 50 postes régionaux et le recours généralisé aux droits d'auteur (taxés à 7.5%) pour rémunérer les journalistes.
+                    </p>
+                </div>
+
+                <!-- Blindspot 2: Local Finances Asphyxia -->
+                <div class="bs-card local-card bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-700 uppercase">Pouvoirs Locaux</span>
+                        <h3 class="text-lg font-bold text-slate-900 mt-0.5">Le Déport Fédéral de l'Austérité sur les Communes</h3>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Brulocalis et la Fédération des CPAS chiffrent à <strong>1,718 milliard d'euros</strong> le choc financier subi par les communes bruxelloises (2025-2029) suite aux coupes fédérales.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="p-3 bg-amber-50 rounded-lg border border-amber-200/60">
+                            <div class="font-bold text-xs text-amber-900">Transferts de Charges Unilatéraux</div>
+                            <div class="text-xs text-amber-800 mt-1">
+                                Explosion des factures de pension des agents locaux, fusions imposées des zones de police, et perte de 17M€/an d'IPP à Bruxelles.
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-rose-50 rounded-lg border border-rose-200/60">
+                            <div class="font-bold text-xs text-rose-900">Démantèlement des Filets Social de Proximité</div>
+                            <div class="text-xs text-rose-800 mt-1">
+                                Suppression du Fonds d'Activation Sociale (FAS), arrêt des financements <em>Housing First</em> (sans-abris) et du soutien aux mères célibataires (MIRIAM).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blindspot 3: Macroeconomic Reality Chart -->
+                <div class="bs-card macro-card lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-bold text-indigo-700 uppercase">Macroéconomie vs Tableur Excel</span>
+                            <h3 class="text-lg font-bold text-slate-900 mt-0.5">L'Illusion Comptable face au Péril Récessif</h3>
+                        </div>
+                        <span class="text-xs bg-indigo-50 text-indigo-800 px-3 py-1 rounded-full font-semibold">Statbel Juillet 2026 : 689 Faillites</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                        <div class="md:col-span-1 space-y-2 text-xs text-slate-600">
+                            <p>
+                                En se focalisant sur la quête aveugle des "10 milliards", le débat médiatique occulte le risque de boucle récessive.
+                            </p>
+                            <ul class="space-y-1 list-disc pl-4">
+                                <li>Croissance PIB 2026 : <strong>0,6%</strong> (0% au T2).</li>
+                                <li>Dette publique 2028 : <strong>115% du PIB</strong>.</li>
+                                <li>Faillites en record absolu dans l'Horeca, l'IT et la logistique.</li>
+                            </ul>
+                        </div>
+                        <div class="md:col-span-2">
+                            <div class="chart-container">
+                                <canvas id="chartMacroMetrics"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- MODULE 5: SIGNAUX DE RUPTURE -->
+        <section id="tab-ruptures" class="hidden space-y-8">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-purple-700 uppercase tracking-widest">Section 4 · Mutations Systémiques</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1 mb-2">Signaux Faibles et Ruptures du Modèle Belge</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Au-delà de la conjoncture politique immédiate, la rentrée 2026 marque l'effritement irréversible des piliers du modèle consociatif d'après-guerre. Éviction des syndicats, polarisation électorale radicale, normalisation morale de l'austérité et scission culturelle des médias linguistiques annoncent la recomposition du pays d'ici 2029.
+                </p>
+            </div>
+
+            <!-- Electoral Polarization Focus -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold text-purple-700 uppercase">Séisme Électoral Bruxellois</span>
+                        <h3 class="text-lg font-bold text-slate-900">Polarisation Extrême : Le PTB en Tête à Bruxelles</h3>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Les sondages de la rentrée 2026 (Ipsos / ULB) confirment le rejet massif des partis traditionnels. Le PTB culmine à 24,9% à Bruxelles, tandis que le Vlaams Belang dominait la Flandre (26,6%).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="chartPollsBrussels"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <strong class="text-purple-900 block mb-1">Rupture du Consensus Centriste</strong>
+                            <p class="text-purple-800">
+                                L'usure accélérée du PS (18,4%) et du MR (14,0%) au profit de la gauche radicale démontre la rupture entre les classes populaires urbaines et les exécutifs d'austérité.
+                            </p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <strong class="text-slate-900 block mb-1">Flandre : Hégémonie Extrême-Droite</strong>
+                            <p class="text-slate-700">
+                                Le Vlaams Belang (26,6%) devance largement la N-VA (22,3%), consolidant la fracture idéologique nord/sud du pays.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Weak Signals Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Signal 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
+                    <span class="text-lg">🔨</span>
+                    <h4 class="font-bold text-slate-900 text-sm">Fin de la Concertation Sociale</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Mise à l'écart systématique du Groupe des Dix par le gouvernement Arizona. Passage en force sur l'annualisation du temps de travail (semaines de 48h), le service minimum carcéral et la loi Quintin.
+                    </p>
+                </div>
+
+                <!-- Signal 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
+                    <span class="text-lg">🏛️</span>
+                    <h4 class="font-bold text-slate-900 text-sm">Fin de l'État-Providence Inconditionnel</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Axiologie néolibérale assumée (Adrien Dolimont) : « L'aide doit aller à ceux qui en ont vraiment besoin ». Conditionnement des allocations et substitution d'un État caritatif à l'universalité des droits.
+                    </p>
+                </div>
+
+                <!-- Signal 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
+                    <span class="text-lg">📺</span>
+                    <h4 class="font-bold text-slate-900 text-sm">Mort de l'Espace Public National</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        La VRT cesse tous ses contenus en français/anglais dès décembre 2026. Parallèlement, <em>De Standaard</em> lance une version francophone payante. La communication belgo-belge est désormais fragmentée.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 mt-12 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <strong>Observatoire Stratégique de la Presse Belge</strong> &copy; Septembre 2026
+            </div>
+            <div class="text-slate-500 text-[11px]">
+                Synthèse rédigée sur la base du Rapport d'Analyse Sémiologique et Macroéconomique Fédérale.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // GLOBAL STATE & TAB NAVIGATION
+        function switchTab(tabId) {
+            // Hide all tab content sections
+            const tabs = ['dashboard', 'focus', 'regions', 'blindspots', 'ruptures'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.add('hidden');
+                
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (navBtn) {
+                    navBtn.classList.remove('bg-slate-700', 'text-white', 'font-bold');
+                    navBtn.classList.add('text-slate-300');
+                }
+            });
+
+            // Show selected tab
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            // Highlight selected nav button
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetNav) {
+                targetNav.classList.add('bg-slate-700', 'text-white', 'font-bold');
+            }
+
+            // Trigger chart renders if needed
+            if (tabId === 'blindspots') renderBlindspotsCharts();
+            if (tabId === 'ruptures') renderRupturesCharts();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // REGIONAL SUBTAB NAVIGATION
+        function switchRegionSubtab(regionId) {
+            const wallonieTab = document.getElementById('subtab-wallonie');
+            const bruxellesTab = document.getElementById('subtab-bruxelles');
+            const btnW = document.getElementById('subnav-wallonie');
+            const btnB = document.getElementById('subnav-bruxelles');
+
+            if (regionId === 'wallonie') {
+                wallonieTab.classList.remove('hidden');
+                bruxellesTab.classList.add('hidden');
+                btnW.className = "flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-slate-900 text-slate-900 bg-white";
+                btnB.className = "flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-transparent text-slate-500 hover:text-slate-800 bg-slate-50";
+            } else {
+                bruxellesTab.classList.remove('hidden');
+                wallonieTab.classList.add('hidden');
+                btnB.className = "flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-slate-900 text-slate-900 bg-white";
+                btnW.className = "flex-1 py-3 px-4 text-xs sm:text-sm font-bold text-center border-b-2 border-transparent text-slate-500 hover:text-slate-800 bg-slate-50";
+            }
+        }
+
+        // CALCULATOR: SAUT D'INDEX PARTIEL
+        function calculateIndexLoss() {
+            const status = document.getElementById('calc-status').value;
+            const income = parseFloat(document.getElementById('calc-income').value) || 0;
+            
+            const threshold = status === 'worker' ? 4000 : 2000;
+            const maxIndexCap = status === 'worker' ? 80 : 40; // Max € increase on first 2% tranche
+
+            // Standard 2% indexation without cap
+            const standardIndex = income * 0.02;
+
+            let CappedIndex = 0;
+            if (income <= threshold) {
+                CappedIndex = standardIndex;
+            } else {
+                // First 2% applies capped to threshold, rest uncapped
+                CappedIndex = maxIndexCap;
+            }
+
+            const loss = Math.max(0, standardIndex - CappedIndex);
+
+            document.getElementById('res-standard').innerText = `${standardIndex.toFixed(0)} € / mois`;
+            document.getElementById('res-capped').innerText = `${CappedIndex.toFixed(0)} € / mois`;
+            document.getElementById('res-loss').innerText = `${loss.toFixed(0)} € / mois`;
+        }
+
+        // FILTER BLINDSPOTS
+        function filterBlindspots(category) {
+            const cards = document.querySelectorAll('.bs-card');
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                } else if (category === 'media' && card.classList.contains('media-card')) {
+                    card.classList.remove('hidden');
+                } else if (category === 'local' && card.classList.contains('local-card')) {
+                    card.classList.remove('hidden');
+                } else if (category === 'macro' && card.classList.contains('macro-card')) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Update UI filter buttons
+            const btns = document.querySelectorAll('.bs-filter-btn');
+            btns.forEach(btn => {
+                btn.className = "bs-filter-btn px-3 py-1 rounded-full bg-slate-200 text-slate-700 font-medium";
+            });
+            event.target.className = "bs-filter-btn px-3 py-1 rounded-full bg-slate-900 text-white font-medium";
+        }
+
+        // CHART RENDERERS (Chart.js)
+        let chartMediaInstance = null;
+        let chartMacroInstance = null;
+        let chartPollsInstance = null;
+
+        function renderBlindspotsCharts() {
+            // Chart 1: Media Pluralism MPM Risk 2026
+            if (!chartMediaInstance) {
+                const ctxMedia = document.getElementById('chartMediaPluralism').getContext('2d');
+                chartMediaInstance = new Chart(ctxMedia, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            'Concentration Propriété',
+                            'Pluralité du Marché',
+                            'Conditions Journalistes',
+                            'Indépendance Politique',
+                            'Ingérence État'
+                        ],
+                        datasets: [{
+                            label: 'Niveau de Risque (%) MPM 2026',
+                            data: [95, 68, 34, 22, 12],
+                            backgroundColor: [
+                                '#B91C1C', // Critical
+                                '#D97706', // High
+                                '#F59E0B', // Medium
+                                '#10B981', // Low
+                                '#059669'  // Very low
+                            ],
+                            borderWidth: 0,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ` Risque mesuré: ${ctx.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                max: 100,
+                                ticks: { callback: value => value + '%' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Macroeconomic Metrics (GDP vs Debt vs Deficit)
+            if (!chartMacroInstance) {
+                const ctxMacro = document.getElementById('chartMacroMetrics').getContext('2d');
+                chartMacroInstance = new Chart(ctxMacro, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Croissance PIB 2026', 'Déficit PIB 2026', 'Déficit Projeté 2031', 'Dette Publique 2028'],
+                        datasets: [{
+                            label: 'Indicateurs Macroéconomiques Belges (%)',
+                            data: [0.6, 4.9, 6.3, 115],
+                            backgroundColor: ['#10B981', '#EF4444', '#991B1B', '#3B82F6'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { callback: value => value + '%' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderRupturesCharts() {
+            // Chart 3: Brussels Polls September 2026
+            if (!chartPollsInstance) {
+                const ctxPolls = document.getElementById('chartPollsBrussels').getContext('2d');
+                chartPollsInstance = new Chart(ctxPolls, {
+                    type: 'bar',
+                    data: {
+                        labels: ['PTB-PVDA', 'PS', 'MR', 'Les Engagés', 'Ecolo', 'DéFI'],
+                        datasets: [{
+                            label: 'Intentions de Vote Bruxelles Rentrée 2026 (%)',
+                            data: [24.9, 18.4, 14.0, 9.4, 8.9, 6.0],
+                            backgroundColor: [
+                                '#7F1D1D', // PTB Dark Red
+                                '#DC2626', // PS Red
+                                '#2563EB', // MR Blue
+                                '#059669', // Les Engagés Turquoise
+                                '#16A34A', // Ecolo Green
+                                '#9333EA'  // DéFI Purple
+                            ],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ` Intention de vote: ${ctx.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                max: 30,
+                                ticks: { callback: value => value + '%' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            switchTab('dashboard');
+            calculateIndexLoss();
+        });
+    </script>
+</body>
+</html>

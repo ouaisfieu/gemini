@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conclave Budgétaire Belge 2026 : L'Avenir des Malades de Longue Durée</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f6f8',
+                            100: '#e5e9f0',
+                            700: '#2c3e50',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        },
+                        arizona: {
+                            blue: '#1e40af',  // MR / Open VLD
+                            yellow: '#d97706',// N-VA
+                            red: '#dc2626',   // Vooruit
+                            orange: '#ea580c',// Les Engagés
+                            green: '#16a34a'  // CD&V
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 320px;
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-active {
+            border-bottom: 3px solid #d97706;
+            color: #0f172a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans leading-relaxed flex flex-col min-h-screen">
+
+    <!-- Chosen Palette: Warm Neutral Executive (Slate, Amber, Crimson, Indigo, Emerald) -->
+    <!-- Application Structure Plan: 
+        1. Sticky Header & Navigation: Tabbed navigation to explore thematic sections (Dashboard, Macro/Health, Coercive Matrix, Political Visions, Threats & Demographics, 2026-2029 Scenarios, Interactive Simulator).
+        2. Section 1 - Tableau de Bord (Executive Summary & Key KPIs): High-level indicators (576k invalidity count, -€523M healthcare norm gap, 80% employment target, €26.2B federal deficit).
+        3. Section 2 - Cadrage Macroéconomique & Soins de Santé: Dynamic chart comparing Healthcare Growth Norm (3.2% vs 2.5% vs 2.0%) and detailed analysis of budget cuts across pensions and unemployment.
+        4. Section 3 - Matrice de Responsabilisation (Mesures & Sanctions): Interactive filterable view categorizing legal coercions by target (Patients, Employers, Doctors & Mutualities) with timeline triggers and financial costs.
+        5. Section 4 - Visions Politiques de la Coalition Arizona: Comparative analysis between liberal-conservatives (N-VA, MR), Vooruit (Frank Vandenbroucke's 4th wave), and centrists (Les Engagés, CD&V).
+        6. Section 5 - Menaces Structurelles & Démographie: Chart of long-term sick demographics (62% >50yo, 58% women, blue vs white collar risk) paired with deep dives into four major threat vectors.
+        7. Section 6 - Modélisation Prospective 2026-2029: Interactive scenario switcher modeling Scenario A (Vases Communicants/CPAS), Scenario B (Administrative Clogging & Revolt), and Scenario C (Targeted 4th Wave Success).
+        8. Section 7 - Simulateur d'Impact Financier & Sanctions: Calculator allowing users to simulate the financial consequences of sanctions on patients and costs for employers.
+    -->
+    <!-- Visualization & Content Choices:
+        - Health Norm Comparison -> Bar/Line Chart (Chart.js) -> Clear visual proof of budget compression vs recommendations.
+        - Coercion Matrix -> HTML Grid + JS Filter -> Interactive sorting by stakeholder group.
+        - Political Spectrum -> Styled HTML Comparison Grid -> Easy visual comparison of party philosophies and compromises.
+        - Patient Demographics -> Doughnut & Stacked Bar Charts (Chart.js) -> Highlighting 62% >50yo, gender gaps, and worker type disparity.
+        - Prospective Scenarios -> Interactive Tabbed Cards + Radar Chart -> Multi-dimensional criteria rating of potential outcomes.
+        - Financial Simulator -> Vanilla JS Reactive Form -> Instant calculation of income loss and penalty taxes.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Canvas and structured HTML/CSS only.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 text-center border-b border-slate-800">
+        <span class="inline-block font-semibold uppercase tracking-wider text-amber-400 mr-2">Analyse Prospective 2026-2029</span>
+        <span>Conclave Budgétaire de l'Automne 2026 & Accords de la Coalition Arizona</span>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-amber-600 text-white font-serif font-bold text-xl px-3 py-1 rounded shadow-sm">AZ</div>
+                    <div>
+                        <h1 class="font-bold text-slate-900 text-base leading-tight">Observatoire de l'Incapacité & du Conclave</h1>
+                        <p class="text-xs text-slate-500">Politiques d'Activation et Malades de Longue Durée</p>
+                    </div>
+                </div>
+                <!-- Navigation Tabs (Desktop) -->
+                <nav class="hidden lg:flex space-x-6 text-sm font-medium text-slate-600">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-button tab-active py-5 transition-colors">Tableau de Bord</button>
+                    <button onclick="switchTab('macro')" id="nav-macro" class="tab-button py-5 transition-colors">Norme & Budget</button>
+                    <button onclick="switchTab('matrix')" id="nav-matrix" class="tab-button py-5 transition-colors">Matrice Législative</button>
+                    <button onclick="switchTab('political')" id="nav-political" class="tab-button py-5 transition-colors">Visions Politiques</button>
+                    <button onclick="switchTab('threats')" id="nav-threats" class="tab-button py-5 transition-colors">Menaces & Démographie</button>
+                    <button onclick="switchTab('scenarios')" id="nav-scenarios" class="tab-button py-5 transition-colors">Scénarios 2029</button>
+                    <button onclick="switchTab('simulator')" id="nav-simulator" class="tab-button py-5 transition-colors bg-amber-50 text-amber-900 px-3 rounded-md my-3 hover:bg-amber-100">Simulateur</button>
+                </nav>
+            </div>
+        </div>
+        <!-- Mobile Navigation Menu -->
+        <div class="lg:hidden bg-slate-100 border-t border-slate-200 px-4 py-2 flex overflow-x-auto space-x-3 text-xs font-medium text-slate-700">
+            <button onclick="switchTab('dashboard')" class="whitespace-nowrap py-1 px-2">Tableau de Bord</button>
+            <button onclick="switchTab('macro')" class="whitespace-nowrap py-1 px-2">Norme & Budget</button>
+            <button onclick="switchTab('matrix')" class="whitespace-nowrap py-1 px-2">Matrice Législative</button>
+            <button onclick="switchTab('political')" class="whitespace-nowrap py-1 px-2">Visions Politiques</button>
+            <button onclick="switchTab('threats')" class="whitespace-nowrap py-1 px-2">Menaces & Démographie</button>
+            <button onclick="switchTab('scenarios')" class="whitespace-nowrap py-1 px-2">Scénarios 2029</button>
+            <button onclick="switchTab('simulator')" class="whitespace-nowrap py-1 px-2 bg-amber-200 rounded">Simulateur</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ==================== TAB 1: TABLEAU DE BORD ==================== -->
+        <section id="tab-dashboard" class="tab-content space-y-8">
+            <!-- Section Intro -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded">Synthese Stratégique</span>
+                    <h2 class="text-2xl font-serif font-bold text-slate-900 mt-2">Le Tournant Inflexionnel de la Protection Sociale Belge</h2>
+                    <p class="text-slate-600 mt-3 text-sm leading-relaxed">
+                        Cette application interactive analyse les répercussions du conclave budgétaire de l'automne 2026 et des réformes de la coalition « Arizona » sur les malades de longue durée en Belgique. À travers des données chiffrées, des matrices réglementaires et une prospective à l'horizon 2029, explorez comment l'impératif macroéconomique d'un taux d'emploi à 80 % redéfinit l'équilibre entre solidarité nationale et injonctions d'activation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- KPI Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Volume d'Incapacité</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">576 643</div>
+                    <div class="text-xs text-rose-600 font-semibold mt-1">● Record historique INAMI</div>
+                    <p class="text-xs text-slate-500 mt-2">Malades de plus d'un an fin 2025 (coût annuel > 6 Mds €).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Coupure Santé Annuelle</div>
+                    <div class="text-3xl font-extrabold text-rose-600 mt-1">- 523 M€</div>
+                    <div class="text-xs text-slate-600 font-semibold mt-1">Norme réduite à 2,0 %</div>
+                    <p class="text-xs text-slate-500 mt-2">Écart annuel vs recommandation de 3,2 % du Bureau du Plan.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Cible Macroéconomique</div>
+                    <div class="text-3xl font-extrabold text-amber-600 mt-1">80 %</div>
+                    <div class="text-xs text-slate-600 font-semibold mt-1">Taux d'emploi 2029</div>
+                    <p class="text-xs text-slate-500 mt-2">Actuellement 72,1 % en Belgique (moyenne UE : 75,4 %).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Sanction Patient Maximal</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">10 % à 100%</div>
+                    <div class="text-xs text-rose-600 font-semibold mt-1">Ponction d'allocation</div>
+                    <p class="text-xs text-slate-500 mt-2">En cas de refus du trajet RAT ou d'absence aux contrôles.</p>
+                </div>
+            </div>
+
+            <!-- Core Executive Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-lg font-serif font-bold text-slate-900 border-b border-slate-100 pb-3">Trois Piliers du Glissement Philosophique</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-1">1. L'Injonction de Soins</div>
+                            <p class="text-slate-600 text-xs">La maladie de longue durée passe d'un statut de risque protégé à une situation d'inactivité sous surveillance active.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-1">2. Responsabilisation Quadripartite</div>
+                            <p class="text-slate-600 text-xs">Pénalités croisées touchant simultanément malades, employeurs, prescripteurs médicaux et mutualités.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800 mb-1">3. Arbitrage Budgétaire</div>
+                            <p class="text-slate-600 text-xs">Compression des dépenses sociales pour financer la baisse de fiscalité sur le travail (différentiel de 500 € net).</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 text-xs text-amber-900 rounded-r">
+                        <strong>Enjeu clé du Conclave :</strong> La Belgique fait face à un déficit fédéral projeté à 26,2 milliards d'euros pour 2026. L'accord de gouvernement Arizona cible l'invalidité comme un réservoir d'emplois prioritaire, tout en durcissant l'accès aux prépensions et au chômage.
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white p-6 rounded-xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">Aperçu Démographique</span>
+                        <h4 class="text-xl font-serif font-bold mt-1">Qui sont les 576 643 malades ?</h4>
+                        <ul class="mt-4 space-y-3 text-xs text-slate-300">
+                            <li class="flex justify-between border-b border-slate-800 pb-2">
+                                <span>Âgés de plus de 50 ans :</span>
+                                <strong class="text-white font-mono">62 %</strong>
+                            </li>
+                            <li class="flex justify-between border-b border-slate-800 pb-2">
+                                <span>Proportion de femmes :</span>
+                                <strong class="text-white font-mono">58 %</strong>
+                            </li>
+                            <li class="flex justify-between border-b border-slate-800 pb-2">
+                                <span>Femmes parmi les employés :</span>
+                                <strong class="text-white font-mono">75 %</strong>
+                            </li>
+                            <li class="flex justify-between border-b border-slate-800 pb-2">
+                                <span>Surrisque Ouvriers vs Employés :</span>
+                                <strong class="text-amber-400 font-mono">x 2.0</strong>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="switchTab('threats')" class="mt-6 w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded transition">
+                        Explorer l'analyse sociologique →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: CADRAGE MACRO & SANTÉ ==================== -->
+        <section id="tab-macro" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">1. Cadrage Macroéconomique & Norme de Croissance de Santé</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    Cette section examine les contraintes financières imposées au système de santé de santé belge. Pour financer la baisse de la fiscalité du travail et résorber un déficit fédéral de 26,2 milliards d'euros, le gouvernement Arizona comprime la norme légale de croissance budgétaire de l'INAMI.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <!-- Chart Container -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2 text-center">Trajectoire de la Norme de Croissance Annuelle du Budget Santé</h3>
+                    <div class="chart-container">
+                        <canvas id="chartNormeSante"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 text-center">
+                        La réduction à 2,0 % génère un manque à gagner structurel de 523 M€/an par rapport aux recommandations médicales minimales du Bureau du Plan (3,2 %).
+                    </p>
+                </div>
+
+                <!-- Textual Context and Analysis -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-900 text-sm">Compression du Budget INAMI (- 523 M€/an)</h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            En rabaissant la norme de croissance à 2,0 % (contre 2,5 % sous la Vivaldi et 3,2 % préconisés pour épouser le vieillissement démographique), le gouvernement impose un sous-financement latent. Les risques majeurs incluent le déconventionnement massif des médecins, l'allongement des listes d'attente et l'augmentation du ticket modérateur pour les soins spécialisés.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-900 text-sm">Réformes Parallèles : Pensions & Chômage (- 2,4 Mds €)</h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Le conclave prévoit d'économiser 2,4 milliards d'euros sur les pensions d'ici 2029 via l'instauration d'un malus de 2 % à 5 % par année d'anticipation (pour moins de 35 ans de carrière). L'allocation d'insertion des jeunes est réduite à 1 an, et l'assimilation des périodes de maladie dans le calcul des droits au chômage est fortement restreinte.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 text-xs text-slate-700">
+                        <strong>Facteur de distorsion :</strong> Bloquer les échappatoires de fin de carrière (prépensions RCC verrouillées) contraint les séniors usés à glisser vers l'incapacité de travail, où ils font désormais face à des sanctions directes.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: MATRICE LÉGISLATIVE ==================== -->
+        <section id="tab-matrix" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">2. Matrice Législative de "Responsabilisation"</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    L'accord de gouvernement déploie un arsenal coercitif s'appliquant symétriquement aux malades, aux entreprises, aux médecins et aux mutualités. Sélectionnez une catégorie pour filtrer les contraintes et sanctions légales.
+                </p>
+
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <button onclick="filterMatrix('all')" id="btn-filter-all" class="matrix-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white">Tous les Acteurs</button>
+                    <button onclick="filterMatrix('patient')" id="btn-filter-patient" class="matrix-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Travailleurs Malades</button>
+                    <button onclick="filterMatrix('employer')" id="btn-filter-employer" class="matrix-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Employeurs & RH</button>
+                    <button onclick="filterMatrix('medical')" id="btn-filter-medical" class="matrix-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Corps Médical & Prescripteurs</button>
+                    <button onclick="filterMatrix('mutuelle')" id="btn-filter-mutuelle" class="matrix-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Mutualités</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Legislative Cards Grid -->
+            <div id="matrix-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards rendered dynamically via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: VISIONS POLITIQUES ==================== -->
+        <section id="tab-political" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">3. Dynamiques Politiques de la Coalition Arizona</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    Les mesures du conclave résolvent des compromis complexes entre cinq partis aux doctrines distinctes. Analyse des lignes de force idéologiques et des arbitrages internes.
+                </p>
+            </div>
+
+            <!-- Political Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Liberal Conservative Axis -->
+                <div class="bg-white rounded-xl border-t-4 border-amber-500 border-x border-b border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded">Axe Libéral-Conservateur</span>
+                            <span class="text-xs font-bold text-slate-400">N-VA & MR</span>
+                        </div>
+                        <h3 class="text-lg font-serif font-bold text-slate-900">Rigueur & Activation Obligatoire</h3>
+                        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                            L'inactivité prolongée est perçue comme un frein économique et parfois un choix de confort ou du chômage déguisé. La priorité est la création du différentiel de 500 € net entre travail et inactivité.
+                        </p>
+                        <div class="mt-4 bg-slate-50 p-3 rounded text-xs italic text-slate-700 border border-slate-200">
+                            « Il faut remettre le système en bonne santé et cesser toute complaisance face à la non-coopération. »
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                        <strong>Gain clé :</strong> Sanctions pécuniaires quadruplées et fin de la cotisation patronale sur les salaires > 340k€.
+                    </div>
+                </div>
+
+                <!-- Vooruit Axis -->
+                <div class="bg-white rounded-xl border-t-4 border-rose-600 border-x border-b border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold uppercase text-rose-600 bg-rose-50 px-2 py-0.5 rounded">Axe Social-Démocrate</span>
+                            <span class="text-xs font-bold text-slate-400">Vooruit (Vandenbroucke)</span>
+                        </div>
+                        <h3 class="text-lg font-serif font-bold text-slate-900">La "Quatrième Vague" & Soins Précoces</h3>
+                        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                            Défend une responsabilisation quadripartite (employeurs et médecins inclus). Met l'accent sur les soins psychologiques de 1ère ligne (-41% d'absentéisme constaté après 6 séances).
+                        </p>
+                        <div class="mt-4 bg-slate-50 p-3 rounded text-xs italic text-slate-700 border border-slate-200">
+                            « Ne pas pointer du doigt les vrais malades, mais offrir de nouvelles chances via la détection précoce. »
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                        <strong>Compromis :</strong> Acceptation des coupes d'austérité INAMI en échange du refinancement de la santé mentale.
+                    </div>
+                </div>
+
+                <!-- Centrist Pivot Axis -->
+                <div class="bg-white rounded-xl border-t-4 border-emerald-600 border-x border-b border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Pivot Centriste</span>
+                            <span class="text-xs font-bold text-slate-400">Les Engagés & CD&V</span>
+                        </div>
+                        <h3 class="text-lg font-serif font-bold text-slate-900">Amortisseur Social & Protection</h3>
+                        <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                            Positionnés comme protecteurs de l'infrastructure de soins et des familles. Priorité à la préservation de l'indexation automatique des salaires et au soutien des CPAS.
+                        </p>
+                        <div class="mt-4 bg-slate-50 p-3 rounded text-xs italic text-slate-700 border border-slate-200">
+                            « Éviter que l'assainissement budgétaire ne se transforme en punition aveugle pour les plus fragiles. »
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                        <strong>Gain clé :</strong> Refinancement d'un milliard d'euros pour les CPAS et préservation de l'enveloppe handicap.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tradeoff Comparison Table -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+                <h3 class="text-base font-bold text-slate-900 mb-4">Matrice de Négociation sur les Mesures Phares</h3>
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase">
+                            <th class="p-3 border border-slate-200">Sujet de Négociation</th>
+                            <th class="p-3 border border-slate-200">Position N-VA / MR</th>
+                            <th class="p-3 border border-slate-200">Position Vooruit</th>
+                            <th class="p-3 border border-slate-200">Position Les Engagés / CD&V</th>
+                            <th class="p-3 border border-slate-200">Compromis Acté en Conclave</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr>
+                            <td class="p-3 font-bold border border-slate-200">Sanctions sur indemnités</td>
+                            <td class="p-3 border border-slate-200">Réduction stricte et suspension immédiate</td>
+                            <td class="p-3 border border-slate-200">Sanction ciblée uniquement sur le refus du questionnaire</td>
+                            <td class="p-3 border border-slate-200">Protection des familles à bas revenus</td>
+                            <td class="p-3 border border-slate-200 bg-amber-50">Sanction de 10% systématique + suspension si absence au contrôle</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold border border-slate-200">Responsabilité Employeurs</td>
+                            <td class="p-3 border border-slate-200">Pas d'entraves aux entreprises ou de surtaxation</td>
+                            <td class="p-3 border border-slate-200">Cotisation de responsabilisation pour fort absentéisme</td>
+                            <td class="p-3 border border-slate-200">Exemption stricte pour les PME</td>
+                            <td class="p-3 border border-slate-200 bg-amber-50">Cotisation de solidarité 30% (mois 2-3) pour >50 sal. + rupture FM 6 mois</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold border border-slate-200">Norme de Croissance Santé</td>
+                            <td class="p-3 border border-slate-200">Réduction à 1.5% - 2.0%</td>
+                            <td class="p-3 border border-slate-200">Maintien à 2.5% au moins</td>
+                            <td class="p-3 border border-slate-200">Proche des 3.2% du Bureau du Plan</td>
+                            <td class="p-3 border border-slate-200 bg-amber-50">Fixée à 2.0% jusqu'en 2028, remontée théorique à 3.0% en 2029</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: MENACES & DÉMOGRAPHIE ==================== -->
+        <section id="tab-threats" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">4. Menaces Structurelles & Réalités Sociologiques</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    L'analyse sociologique démontre une inadéquation majeure entre la rhétorique punitive du gouvernement et la réalité clinique des invalides.
+                </p>
+            </div>
+
+            <!-- Charts & Breakdown Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Demographics Chart -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2 text-center">Répartition par Âge et Genre des Malades (>1 An)</h3>
+                    <div class="chart-container">
+                        <canvas id="chartDemographics"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 text-center">
+                        62 % des malades ont plus de 50 ans, une population touchée par l'usure physique et l'allongement des carrières.
+                    </p>
+                </div>
+
+                <!-- Worker Status Disparity Chart -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2 text-center">Taux de Risque d'Incapacité Longue : Ouvriers vs Employés</h3>
+                    <div class="chart-container">
+                        <canvas id="chartWorkers"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 text-center">
+                        Un ouvrier a deux fois plus de risques de devenir malade de longue durée qu'un employé en raison de la pénibilité physique.
+                    </p>
+                </div>
+            </div>
+
+            <!-- The 4 Structural Threats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-rose-600 uppercase">Menace 1</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Inversion de la Culpabilité & Déni des Causes</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Sanctionner pécuniairement le malade repose sur l'hypothèse d'un déficit de motivation. Cette approche occulte l'usure professionnelle (1 collaborateur sur 10 a plus de 60 ans aujourd'hui) et l'explosion des troubles musculo-squelettiques et burn-out.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-rose-600 uppercase">Menace 2</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Paupérisation Immédiate</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Les indemnités d'incapacité oscillent entre 491 € et 857 € par mois après garantie. Une ponction de 10 % (50 € à 85 €/mois) amputera directement le budget de survie et d'accès aux traitements non remboursés.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-rose-600 uppercase">Menace 3</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Rupture du Secret Médical & Chilling Effect</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        La surveillance algorithmique e-Health des médecins prescripteurs et le plafonnement des certificats à 3 mois poussent les généralistes à écourter prématurément le repos clinique sous peine d'interpellation administrative.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-rose-600 uppercase">Menace 4</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Industrialisation de la Force Majeure Médicale</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Le passage du délai de licenciement de 9 à 6 mois assorti d'une taxe unique de 1 800 € pousse les entreprises à se séparer rapidement des malades âgés plutôt qu'à financer la cotisation de solidarité de 30 % ou adapter le poste.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 6: SCÉNARIOS PROSPECTIFS ==================== -->
+        <section id="tab-scenarios" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">5. Modélisation Prospective (Horizon 2026-2029)</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    Trois trajectoires probables découlant de la politique d'activation du Conclave. Choisissez un scénario pour visualiser son impact structurel et ses métriques.
+                </p>
+
+                <!-- Scenario Tabs -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6">
+                    <button onclick="selectScenario('A')" id="btn-scen-A" class="scenario-btn p-4 text-left rounded-lg border-2 border-amber-500 bg-amber-50/50">
+                        <div class="text-xs font-bold text-amber-800">Scénario A (75% Probabilité)</div>
+                        <div class="font-serif font-bold text-slate-900 text-sm mt-1">Les Vases Communicants & Bascule CPAS</div>
+                    </button>
+                    <button onclick="selectScenario('B')" id="btn-scen-B" class="scenario-btn p-4 text-left rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50">
+                        <div class="text-xs font-bold text-slate-500">Scénario B (50% Probabilité)</div>
+                        <div class="font-serif font-bold text-slate-900 text-sm mt-1">Engorgement & Resistance Médicale</div>
+                    </button>
+                    <button onclick="selectScenario('C')" id="btn-scen-C" class="scenario-btn p-4 text-left rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50">
+                        <div class="text-xs font-bold text-slate-500">Scénario C (20% Probabilité)</div>
+                        <div class="font-serif font-bold text-slate-900 text-sm mt-1">Succès Cible du Secteur Tertiaire</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Scenario Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div id="scenario-title-container">
+                        <!-- Dynamic Scenario Title -->
+                    </div>
+                    <div id="scenario-text-container" class="text-xs text-slate-600 leading-relaxed space-y-3">
+                        <!-- Dynamic Scenario Text -->
+                    </div>
+                </div>
+
+                <!-- Scenario Score Canvas Chart -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-bold text-slate-800 mb-2 text-center">Évaluation Multicritère du Scénario</h3>
+                    <div class="chart-container">
+                        <canvas id="chartScenarioRadar"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 7: SIMULATEUR ==================== -->
+        <section id="tab-simulator" class="tab-content hidden space-y-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-serif font-bold text-slate-900">6. Simulateur d'Impact Financier du Conclave</h2>
+                <p class="text-slate-600 mt-2 text-sm">
+                    Calculez les conséquences financières directes des nouvelles réglementations 2026 pour un individu ou une entreprise selon la durée d'incapacité et le niveau de conformité.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Input Form -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="font-bold text-slate-900 text-sm border-b pb-2">Paramètres de la Situation</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Indemnité mensuelle de base brute (€)</label>
+                        <input type="number" id="sim-indemnite" value="1600" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500">
+                        <span class="text-[10px] text-slate-400">Indemnité moyenne INAMI d'incapacité primaire ou invalidité.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Durée d'Incapacité Absolue</label>
+                        <select id="sim-duree" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500">
+                            <option value="2">2 mois (Mois 2)</option>
+                            <option value="3" selected>3 mois (Mois 3)</option>
+                            <option value="7">7 mois (Force Majeure possible)</option>
+                            <option value="12">12 mois et plus (Invalidité)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Conformité de l'Individu</label>
+                        <select id="sim-patient-status" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500">
+                            <option value="ok">Totalement coopératif (Trajet RAT suivi)</option>
+                            <option value="late">Questionnaire rempli en retard (-10%)</option>
+                            <option value="absent">Absence injustifiée au contrôle médical (Suspension 100%)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Taille de l'Entreprise Employeuse</label>
+                        <select id="sim-employer-size" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500">
+                            <option value="small">Moins de 20 salariés (Exempté)</option>
+                            <option value="medium">20 à 50 salariés (Trajet obligatoire)</option>
+                            <option value="large" selected>Plus de 50 salariés (Cotisation Solidarité 30%)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="calculateSimulation()" class="w-full py-2.5 bg-slate-900 text-white font-bold text-xs rounded hover:bg-slate-800 transition">
+                        Calculer l'Impact Financier
+                    </button>
+                </div>
+
+                <!-- Simulation Output -->
+                <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md flex flex-col justify-between space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider">Résultats du Calcul d'Impact</h3>
+                        
+                        <div class="mt-6 space-y-4">
+                            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                                <div class="text-xs text-slate-400">Indemnité Mensuelle Perçue par le Malade</div>
+                                <div id="res-patient-income" class="text-2xl font-bold text-emerald-400 mt-1">1 600 € / mois</div>
+                                <div id="res-patient-note" class="text-[11px] text-slate-300 mt-1">Aucune sanction appliquée.</div>
+                            </div>
+
+                            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                                <div class="text-xs text-slate-400">Coûts & Surtaxes Cumulés pour l'Employeur</div>
+                                <div id="res-employer-cost" class="text-2xl font-bold text-amber-400 mt-1">960 €</div>
+                                <div id="res-employer-note" class="text-[11px] text-slate-300 mt-1">Cotisation de solidarité 30% (mois 2 et 3).</div>
+                            </div>
+
+                            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                                <div class="text-xs text-slate-400">Statut du Contrat de Travail</div>
+                                <div id="res-contract-status" class="text-sm font-bold text-white mt-1">Maintien sous contrat avec obligation RAT</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 border-t border-slate-800 pt-3">
+                        * Estimation basée sur le décret d'exécution Arizona 2026.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Observatoire Stratégique de l'Incapacité de Travail — Modélisation du Conclave Budgétaire Belge 2026</p>
+            <p class="mt-1">Application SPA conforme aux exigences de neutralité et de lisibilité des données de santé publique.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Matrix Data Definition
+        const matrixData = [
+            {
+                category: 'patient',
+                title: 'Refus ou Retard Trajet RAT',
+                target: 'Travailleurs Malades',
+                sanction: 'Pénalité de 10% sur l\'indemnité journalière',
+                detail: 'S\'applique immédiatement si le questionnaire de retour au travail n\'est pas renvoyé dans le délai imparti à la mutualité.',
+                timing: 'À partir de la 8ème semaine'
+            },
+            {
+                category: 'patient',
+                title: 'Absence au Contrôle Médical',
+                target: 'Travailleurs Malades',
+                sanction: 'Suspension TOTALE (100%) des indemnités',
+                detail: 'Une absence non justifiée chez le médecin-conseil ou au 2ème rendez-vous de la médecine du travail coupe tout revenu.',
+                timing: 'À tout moment'
+            },
+            {
+                category: 'patient',
+                title: 'Délai de Réchute & Salaire Garanti',
+                target: 'Travailleurs Malades',
+                sanction: 'Maintien sans salaire garanti patronal',
+                detail: 'Obligation d\'avoir travaillé au moins 8 semaines consécutives (au lieu de 2 semaines auparavant) pour rouvrir le droit à 1 mois de salaire garanti.',
+                timing: 'En cas de reprise manquée'
+            },
+            {
+                category: 'employer',
+                title: 'Cotisation de Solidarité 30%',
+                target: 'Employeurs (> 50 salariés)',
+                sanction: '30% de l\'indemnité INAMI à charge entreprise',
+                detail: 'Prélevé obligatoirement pour le 2ème et 3ème mois d\'absence ininterrompue du travailleur (~1 700 € cumulés).',
+                timing: 'Mois 2 et Mois 3'
+            },
+            {
+                category: 'employer',
+                title: 'Défaut d\'Initiation du Trajet RAT',
+                target: 'Employeurs (> 20 salariés)',
+                sanction: 'Amende de 500 € à 5 000 € par salarié',
+                detail: 'Pénalité pénale/administrative si l\'entreprise n\'initie pas de trajet de réintégration pour un malade de 6 mois à potentiel résiduel.',
+                timing: 'Après 6 mois'
+            },
+            {
+                category: 'employer',
+                title: 'Rupture Force Majeure Médicale',
+                target: 'Employeurs (Tous)',
+                sanction: 'Taxe forfaitaire de 1 800 € au fonds RAT',
+                detail: 'Période d\'attente avant licenciement réduite de 9 à 6 mois. La taxe de 1 800 € solde tout litige pour l\'employeur.',
+                timing: 'Dès 6 mois'
+            },
+            {
+                category: 'medical',
+                title: 'Plafonnement des Certificats',
+                target: 'Médecins Traitants',
+                sanction: 'Interdiction des arrêts > 3 mois',
+                detail: 'Interdiction stricte d\'émettre un certificat initial ou de prolongation d\'une durée ininterrompue supérieure à 3 mois.',
+                timing: 'À la prescription'
+            },
+            {
+                category: 'medical',
+                title: 'Surveillance Algorithmique e-Health',
+                target: 'Médecins Traitants',
+                sanction: 'Interpellation & Sanctions INAMI',
+                detail: 'Base de données centralisée comparant les moyennes de prescription des médecins. Contrôles ciblés sur les déviants statistiques.',
+                timing: 'Continu'
+            },
+            {
+                category: 'mutuelle',
+                title: 'Financement Variable sur Objectif RAT',
+                target: 'Organismes Assureurs / Mutualités',
+                sanction: 'Réduction du budget d\'administration',
+                detail: 'L\'octroi de la part fixe administrative de l\'État dépend de l\'atteinte d\'un objectif d\'augmentation de +17% de sorties vers l\'emploi.',
+                timing: 'Évaluation annuelle'
+            }
+        ];
+
+        // Scenario Data Definition
+        const scenarios = {
+            'A': {
+                title: 'Scénario A : Phénomène des Vases Communicants & Paupérisation Communale',
+                prob: 'Probabilité Élevée (75%)',
+                radar: [85, 30, 20, 90, 80], // [Pression CPAS, Taux Emploi Réel, Satisfaction Médicale, Sanctions Appliquées, Économies INAMI]
+                text: `
+                    <p><strong>Mécanique :</strong> Les radiations massives pour non-conformité administrative (10% à 100% de perte d'allocation) et le rejet des travailleurs sénieurs par le marché du travail entraînent un glissement en chaîne. Ne pouvant accéder ni à la retraite anticipée ni au chômage durci, les anciens invalides échouent au CPAS.</p>
+                    <p><strong>Résultat à 2029 :</strong> L'État fédéral assainit artificiellement le budget INAMI, mais transfère l'addiction financière vers les communes. L'enveloppe additionnelle d'un milliard pour les CPAS est totalement consommée dès 2028. La pauvreté des plus de 50 ans augmente de manière critique.</p>
+                `
+            },
+            'B': {
+                title: 'Scénario B : Engorgement Bureaucratique & Fronde Médicale',
+                prob: 'Probabilité Modérée (50%)',
+                radar: [50, 25, 10, 40, 30],
+                text: `
+                    <p><strong>Mécanique :</strong> Face à la surcharge de dossiers (convocations systématiques à la 8ème semaine) et au manque chronique de médecins du travail et de contrôleurs, le système s'effondre sous son propre poids. Les médecins généralistes entrent en résistance passive en multipliant les certificats courts successifs (< 3 mois) sous des codes pathologies modifiés.</p>
+                    <p><strong>Résultat à 2029 :</strong> Paralysie administrative. Le gouvernement est contraint de geler l'application des amendes patronales par circulaire. Le climat d'anxiété pour les malades est maximal sans aucun gain sur le taux d'emploi.</p>
+                `
+            },
+            'C': {
+                title: 'Scénario C : Succès Cible de la "Quatrième Vague" dans le Tertiaire',
+                prob: 'Probabilité Faible (20%)',
+                radar: [30, 60, 65, 30, 50],
+                text: `
+                    <p><strong>Mécanique :</strong> L'investissement dans les soins psychologiques de 1ère ligne porte ses fruits pour la population jeune du secteur tertiaire touchée par le burn-out précoce. Les reprises partielles aménagées fonctionnent bien chez les employés qualifiés.</p>
+                    <p><strong>Résultat à 2029 :</strong> Amélioration marginale du taux d'emploi (+1.2%), mais échec total pour les 62% de malades de plus de 50 ans et les ouvriers usés par la pénibilité physique, maintenant la fracture sociale.</p>
+                `
+            }
+        };
+
+        // Chart Variables
+        let chartNorme, chartDemog, chartWork, chartRadar;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMatrixCards('all');
+            initCharts();
+            selectScenario('A');
+            calculateSimulation();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('tab-active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) activeNav.classList.add('tab-active');
+
+            // Resize charts on display toggle
+            if (chartNorme) chartNorme.resize();
+            if (chartDemog) chartDemog.resize();
+            if (chartWork) chartWork.resize();
+            if (chartRadar) chartRadar.resize();
+        }
+
+        // Render Legislative Matrix Cards
+        function filterMatrix(category) {
+            // Update button styles
+            document.querySelectorAll('.matrix-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById(`btn-filter-${category}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+                activeBtn.classList.add('bg-slate-900', 'text-white');
+            }
+
+            renderMatrixCards(category);
+        }
+
+        function renderMatrixCards(category) {
+            const container = document.getElementById('matrix-cards-container');
+            container.innerHTML = '';
+
+            const filtered = category === 'all' ? matrixData : matrixData.filter(d => d.category === category);
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700">${item.target}</span>
+                            <span class="text-[10px] text-amber-600 font-semibold">${item.timing}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm mb-2">${item.title}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-3">${item.detail}</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 mt-2">
+                        <span class="text-[11px] font-bold text-rose-600 block">Sanction : ${item.sanction}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize Chart.js Data Visualizations
+        function initCharts() {
+            // 1. Healthcare Norm Chart
+            const ctxNorme = document.getElementById('chartNormeSante').getContext('2d');
+            chartNorme = new Chart(ctxNorme, {
+                type: 'bar',
+                data: {
+                    labels: ['Bureau du Plan (Rec.)', 'Coalition Vivaldi (Préc.)', 'Coalition Arizona (Actuelle)'],
+                    datasets: [{
+                        label: 'Norme de Croissance Annuelle (%)',
+                        data: [3.2, 2.5, 2.0],
+                        backgroundColor: ['#10b981', '#6366f1', '#f43f5e'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` Norme légale : +${ctx.raw}% par an`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 4.0,
+                            ticks: { callback: (v) => v + ' %' }
+                        }
+                    }
+                }
+            });
+
+            // 2. Demographics Chart
+            const ctxDemog = document.getElementById('chartDemographics').getContext('2d');
+            chartDemog = new Chart(ctxDemog, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Plus de 50 ans (62%)', 'Moins de 50 ans (38%)'],
+                    datasets: [{
+                        data: [62, 38],
+                        backgroundColor: ['#d97706', '#cbd5e1'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 3. Worker Status Chart
+            const ctxWork = document.getElementById('chartWorkers').getContext('2d');
+            chartWork = new Chart(ctxWork, {
+                type: 'bar',
+                data: {
+                    labels: ['Ouvriers (Pénibilité physique)', 'Employés (Tertiaire)'],
+                    datasets: [{
+                        label: 'Indice de Risque d\'Incapacité (>1 an)',
+                        data: [200, 100],
+                        backgroundColor: ['#dc2626', '#3b82f6'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: { label: (ctx) => ` Risque relatif : ${ctx.raw === 200 ? '2x plus élevé' : 'Base 100'}` }
+                        }
+                    },
+                    scales: {
+                        x: { display: false }
+                    }
+                }
+            });
+
+            // 4. Prospective Scenario Radar Chart
+            const ctxRadar = document.getElementById('chartScenarioRadar').getContext('2d');
+            chartRadar = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Pression CPAS', 'Taux Emploi Réel', 'Satisfaction Médicale', 'Sanctions Appliquées', 'Économies INAMI'],
+                    datasets: [{
+                        label: 'Indicateurs de Performance / Impact',
+                        data: scenarios['A'].radar,
+                        backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                        borderColor: '#d97706',
+                        pointBackgroundColor: '#d97706'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Scenario Selector Logic
+        function selectScenario(scenKey) {
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-amber-50/50');
+                btn.classList.add('border-slate-200', 'bg-white');
+            });
+            const activeBtn = document.getElementById(`btn-scen-${scenKey}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-slate-200', 'bg-white');
+                activeBtn.classList.add('border-amber-500', 'bg-amber-50/50');
+            }
+
+            const sc = scenarios[scenKey];
+            document.getElementById('scenario-title-container').innerHTML = `
+                <div class="text-xs font-bold uppercase text-amber-600">${sc.prob}</div>
+                <h3 class="text-lg font-serif font-bold text-slate-900 mt-1">${sc.title}</h3>
+            `;
+            document.getElementById('scenario-text-container').innerHTML = sc.text;
+
+            // Update Radar Chart
+            if (chartRadar) {
+                chartRadar.data.datasets[0].data = sc.radar;
+                chartRadar.update();
+            }
+        }
+
+        // Calculate Interactive Simulation
+        function calculateSimulation() {
+            const baseIncome = parseFloat(document.getElementById('sim-indemnite').value) || 1600;
+            const duree = parseInt(document.getElementById('sim-duree').value);
+            const patientStatus = document.getElementById('sim-patient-status').value;
+            const employerSize = document.getElementById('sim-employer-size').value;
+
+            // Patient Income Calculation
+            let finalIncome = baseIncome;
+            let patientNote = "Indemnité intégrale maintenue.";
+
+            if (patientStatus === 'late') {
+                finalIncome = baseIncome * 0.90;
+                patientNote = "Sanction de 10% appliquée pour retard administratif (-" + Math.round(baseIncome * 0.10) + " €/mois).";
+            } else if (patientStatus === 'absent') {
+                finalIncome = 0;
+                patientNote = "SUSPENSION TOTALE (100%) pour non-présentation au contrôle médical.";
+            }
+
+            // Employer Cost Calculation
+            let employerCost = 0;
+            let employerNote = "Aucune surtaxe d'absentéisme.";
+
+            if (employerSize === 'large' && duree >= 2) {
+                const monthsTaxed = Math.min(duree - 1, 2); // Months 2 and 3
+                employerCost += (baseIncome * 0.30) * monthsTaxed;
+                employerNote = `Cotisation de solidarité 30% appliquée sur ${monthsTaxed} mois d'absence.`;
+            }
+
+            if (duree >= 7) {
+                employerCost += 1800; // Force Majeure Exit Tax
+                employerNote += " + Taxe forfaitaire 1 800 € pour rupture Force Majeure Médicale.";
+            }
+
+            // Contract Status Logic
+            let contractStatus = "Maintien sous contrat (Obligation de suivi RAT)";
+            if (duree >= 6) {
+                contractStatus = "Éligible au licenciement pour Force Majeure Médicale (Délai 6 mois atteint)";
+            }
+
+            // Update UI Output
+            document.getElementById('res-patient-income').innerText = Math.round(finalIncome).toLocaleString('fr-BE') + " € / mois";
+            document.getElementById('res-patient-note').innerText = patientNote;
+
+            document.getElementById('res-employer-cost').innerText = Math.round(employerCost).toLocaleString('fr-BE') + " €";
+            document.getElementById('res-employer-note').innerText = employerNote;
+
+            document.getElementById('res-contract-status').innerText = contractStatus;
+        }
+    </script>
+</body>
+</html>

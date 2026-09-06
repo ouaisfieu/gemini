@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conclave Budgétaire Belge 2026-2027 | Analyse Stratégique & Dashboard</title>
+    <!-- Chosen Palette: Warm Neutral Slate -->
+    <!-- Application Structure Plan: 
+         - Architecture thématique et interactive optimisée pour l'exploration fluide :
+           1. Header & KPI Ticker : Vue d'ensemble instantanée des chiffres clés (déficit, dette, effort global) avec recherche globale.
+           2. Navigation par Onglets Fonctionnels :
+              - Tab 1: Cadrage Macroéconomique & Trajectoire UE (Graphiques évolutifs Chart.js du déficit/dette 2025-2031, comparatif européen de la PDE, simulateur de dette).
+              - Tab 2: Cartographie Politique Arizona (Matrice interactive des ministres, forces politiques, tensions dogmatiques TINA vs TNA).
+              - Tab 3: Réformes Fédérales & Calculateur d'Impact (Emploi, Santé/PROMES, Pensions, Compromis fiscal, Calculateur d'indexation salariale).
+              - Tab 4: Austérité Régionale (Wallonie & FWB - Analyse du plan 538M€ wallon avec filtres, simulateur de minerval FWB, réforme de la carrière enseignante).
+              - Tab 5: Matrice Synthétique des Mesures (Tableau de bord inter-entités filtrable et recherchable de 25+ réformes).
+         - Justification : Cette structure évite la lecture linéaire passive et permet aux citoyens, analystes et décideurs d'isoler rapidement les impacts sectoriels ou individuels du conclave.
+    -->
+    <!-- Visualization & Content Choices: 
+         - Macroéconomie -> Graphique combiné Ligne/Barre (Chart.js) -> Toggle Déficit vs Dette -> Comparaison visuelle de l'effet boule de neige.
+         - Gouvernement -> Cartes de ministres filtrables par parti -> Vue détaillée au clic -> Clarté sur l'équilibre Arizona.
+         - Impact Salarial -> Calculateur JS interactif -> Saisie du salaire brut -> Résultat immédiat du plafonnement d'indexation.
+         - Minerval FWB -> Graphique à barres comparatif + Simulateur de statut social -> Rendre compréhensible la réforme du DIES.
+         - Plan Wallonie -> Graphique Doughnut + Tableau filtrable dynamique -> Exploration du démantèlement APE et coupes régionales.
+         - Confirmation : Aucun graphique SVG utilisé, aucune librairie Mermaid JS. FontAwesome utilisé via CDN pour l'iconographie.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fcfbf7',
+                            100: '#f6f3e8',
+                            200: '#ece5cd',
+                            500: '#d97706',
+                            700: '#b45309',
+                            800: '#78350f',
+                            900: '#451a03',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900">
+
+    <!-- TOP HEADER / KPI TICKER -->
+    <header class="bg-navy-900 text-white sticky top-0 z-50 shadow-md border-b border-amber-600/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500 text-navy-900 flex items-center justify-center font-bold text-xl shadow-inner">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-bold tracking-tight text-stone-100">
+                            Conclave Budgétaire Belge <span class="text-amber-400">2026-2027</span>
+                        </h1>
+                        <p class="text-xs text-stone-400">Analyse Stratégique & Perspectives de Consolidation Publique</p>
+                    </div>
+                </div>
+
+                <!-- Global Quick Search & Entity Indicator -->
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <div class="relative w-full md:w-64">
+                        <input type="text" id="globalSearch" onkeyup="handleGlobalSearch()" placeholder="Rechercher une réforme, un ministre..." 
+                            class="w-full pl-9 pr-3 py-1.5 text-xs bg-navy-800 text-stone-200 rounded-md border border-stone-700 focus:outline-none focus:border-amber-500 transition">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-stone-400 text-xs"></i>
+                    </div>
+                    <span class="hidden lg:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Procédure PDE
+                    </span>
+                </div>
+            </div>
+
+            <!-- KEY NUMBERS BANNER -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-3 border-t border-stone-800 text-xs">
+                <div class="bg-navy-800/80 p-2 rounded border border-stone-700/50">
+                    <span class="text-stone-400 block">Effort Fédéral Requis</span>
+                    <span class="text-amber-400 font-bold text-sm sm:text-base">7,7 à 10,0 Mds €</span>
+                </div>
+                <div class="bg-navy-800/80 p-2 rounded border border-stone-700/50">
+                    <span class="text-stone-400 block">Déficit Public (2026)</span>
+                    <span class="text-red-400 font-bold text-sm sm:text-base">4,9 % du PIB</span>
+                </div>
+                <div class="bg-navy-800/80 p-2 rounded border border-stone-700/50">
+                    <span class="text-stone-400 block">Dette Publique (2026)</span>
+                    <span class="text-amber-400 font-bold text-sm sm:text-base">110,7 % du PIB</span>
+                </div>
+                <div class="bg-navy-800/80 p-2 rounded border border-stone-700/50">
+                    <span class="text-stone-400 block">Plan Wallonie / FWB</span>
+                    <span class="text-emerald-400 font-bold text-sm sm:text-base">-538M€ / -184M€</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN NAVIGATION TABS -->
+    <nav class="bg-white border-b border-stone-200 sticky top-[108px] sm:top-[98px] z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-1 sm:space-x-4 overflow-x-auto custom-scrollbar py-2 text-xs sm:text-sm font-medium">
+                <button onclick="switchTab('macro')" id="tab-macro" class="tab-btn px-3 py-2 rounded-lg text-amber-800 bg-amber-50 font-semibold border border-amber-200 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line"></i> Macroéconomie & UE
+                </button>
+                <button onclick="switchTab('political')" id="tab-political" class="tab-btn px-3 py-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear"></i> Coalition Arizona
+                </button>
+                <button onclick="switchTab('federal')" id="tab-federal" class="tab-btn px-3 py-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced"></i> Réformes Fédérales
+                </button>
+                <button onclick="switchTab('regions')" id="tab-regions" class="tab-btn px-3 py-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot"></i> Wallonie & FWB
+                </button>
+                <button onclick="switchTab('matrix')" id="tab-matrix" class="tab-btn px-3 py-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> Matrice des Mesures
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: CADRAGE MACROÉCONOMIQUE & UE       -->
+        <!-- ========================================== -->
+        <section id="content-macro" class="tab-content space-y-6">
+            <!-- Intro Card -->
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-globe text-amber-600"></i> Le Cadrage Macroéconomique et la Contrainte Européenne
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    Sous la pression directe du Conseil de l'Union européenne et de la <strong>Procédure pour Déficit Excessif (PDE)</strong> initiée en raison d'un déficit 2023 de 5,2 % du PIB, la Belgique fait face à un impératif d'assainissement d'une ampleur inédite. Selon le Comité de monitoring, à politique inchangée, le déficit public global atteindra 6,2 % du PIB d'ici 2031, propulsant la dette à plus de 122 % du PIB.
+                </p>
+            </div>
+
+            <!-- Grid 2 Cols: Chart & EU Timetable -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Projections Chart Container -->
+                <div class="lg:col-span-7 bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="font-bold text-stone-800 text-base">Projections Budgétaires (2025 - 2031)</h3>
+                            <p class="text-xs text-stone-500">Source: Comité de Monitoring & Bureau Fédéral du Plan</p>
+                        </div>
+                        <div class="inline-flex rounded-md shadow-sm">
+                            <button onclick="updateMacroChart('deficit')" id="btn-chart-deficit" class="px-2.5 py-1 text-xs font-semibold rounded-l-md bg-amber-600 text-white border border-amber-600">
+                                Déficits (% PIB)
+                            </button>
+                            <button onclick="updateMacroChart('debt')" id="btn-chart-debt" class="px-2.5 py-1 text-xs font-semibold rounded-r-md bg-stone-100 text-stone-700 border border-stone-300 hover:bg-stone-200">
+                                Dette Publique (% PIB)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900">
+                        <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i>
+                        <strong>Effet « Boule de Neige » :</strong> En 2024, la dette fédérale s'élevait à 519,2 milliards €, générant plus de 10 milliards € d'intérêts annuels. Sans correction, la charge d'intérêts menace d'absorber l'essentiel des marges fiscales.
+                    </div>
+                </div>
+
+                <!-- EU PDE Context & Comparative Table -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-stone-800 text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-flag-eu text-blue-600"></i> Trajectoire Traité UE (Art. 126)
+                        </h3>
+                        <p class="text-xs text-stone-600 mb-4 leading-relaxed">
+                            Le Conseil UE impose à la Belgique de limiter la croissance nominale de ses dépenses nettes à <strong>2,4% (2025)</strong>, <strong>1,9% (2026)</strong> et <strong>2,0% (2027)</strong>. Pour éviter un ajustement brutal sur 3 ans, la Belgique a négocié un plan d'étalement sur <strong>7 ans</strong> assorti de réformes structurelles majeures.
+                        </p>
+
+                        <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Calendrier UE de Correction du Déficit</h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between items-center p-2 rounded bg-red-50 border border-red-200">
+                                <span class="font-semibold text-red-900">Belgique</span>
+                                <span class="px-2 py-0.5 rounded bg-red-200 text-red-800 font-bold">2027 (Plan 7 ans)</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-stone-50 border border-stone-200">
+                                <span>Italie / Slovaquie</span>
+                                <span class="font-medium text-stone-600">2026 / 2027</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-stone-50 border border-stone-200">
+                                <span>Pologne / France</span>
+                                <span class="font-medium text-stone-600">2028 / 2029</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-stone-50 border border-stone-200">
+                                <span>Roumanie</span>
+                                <span class="font-medium text-stone-600">2030</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-emerald-50 border border-emerald-200">
+                                <span class="text-emerald-900">Malte</span>
+                                <span class="px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 font-bold">Sortie Anticipée (2026)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bureau du Plan Highlight -->
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-stone-500">
+                        <strong class="text-stone-700">Rapport BFP 13320 :</strong> Le Bureau Fédéral du Plan a répertorié plus de 250 options politiques. La Sécurité sociale représente 147,3 Mds € (dont 50% en pensions et 28% en soins de santé).
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMULATEUR INTERACTIF DE TRAJECTOIRE -->
+            <div class="bg-gradient-to-r from-navy-900 to-slate-800 text-white p-6 rounded-xl shadow-md">
+                <div class="max-w-3xl">
+                    <h3 class="text-lg font-bold text-amber-400 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Simulateur d'Impact de l'Effort d'Assainissement
+                    </h3>
+                    <p class="text-xs text-stone-300 mb-4">
+                        Ajustez l'effort budgétaire annuel cumulé réalisé par le gouvernement fédéral pour observer la trajectoire estimée du déficit en 2029.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center bg-navy-800/80 p-4 rounded-lg border border-stone-700">
+                        <div class="sm:col-span-2 space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span>Effort Annuel Cumulé :</span>
+                                <span id="effortVal" class="font-bold text-amber-400 text-sm">8,0 Mds €</span>
+                            </div>
+                            <input type="range" id="effortRange" min="2" max="18" step="0.5" value="8" oninput="calculateBudgetSimulation()"
+                                class="w-full accent-amber-500 bg-stone-700 h-2 rounded-lg cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-stone-400">
+                                <span>2 Mds € (Ajustement faible)</span>
+                                <span>10 Mds € (Cible Arizona)</span>
+                                <span>18 Mds € (Recommandation BNB)</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center p-3 bg-navy-900/90 rounded border border-amber-500/30">
+                            <span class="text-[11px] text-stone-400 block">Déficit Estimé 2029</span>
+                            <span id="simDeficitResult" class="text-xl font-extrabold text-amber-400">3,4 % du PIB</span>
+                            <span id="simStatusBadge" class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-900/60 text-red-200 border border-red-700">
+                                Hors cible UE (&gt;3%)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 2: COALITION ARIZONA & ÉQUILIBRE       -->
+        <!-- ========================================== -->
+        <section id="content-political" class="tab-content hidden space-y-6">
+            <!-- Intro Card -->
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-users-viewfinder text-amber-600"></i> L'Architecture Politique : La Coalition Arizona à l'Épreuve
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    Prestation de serment le 3 février 2025 après 239 jours de négociations. Mené par Bart De Wever (N-VA), ce gouvernement repose sur une alliance pentapartite (N-VA, MR, Les Engagés, Vooruit, CD&V). L'arbitrage budgétaire oppose la ligne de rigueur libérale-nationaliste aux garanties sociales réclamées par le centre et Vooruit.
+                </p>
+            </div>
+
+            <!-- Filter By Party -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+                <span class="text-stone-500">Filtrer par formation :</span>
+                <button onclick="filterMinisters('ALL')" class="party-filter-btn px-3 py-1 rounded-full bg-navy-800 text-white">Tous</button>
+                <button onclick="filterMinisters('N-VA')" class="party-filter-btn px-3 py-1 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200">N-VA</button>
+                <button onclick="filterMinisters('MR')" class="party-filter-btn px-3 py-1 rounded-full bg-blue-100 text-blue-900 hover:bg-blue-200">MR</button>
+                <button onclick="filterMinisters('Les Engagés')" class="party-filter-btn px-3 py-1 rounded-full bg-teal-100 text-teal-900 hover:bg-teal-200">Les Engagés</button>
+                <button onclick="filterMinisters('Vooruit')" class="party-filter-btn px-3 py-1 rounded-full bg-red-100 text-red-900 hover:bg-red-200">Vooruit</button>
+                <button onclick="filterMinisters('CD&V')" class="party-filter-btn px-3 py-1 rounded-full bg-orange-100 text-orange-900 hover:bg-orange-200">CD&V</button>
+            </div>
+
+            <!-- Dynamic Minister Cards Grid -->
+            <div id="ministersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- JS Populated -->
+            </div>
+
+            <!-- Ideological Confrontation Focus: TINA vs TNA & Tax Debate -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <!-- Debate 1: TINA vs TNA -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-stone-800 text-base">« TINA » vs « This is Not Acceptable »</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Tension Sociale</span>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-stone-50 rounded border-l-4 border-navy-800">
+                                <strong class="text-navy-900 block font-semibold mb-1">Bart De Wever (Premier ministre / N-VA) :</strong>
+                                « There Is No Alternative » — L'assainissement est une obligation existentielle pour éviter le spectre du « scénario grec » et la perte de souveraineté financière face aux marchés et à l'UE.
+                            </div>
+                            <div class="p-3 bg-red-50 rounded border-l-4 border-red-600">
+                                <strong class="text-red-900 block font-semibold mb-1">Front Commun Syndical (CSC / Marie-Hélène Ska) :</strong>
+                                « This is Not Acceptable » — Dénonciation d'un plan asymétrique qui épargne les grands patrimoines et fait porter l'effort sur les travailleurs, les malades et la fonction publique.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debate 2: Patrimoine vs Consommation -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-stone-800 text-base">Clash Fiscal : Impôt Fortune vs Rigueur</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Arbitrage Intérieur</span>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-teal-50 rounded border-l-4 border-teal-600">
+                                <strong class="text-teal-900 block font-semibold mb-1">Les Engagés (Maxime Prévot) :</strong>
+                                Proposition d'une taxe progressive sur les patrimoines &gt; 500k€ (jusqu'à 0,6% au-delà de 3M€) pour garantir la justice fiscale face aux coupes sociales.
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded border-l-4 border-blue-600">
+                                <strong class="text-blue-900 block font-semibold mb-1">MR (Georges-Louis Bouchez) :</strong>
+                                Veto absolu. Risque de fuite des capitaux et délocalisation des sièges sociaux. Rejet de la taxation des stocks de capital au profit d'une baisse des dépenses publiques.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 3: RÉFORMES FÉDÉRALES & CALCULATEURS   -->
+        <!-- ========================================== -->
+        <section id="content-federal" class="tab-content hidden space-y-6">
+            <!-- Intro Card -->
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-briefcase text-amber-600"></i> Les Réformes Structurelles Fédérales
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    Le conclave modifie en profondeur le droit du travail, le soutien aux indépendants, l'assurance maladie-invalidité et la fiscalité indirecte. Explorez ci-dessous les piliers de réformes ou calculez votre impact individuel.
+                </p>
+            </div>
+
+            <!-- Interactive Sub-tabs for Federal Pillars -->
+            <div class="flex flex-wrap gap-2 text-xs font-semibold">
+                <button onclick="switchFederalPillar('travail')" id="pill-travail" class="fed-pill-btn px-3 py-1.5 rounded-lg bg-navy-800 text-white shadow-sm">
+                    <i class="fa-solid fa-user-gear mr-1"></i> Travail &amp; Indépendants
+                </button>
+                <button onclick="switchFederalPillar('sante')" id="pill-sante" class="fed-pill-btn px-3 py-1.5 rounded-lg bg-stone-200 text-stone-700 hover:bg-stone-300">
+                    <i class="fa-solid fa-heart-pulse mr-1"></i> Santé &amp; Invalidité (ReAT)
+                </button>
+                <button onclick="switchFederalPillar('pensions')" id="pill-pensions" class="fed-pill-btn px-3 py-1.5 rounded-lg bg-stone-200 text-stone-700 hover:bg-stone-300">
+                    <i class="fa-solid fa-piggy-bank mr-1"></i> Pensions &amp; Salaires
+                </button>
+                <button onclick="switchFederalPillar('fiscalite')" id="pill-fiscalite" class="fed-pill-btn px-3 py-1.5 rounded-lg bg-stone-200 text-stone-700 hover:bg-stone-300">
+                    <i class="fa-solid fa-receipt mr-1"></i> Fiscalité &amp; Justice
+                </button>
+            </div>
+
+            <!-- Content Pillar 1: Labor & Self-employed -->
+            <div id="fed-pillar-travail" class="fed-pillar-content grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-amber-700 flex items-center gap-2">
+                        <i class="fa-solid fa-clock"></i> Flexibilisation du Marché du Travail
+                    </h3>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>360h / 450h Sup Volontaires :</strong> 360 heures/an utilisables sans justification (240h défiscalisées « brut=net »). Élevé à 450h pour l'Horeca (360h défiscalisées).
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Travail de Nuit &amp; E-Commerce :</strong> Abolition de l'interdiction de principe. Plage horaire 20h-6h (23h pour la distribution/e-commerce). Primes CCT n°49 garanties.
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Temps Partiel &amp; Flexijobs :</strong> Durée minimale abaissée du 1/3 au 1/10e d'un temps plein. Extension des flexijobs au secteur public (sur base volontaire).
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-amber-700 flex items-center gap-2">
+                        <i class="fa-solid fa-store"></i> Valorisation du Statut des Indépendants
+                    </h3>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Maternité Indépendante :</strong> Extension de l'exonération des cotisations sociales post-grossesse de 1 à <strong>2 trimestres</strong> sans bloquer la PLCI.
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Étudiants-Entrepreneurs :</strong> Pérennisation de la hausse des plafonds fiscaux et maintien du statut durant le trimestre de diplomation.
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Indépendants Complémentaires :</strong> Valorisation des cotisations pour l'ouverture de droits de pension effectifs + réduction des pénalités de retard.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Pillar 2: Health & Invalidity -->
+            <div id="fed-pillar-sante" class="fed-pillar-content hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-emerald-700 flex items-center gap-2">
+                        <i class="fa-solid fa-notes-medical"></i> Budget Soins de Santé &amp; PROMES
+                    </h3>
+                    <p class="text-xs text-stone-600 mb-3">
+                        Enveloppe globale fixée à <strong>41,579 Mds €</strong> en 2026. Maintien de la norme de croissance réelle à <strong>2,0%</strong> guidée par le modèle de microsimulation PROMES.
+                    </p>
+                    <div class="p-3 bg-red-50 rounded border border-red-200 text-xs text-red-900 mb-2">
+                        <strong>Effort d'efficience immédiat : -907 Millions €</strong> ciblés sur la biologie clinique, l'imagerie médicale et le prix des médicaments.
+                    </div>
+                    <p class="text-[11px] text-stone-500">Hausse ciblée du ticket modérateur à charge des patients dès 2026.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-emerald-700 flex items-center gap-2">
+                        <i class="fa-solid fa-person-walking-with-cane"></i> Réintégration Malaise/Invalidité (ReAT)
+                    </h3>
+                    <div class="space-y-2 text-xs text-stone-600">
+                        <div class="p-2 bg-stone-50 rounded">
+                            <strong>1. Plan Phénix :</strong> Extension du suivi psychologique de première ligne (6 séances réduisent l'absentéisme de 41%).
+                        </div>
+                        <div class="p-2 bg-stone-50 rounded">
+                            <strong>2. Capacité Résiduelle :</strong> Évaluation orientée sur ce que le patient peut encore accomplir plutôt que sur ses limites.
+                        </div>
+                        <div class="p-2 bg-stone-50 rounded">
+                            <strong>3. Responsabilisation :</strong> Sanctions pour les entreprises à fort taux d'invalidité et retenues sur frais de gestion des mutualités défaillantes (+17% d'objectif de sortie).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Pillar 3: Pensions & Wages -->
+            <div id="fed-pillar-pensions" class="fed-pillar-content hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-blue-700 flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill-trend-up"></i> Plafonnement de l'Indexation Salariale
+                    </h3>
+                    <p class="text-xs text-stone-600 mb-2">
+                        Pour stopper la spirale prix-salaires, l'indexation est plafonnée au-delà de <strong>4 000 € bruts/mois</strong>. Tout salaire supérieur reçoit un montant forfaitaire fixe équivalent à l'augmentation de la tranche de 4 000 €.
+                    </p>
+                    <div class="p-2.5 bg-blue-50 rounded border border-blue-200 text-xs text-blue-900">
+                        <i class="fa-solid fa-shield-cat mr-1"></i>
+                        Le surplus non versé est capté par l'État fédéral sous forme de cotisations pour réduire le déficit.
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-blue-700 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-holding-dollar"></i> Pensions &amp; Bas Salaires
+                    </h3>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Soutien Bas Salaires :</strong> Avancement à 2028 de la division par 2 de la CSSS et hausse du Bonus à l'emploi (+50€ net/mois).
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Protection des Retraites :</strong> Validation de la 1ère année pour jeunes diplômés et neutralisation de 5 jours manquants/an pour valider une carrière (156 jours).
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Suppression Double Indexation :</strong> Fin de la double indexation pour toutes les pensions &gt; 2 000 €.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Pillar 4: Taxation & Justice -->
+            <div id="fed-pillar-fiscalite" class="fed-pillar-content hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-purple-700 flex items-center gap-2">
+                        <i class="fa-solid fa-coins"></i> Fiscalité sur le Capital &amp; Entreprises
+                    </h3>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        <li class="p-2 bg-purple-50 rounded text-purple-900">
+                            <strong>Taxe Comptes-Titres :</strong> Doublée de 0,15% à <strong>0,30%</strong> pour les comptes &gt; 1M€ (+462M€ de recettes).
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Régime VVPR-bis :</strong> Précompte mobilier sur dividendes de liquidation relevé de 15% à 18% (+300M€ d'ici 2029).
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Taxe Bancaire :</strong> Contribution accrue des grands établissements de crédit (+150M€/an).
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <h3 class="font-bold text-stone-800 text-sm mb-2 text-purple-700 flex items-center gap-2">
+                        <i class="fa-solid fa-gavel"></i> Modernisation &amp; Taxes Comportementales
+                    </h3>
+                    <ul class="space-y-2 text-xs text-stone-600">
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Parquet National Financier :</strong> Création d'une structure dédiée à la grande fraude fiscale + recrutement de 377 inspecteurs.
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Investissement Justice :</strong> Envelope de 600M€ consacrée à la rénovation du réseau judiciaire.
+                        </li>
+                        <li class="p-2 bg-stone-50 rounded">
+                            <strong>Taxes Vertes &amp; Colis :</strong> TVA engrais/pesticides portée de 6% à 21%, accises/vols 2027 et taxe de 2€ par colis hors-UE.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CALCULATEUR D'IMPACT SALARIAL INTERACTIF -->
+            <div class="bg-white p-6 rounded-xl border border-amber-300 shadow-sm bg-gradient-to-br from-amber-50/50 to-orange-50/30">
+                <div class="max-w-2xl">
+                    <h3 class="text-base font-bold text-stone-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-amber-600"></i> Calculateur d'Impact de l'Indexation Salariale
+                    </h3>
+                    <p class="text-xs text-stone-600 mb-4">
+                        Testez l'effet de la réforme du plafonnement de l'indexation lors d'un saut d'indice de 2,0 %.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-1">Votre Salaire Brut Mensuel (€)</label>
+                            <input type="number" id="calcSalaryInput" value="4800" step="100" min="1500" max="15000" oninput="calculateIndexationImpact()"
+                                class="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <span class="text-[10px] text-stone-500 mt-1 block">Le plafond d'application est de 4 000 €/mois.</span>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-stone-200 shadow-xs space-y-2 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">Indexation Théorique (2%) :</span>
+                                <span id="calcTheoGain" class="font-semibold text-stone-800">+96,00 €/mois</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">Indexation Réelle Accordée :</span>
+                                <span id="calcRealGain" class="font-bold text-amber-700">+80,00 €/mois</span>
+                            </div>
+                            <div class="pt-2 border-t border-stone-100 flex justify-between font-bold">
+                                <span class="text-stone-700">Solidarité Captée par l'État :</span>
+                                <span id="calcStateLoss" class="text-red-600">-16,00 €/mois</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 4: WALLONIE & FWB (RÉGIONS)            -->
+        <!-- ========================================== -->
+        <section id="content-regions" class="tab-content hidden space-y-6">
+            <!-- Intro Card -->
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-landmark text-amber-600"></i> L'Austérité Régionale : Wallonie &amp; Fédération Wallonie-Bruxelles
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    Parallèlement à l'effort fédéral, les gouvernements wallon (Adrien Dolimont) et de la FWB (Elisabeth Degryse) amorcent un virage d'austérité budgétaire majeur pour stopper l'emballement de leurs dettes respectives.
+                </p>
+            </div>
+
+            <!-- Grid Wallonie Plan vs FWB Reforms -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Wallonie 538M Plan Breakdown -->
+                <div class="lg:col-span-7 bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="font-bold text-stone-800 text-base">Plan d'Assainissement Wallon (538M€)</h3>
+                            <p class="text-xs text-stone-500">Plafond déficit SEC 2026 : -2,015 Mds €</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
+                            -270M€ Coupes Directes
+                        </span>
+                    </div>
+
+                    <!-- Wallonie Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="wallonieChart"></canvas>
+                    </div>
+
+                    <!-- Filterable List of Walloon Measures -->
+                    <div class="mt-4 space-y-2">
+                        <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wider">Détails des Réductions Sectorielles</h4>
+                        <div class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs">
+                            <div class="p-2 bg-stone-50 rounded flex justify-between items-center">
+                                <div>
+                                    <strong class="text-stone-800">Aides APE (Emploi) :</strong>
+                                    <span class="text-stone-500 block text-[11px]">-25% pouvoirs publics, -12,5% non-marchand, 0% provinces.</span>
+                                </div>
+                                <span class="font-bold text-red-600 whitespace-nowrap">-83,7 M€</span>
+                            </div>
+                            <div class="p-2 bg-stone-50 rounded flex justify-between items-center">
+                                <div>
+                                    <strong class="text-stone-800">Pouvoirs Locaux :</strong>
+                                    <span class="text-stone-500 block text-[11px]">Gel indexation du fonds communal + -15% zones de secours.</span>
+                                </div>
+                                <span class="font-bold text-red-600 whitespace-nowrap">-65,2 M€</span>
+                            </div>
+                            <div class="p-2 bg-stone-50 rounded flex justify-between items-center">
+                                <div>
+                                    <strong class="text-stone-800">Wallonie Entreprendre (WE) :</strong>
+                                    <span class="text-stone-500 block text-[11px]">Budget réduit de 124M€ à 64M€ + dividende accru.</span>
+                                </div>
+                                <span class="font-bold text-red-600 whitespace-nowrap">-60,0 M€</span>
+                            </div>
+                            <div class="p-2 bg-stone-50 rounded flex justify-between items-center">
+                                <div>
+                                    <strong class="text-stone-800">AVIQ (Santé/Social) :</strong>
+                                    <span class="text-stone-500 block text-[11px]">Recentrage strict sur les missions primaires.</span>
+                                </div>
+                                <span class="font-bold text-red-600 whitespace-nowrap">-28,3 M€</span>
+                            </div>
+                            <div class="p-2 bg-stone-50 rounded flex justify-between items-center">
+                                <div>
+                                    <strong class="text-stone-800">Fonctionnement État &amp; Subventions :</strong>
+                                    <span class="text-stone-500 block text-[11px]">Coupes cabinets (-0,6M€), SPW et subventions facultatives.</span>
+                                </div>
+                                <span class="font-bold text-red-600 whitespace-nowrap">-26,1 M€</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FWB Higher Ed & School Reforms -->
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- School & Teachers Reform -->
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-stone-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-indigo-600"></i> FWB : Enseignement &amp; Carrière
+                        </h3>
+                        <p class="text-xs text-stone-600">
+                            Effort global 2026-2029 : -86,7M€ dans l'obligatoire. Revalorisation des nouveaux profs (+5% net + CDI dès 2027) contre rationalisation du temps de travail.
+                        </p>
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2 bg-indigo-50 rounded border border-indigo-100">
+                                <strong>Temps de Charge :</strong> Harmonisation à 22 périodes de cours pour le secondaire. Réduction des détachements (-270 ETP renvoyés en classe).
+                            </div>
+                            <div class="p-2 bg-red-50 rounded border border-red-100 text-red-900">
+                                <strong>Régime Maladie Alignè :</strong> Maintien du salaire à 100% limité à un « pot maladie » de 15 jours (puis 60%). Max 3 jours/an sans certificat.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FWB Culture Moratorium -->
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                        <h3 class="font-bold text-stone-800 text-sm text-purple-800 flex items-center gap-2">
+                            <i class="fa-solid fa-masks-theater"></i> Moratoire Culturel (-12,9M€)
+                        </h3>
+                        <p class="text-xs text-stone-600">
+                            Non-indexation des subventions en 2026. <strong>Moratoire complet</strong> sur l'agrément de nouvelles structures jusqu'en 2028. Disparition programmée du réseau <i>Point Culture</i>.
+                        </p>
+                    </div>
+
+                    <!-- SIMULATEUR DE MINERVAL FWB -->
+                    <div class="bg-white p-5 rounded-xl border border-indigo-200 shadow-sm bg-gradient-to-br from-indigo-50/40 to-slate-50">
+                        <h3 class="font-bold text-indigo-900 text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-school text-indigo-600"></i> Simulateur Minerval Enseignement Supérieur
+                        </h3>
+                        <p class="text-xs text-stone-600 mb-3">
+                            Le droit d'inscription classique double pour passer à <strong>1 194 €</strong> dès la rentrée 2026 (rattrapage technique). Sélectionnez votre profil :
+                        </p>
+
+                        <div class="space-y-3 text-xs">
+                            <select id="minervalSelect" onchange="calculateMinerval()" class="w-full px-3 py-1.5 bg-white border border-stone-300 rounded font-medium focus:ring-2 focus:ring-indigo-500">
+                                <option value="FULL">Tarif Plein (Classe Moyenne Supérieure)</option>
+                                <option value="INTERMEDIATE">Palier Intermédiaire (Classe Moyenne Inférieure)</option>
+                                <option value="MODEST">Condition Modeste (Revenus Régulés)</option>
+                                <option value="BURSARY">Boursier (Gratuité)</option>
+                                <option value="NON_EU">Étudiant UE Non-Résident (Sans DIES)</option>
+                            </select>
+
+                            <div class="p-3 bg-white rounded border border-stone-200 space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-stone-500">Minerval à Payer :</span>
+                                    <span id="minervalCost" class="font-bold text-indigo-900">1 194 €</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-stone-500">Bourse / DIES Éligible :</span>
+                                    <span id="minervalGrant" class="font-semibold text-emerald-600">Droit Individuel (DIES 2 000€)</span>
+                                </div>
+                                <p id="minervalNote" class="text-[10px] text-stone-400 pt-1 border-t border-stone-100">
+                                    Le mécanisme DIES est garanti pour les résidents belges et européens installés.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 5: MATRICE SYNTHÉTIQUE DES MESURES     -->
+        <!-- ========================================== -->
+        <section id="content-matrix" class="tab-content hidden space-y-6">
+            <!-- Intro Card -->
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-amber-600"></i> Matrice Synthétique Exhaustive des Réformes
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    Explorez, filtrez et recherchez l'ensemble des 25+ décisions majeures actées lors du conclave budgétaire 2026-2027 à travers les différentes entités du pays.
+                </p>
+            </div>
+
+            <!-- Controls bar -->
+            <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center text-xs">
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <span class="font-semibold text-stone-600">Entité :</span>
+                    <select id="matrixEntityFilter" onchange="filterMatrix()" class="px-3 py-1.5 bg-stone-50 border border-stone-300 rounded font-medium">
+                        <option value="ALL">Toutes les Entités</option>
+                        <option value="Fédéral">État Fédéral</option>
+                        <option value="Wallonie">Région Wallonne</option>
+                        <option value="FWB">Fédération Wallonie-Bruxelles</option>
+                    </select>
+
+                    <span class="font-semibold text-stone-600 ml-2">Domaine :</span>
+                    <select id="matrixDomainFilter" onchange="filterMatrix()" class="px-3 py-1.5 bg-stone-50 border border-stone-300 rounded font-medium">
+                        <option value="ALL">Tous les Domaines</option>
+                        <option value="Emploi">Emploi &amp; Travail</option>
+                        <option value="Santé">Santé &amp; Social</option>
+                        <option value="Fiscalité">Fiscalité &amp; Recettes</option>
+                        <option value="Éducation">Éducation &amp; Culture</option>
+                        <option value="Justice">Justice &amp; État</option>
+                    </select>
+                </div>
+
+                <div class="text-stone-500 font-medium">
+                    Résultats : <span id="matrixCount" class="font-bold text-amber-700">0</span> mesures
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-stone-700">
+                        <thead class="bg-navy-900 text-white uppercase tracking-wider text-[11px]">
+                            <tr>
+                                <th class="p-3">Entité</th>
+                                <th class="p-3">Mesure / Réforme</th>
+                                <th class="p-3">Domaine</th>
+                                <th class="p-3">Impact Budgétaire / Description</th>
+                                <th class="p-3 text-center">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixTbody" class="divide-y divide-stone-200">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-900 text-stone-400 py-6 border-t border-stone-800 text-xs mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
+            <p class="font-medium text-stone-300">
+                Analyse Stratégique et Perspectives du Conclave Budgétaire Belge 2026-2027
+            </p>
+            <p class="text-stone-500 text-[11px]">
+                Sources des données : Comité de Monitoring, Bureau Fédéral du Plan (Rapport 13320), Banque Nationale de Belgique, FMI Article IV &amp; Traités Européens.
+            </p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // DATA STRUCTURES
+        // ==========================================
+        
+        const ministersData = [
+            { name: "Bart De Wever", role: "Premier ministre", party: "N-VA", color: "bg-amber-100 text-amber-900 border-amber-300", focus: "Coordination globale & Veto TINA", impact: "Pilotage de la trajectoire PDE 7 ans" },
+            { name: "David Clarinval", role: "Vice-PM, Emploi & Économie", party: "MR", color: "bg-blue-100 text-blue-900 border-blue-300", focus: "Flexibilisation marché du travail", impact: "360h sup, travail de nuit e-commerce" },
+            { name: "Maxime Prévot", role: "Vice-PM, Affaires Étrangères", party: "Les Engagés", color: "bg-teal-100 text-teal-900 border-teal-300", focus: "Équité sociale & Taxe Fortune", impact: "Porteur du compromis fiscal progressif" },
+            { name: "Frank Vandenbroucke", role: "Vice-PM, Santé & Affaires Sociales", party: "Vooruit", color: "bg-red-100 text-red-900 border-red-300", focus: "Norme 2% Santé & Plan ReAT", impact: "Réintégration invalidité (-17% sorties)" },
+            { name: "Vincent Van Peteghem", role: "Vice-PM, Budget", party: "CD&V", color: "bg-orange-100 text-orange-900 border-orange-300", focus: "Rigueur & Trajectoire SEC", impact: "Cadrage des 250 options du BFP" },
+            { name: "Jan Jambon", role: "Vice-PM, Finances & Pensions", party: "N-VA", color: "bg-amber-100 text-amber-900 border-amber-300", focus: "Fiscalité du capital & Retraites", impact: "Taxe comptes-titres (0,30%), Plafonnement indexation" },
+            { name: "Éléonore Simonet", role: "Ministre Indépendants & PME", party: "MR", color: "bg-blue-100 text-blue-900 border-blue-300", focus: "Protection des autonomes", impact: "2 trimestres exonération maternité" },
+            { name: "Annelies Verlinden", role: "Ministre de la Justice", party: "CD&V", color: "bg-orange-100 text-orange-900 border-orange-300", focus: "Lutte anti-fraude & Infrastructure", impact: "Parquet Financier + 600M€ Justice" }
+        ];
+
+        const matrixData = [
+            { entity: "Fédéral", title: "Plafonnement de l'Indexation Salariale", domain: "Emploi", impact: "Forfait au-delà de 4 000€ brut. Différentiel capté par l'État.", status: "Voté 2026" },
+            { entity: "Fédéral", title: "Heures Supérieures Volontaires (360h/450h)", domain: "Emploi", impact: "240h défiscalisées brut=net (360h en Horeca).", status: "En vigueur" },
+            { entity: "Fédéral", title: "Déréglementation Travail de Nuit", domain: "Emploi", impact: "Début à 23h pour e-commerce/logistique.", status: "Voté 2026" },
+            { entity: "Fédéral", title: "Réforme Incapacité de Travail (ReAT)", domain: "Santé", impact: "+17% sorties invalidité, sanctions firmes/mutuelles.", status: "Phase 4" },
+            { entity: "Fédéral", title: "Norme Soins de Santé 2,0%", domain: "Santé", impact: "Enveloppe 41,58 Mds € avec effort efficience de -907M€.", status: "Confirmé" },
+            { entity: "Fédéral", title: "Doublement Taxe Comptes-Titres", domain: "Fiscalité", impact: "Taux porté de 0,15% à 0,30% pour &gt;1M€ (+462M€).", status: "Voté 2026" },
+            { entity: "Fédéral", title: "Hausse Précompte VVPR-bis", domain: "Fiscalité", impact: "Passage de 15% à 18% sur dividendes (+300M€ 2029).", status: "Voté 2026" },
+            { entity: "Fédéral", title: "Taxe Colis Hors-UE & Engrais", domain: "Fiscalité", impact: "2€/colis e-commerce. TVA engrais 6% -&gt; 21%.", status: "Prévu 2027" },
+            { entity: "Fédéral", title: "Parquet National Financier", domain: "Justice", impact: "Création + 377 inspecteurs fiscaux + 600M€ travaux.", status: "En cours" },
+            
+            { entity: "Wallonie", title: "Démantèlement Partiel APE", domain: "Emploi", impact: "-83,7M€ (-25% public, -12,5% non-marchand, 0% provinces).", status: "Acté 2026" },
+            { entity: "Wallonie", title: "Gel Fonds des Communes", domain: "Santé", impact: "-65,2M€ (+1% gel index + -15% zones de secours).", status: "Acté 2026" },
+            { entity: "Wallonie", title: "Réduction Wallonie Entreprendre", domain: "Fiscalité", impact: "-60M€ dotation (124M€ -&gt; 64M€) + 15M€ dividende.", status: "Acté 2026" },
+            { entity: "Wallonie", title: "Plafonnement Budget AVIQ", domain: "Santé", impact: "-28,3M€ par recentrage des missions.", status: "Acté 2026" },
+            { entity: "Wallonie", title: "Prélèvement Kilométrique Poids Lourds", domain: "Fiscalité", impact: "+20M€ recettes SOFICO (alignement Flandre).", status: "Voté 2026" },
+
+            { entity: "FWB", title: "Rationalisation Enseignement Obligatoire", domain: "Éducation", impact: "-86,7M€ d'économies sur la période 2026-2029.", status: "En cours" },
+            { entity: "FWB", title: "Temps de Charge Enseignant 22h", domain: "Éducation", impact: "Harmonisation 22h secondaire + retour 270 ETP.", status: "Rentrée 2026" },
+            { entity: "FWB", title: "Alignement Pot Maladie Enseignants", domain: "Éducation", impact: "100% salaire limité à 15 jours, puis 60%.", status: "Voté 2026" },
+            { entity: "FWB", title: "Doublement Minerval Universitaire", domain: "Éducation", impact: "Minerval plein à 1 194€ + Création DIES 2 000€.", status: "Rentrée 2026" },
+            { entity: "FWB", title: "Moratoire Subventions Culture", domain: "Éducation", impact: "-12,9M€, non-indexation et gel agréments 2028.", status: "Gel 2026-28" }
+        ];
+
+        let macroChartInstance = null;
+        let wallonieChartInstance = null;
+
+        // ==========================================
+        // INITIALIZATION & TAB SWITCHING
+        // ==========================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMinistersGrid('ALL');
+            renderMatrixTable(matrixData);
+            initMacroChart();
+            initWallonieChart();
+            calculateBudgetSimulation();
+            calculateIndexationImpact();
+            calculateMinerval();
+        });
+
+        function switchTab(tabId) {
+            // Update Tab buttons styling
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-amber-800', 'bg-amber-50', 'font-semibold', 'border', 'border-amber-200');
+                btn.classList.add('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100');
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100');
+            activeBtn.classList.add('text-amber-800', 'bg-amber-50', 'font-semibold', 'border', 'border-amber-200');
+
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show current tab
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+        }
+
+        // ==========================================
+        // TAB 1: MACROECONOMICS CHART & SIMULATOR
+        // ==========================================
+
+        function initMacroChart() {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            
+            macroChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2025', '2026', '2027', '2028', '2029', '2030', '2031'],
+                    datasets: [
+                        {
+                            label: 'Déficit Entité I (Fédéral + SecSoc) % PIB',
+                            data: [4.2, 3.9, 4.4, 4.8, 5.1, 5.4, 5.7],
+                            borderColor: '#d97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Déficit Public Global % PIB',
+                            data: [5.1, 4.9, 5.1, 5.4, 5.7, 6.0, 6.2],
+                            borderColor: '#dc2626',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 2,
+                            max: 7,
+                            ticks: { callback: value => value + '%' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMacroChart(type) {
+            const btnDeficit = document.getElementById('btn-chart-deficit');
+            const btnDebt = document.getElementById('btn-chart-debt');
+
+            if (type === 'deficit') {
+                btnDeficit.className = "px-2.5 py-1 text-xs font-semibold rounded-l-md bg-amber-600 text-white border border-amber-600";
+                btnDebt.className = "px-2.5 py-1 text-xs font-semibold rounded-r-md bg-stone-100 text-stone-700 border border-stone-300 hover:bg-stone-200";
+
+                macroChartInstance.data.datasets = [
+                    {
+                        label: 'Déficit Entité I (Fédéral + SecSoc) % PIB',
+                        data: [4.2, 3.9, 4.4, 4.8, 5.1, 5.4, 5.7],
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Déficit Public Global % PIB',
+                        data: [5.1, 4.9, 5.1, 5.4, 5.7, 6.0, 6.2],
+                        borderColor: '#dc2626',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3
+                    }
+                ];
+                macroChartInstance.options.scales.y.min = 2;
+                macroChartInstance.options.scales.y.max = 7;
+                macroChartInstance.options.scales.y.ticks.callback = value => value + '%';
+            } else {
+                btnDebt.className = "px-2.5 py-1 text-xs font-semibold rounded-r-md bg-amber-600 text-white border border-amber-600";
+                btnDeficit.className = "px-2.5 py-1 text-xs font-semibold rounded-l-md bg-stone-100 text-stone-700 border border-stone-300 hover:bg-stone-200";
+
+                macroChartInstance.data.datasets = [
+                    {
+                        label: 'Taux d\'Endettement Public (% du PIB)',
+                        data: [107.9, 110.7, 112.7, 115.2, 117.8, 120.1, 122.6],
+                        borderColor: '#1e293b',
+                        backgroundColor: 'rgba(30, 41, 59, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ];
+                macroChartInstance.options.scales.y.min = 100;
+                macroChartInstance.options.scales.y.max = 130;
+                macroChartInstance.options.scales.y.ticks.callback = value => value + '%';
+            }
+            macroChartInstance.update();
+        }
+
+        function calculateBudgetSimulation() {
+            const effort = parseFloat(document.getElementById('effortRange').value);
+            document.getElementById('effortVal').innerText = effort.toFixed(1) + ' Mds €';
+
+            // Baseline deficit in 2029 is 5.7% (GDP approx 600B)
+            // Each 1B effort reduces deficit by roughly 0.16% of GDP
+            const baselineDeficit = 5.7;
+            const reduction = (effort - 2) * 0.18;
+            let simDeficit = Math.max(2.1, baselineDeficit - reduction);
+
+            const resultEl = document.getElementById('simDeficitResult');
+            const badgeEl = document.getElementById('simStatusBadge');
+
+            resultEl.innerText = simDeficit.toFixed(1) + ' % du PIB';
+
+            if (simDeficit <= 3.0) {
+                badgeEl.innerText = "Conforme Cible UE (≤3%)";
+                badgeEl.className = "inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-900/80 text-emerald-200 border border-emerald-700";
+            } else if (simDeficit <= 4.0) {
+                badgeEl.innerText = "Trajectoire Ajustée (PDE)";
+                badgeEl.className = "inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-900/80 text-amber-200 border border-amber-700";
+            } else {
+                badgeEl.innerText = "Hors cible UE (>3%)";
+                badgeEl.className = "inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-900/80 text-red-200 border border-red-700";
+            }
+        }
+
+        // ==========================================
+        // TAB 2: MINISTERS GRID & FILTERS
+        // ==========================================
+
+        function renderMinistersGrid(partyFilter) {
+            const grid = document.getElementById('ministersGrid');
+            grid.innerHTML = '';
+
+            const filtered = partyFilter === 'ALL' 
+                ? ministersData 
+                : ministersData.filter(m => m.party === partyFilter);
+
+            filtered.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-stone-900 text-sm">${m.name}</h4>
+                                <p class="text-xs text-stone-500">${m.role}</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${m.color}">${m.party}</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-stone-100 text-xs space-y-1">
+                            <p class="text-stone-700"><strong>Priorité :</strong> ${m.focus}</p>
+                            <p class="text-stone-500 text-[11px]"><strong>Arbitrage :</strong> ${m.impact}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterMinisters(party) {
+            document.querySelectorAll('.party-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-navy-800', 'text-white');
+                btn.classList.add('bg-stone-100', 'text-stone-700');
+            });
+            renderMinistersGrid(party);
+        }
+
+        // ==========================================
+        // TAB 3: FEDERAL PILLARS & CALCULATOR
+        // ==========================================
+
+        function switchFederalPillar(pillarId) {
+            document.querySelectorAll('.fed-pill-btn').forEach(btn => {
+                btn.classList.remove('bg-navy-800', 'text-white');
+                btn.classList.add('bg-stone-200', 'text-stone-700');
+            });
+            document.getElementById(`pill-${pillarId}`).classList.remove('bg-stone-200', 'text-stone-700');
+            document.getElementById(`pill-${pillarId}`).classList.add('bg-navy-800', 'text-white');
+
+            document.querySelectorAll('.fed-pillar-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`fed-pillar-${pillarId}`).classList.remove('hidden');
+        }
+
+        function calculateIndexationImpact() {
+            const salary = parseFloat(document.getElementById('calcSalaryInput').value) || 0;
+            const theoGain = salary * 0.02; // 2% index jump
+            let realGain = 0;
+            
+            if (salary <= 4000) {
+                realGain = theoGain;
+            } else {
+                realGain = 4000 * 0.02; // capped at 80€
+            }
+
+            const stateLoss = theoGain - realGain;
+
+            document.getElementById('calcTheoGain').innerText = '+' + theoGain.toFixed(2) + ' €/mois';
+            document.getElementById('calcRealGain').innerText = '+' + realGain.toFixed(2) + ' €/mois';
+            document.getElementById('calcStateLoss').innerText = '-' + stateLoss.toFixed(2) + ' €/mois';
+        }
+
+        // ==========================================
+        // TAB 4: WALLONIE CHART & MINERVAL SIMULATOR
+        // ==========================================
+
+        function initWallonieChart() {
+            const ctx = document.getElementById('wallonieChart').getContext('2d');
+            
+            wallonieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aides APE (Emploi)', 'Pouvoirs Locaux', 'Wallonie Entreprendre', 'AVIQ (Santé)', 'Fonctionnement État'],
+                    datasets: [{
+                        data: [83.7, 65.2, 60.0, 28.3, 26.1],
+                        backgroundColor: ['#dc2626', '#d97706', '#2563eb', '#0d9488', '#64748b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': -' + context.parsed + ' M€';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateMinerval() {
+            const status = document.getElementById('minervalSelect').value;
+            const costEl = document.getElementById('minervalCost');
+            const grantEl = document.getElementById('minervalGrant');
+            const noteEl = document.getElementById('minervalNote');
+
+            switch(status) {
+                case 'FULL':
+                    costEl.innerText = '1 194 €';
+                    grantEl.innerText = 'Bourse DIES (2 000€ octroyée)';
+                    noteEl.innerText = 'Plein tarif de rattrapage technique. Couvert par le DIES pour les résidents.';
+                    break;
+                case 'INTERMEDIATE':
+                    costEl.innerText = '835 €';
+                    grantEl.innerText = 'Tarif Réduit Classe Moyenne';
+                    noteEl.innerText = 'Création d\'un palier intermédiaire basé sur l\'avertissement extrait de rôle.';
+                    break;
+                case 'MODEST':
+                    costEl.innerText = '375 €';
+                    grantEl.innerText = 'Condition Modeste Élargie';
+                    noteEl.innerText = 'Statut assoupli pour couvrir une tranche plus large de la population.';
+                    break;
+                case 'BURSARY':
+                    costEl.innerText = '0 €';
+                    grantEl.innerText = 'Gratuité Totale (Boursier)';
+                    noteEl.innerText = 'Maintien de la gratuité intégrale pour les étudiants boursiers.';
+                    break;
+                case 'NON_EU':
+                    costEl.innerText = '3 194 €';
+                    grantEl.innerText = 'Non Éligible DIES';
+                    noteEl.innerText = 'Les étudiants hors-UE non résidents paient le coût réel de formation sans subside DIES.';
+                    break;
+            }
+        }
+
+        // ==========================================
+        // TAB 5: SYNTHETIC MATRIX & GLOBAL SEARCH
+        // ==========================================
+
+        function renderMatrixTable(data) {
+            const tbody = document.getElementById('matrixTbody');
+            tbody.innerHTML = '';
+            document.getElementById('matrixCount').innerText = data.length;
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-stone-50 transition";
+                
+                let entityBadge = "bg-stone-100 text-stone-800";
+                if(item.entity === 'Fédéral') entityBadge = "bg-amber-100 text-amber-900 border border-amber-300";
+                if(item.entity === 'Wallonie') entityBadge = "bg-red-100 text-red-900 border border-red-300";
+                if(item.entity === 'FWB') entityBadge = "bg-indigo-100 text-indigo-900 border border-indigo-300";
+
+                tr.innerHTML = `
+                    <td class="p-3 whitespace-nowrap font-medium">
+                        <span class="px-2 py-0.5 rounded text-[10px] ${entityBadge}">${item.entity}</span>
+                    </td>
+                    <td class="p-3 font-semibold text-stone-900">${item.title}</td>
+                    <td class="p-3 text-stone-500">${item.domain}</td>
+                    <td class="p-3 text-stone-600">${item.impact}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-200 text-stone-700">${item.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterMatrix() {
+            const entity = document.getElementById('matrixEntityFilter').value;
+            const domain = document.getElementById('matrixDomainFilter').value;
+
+            const filtered = matrixData.filter(item => {
+                const matchEntity = (entity === 'ALL' || item.entity === entity);
+                const matchDomain = (domain === 'ALL' || item.domain === domain);
+                return matchEntity && matchDomain;
+            });
+
+            renderMatrixTable(filtered);
+        }
+
+        function handleGlobalSearch() {
+            const query = document.getElementById('globalSearch').value.toLowerCase();
+            if(!query) {
+                filterMatrix();
+                return;
+            }
+
+            // Switch automatically to matrix view if typing search
+            switchTab('matrix');
+
+            const filtered = matrixData.filter(item => {
+                return item.title.toLowerCase().includes(query) || 
+                       item.impact.toLowerCase().includes(query) ||
+                       item.entity.toLowerCase().includes(query) ||
+                       item.domain.toLowerCase().includes(query);
+            });
+
+            renderMatrixTable(filtered);
+        }
+    </script>
+</body>
+</html>

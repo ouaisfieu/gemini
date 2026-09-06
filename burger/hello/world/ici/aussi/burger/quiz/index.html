@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiographie des Médias Citoyens & Indépendants en Belgique</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f6f9',
+                            100: '#e5e9f0',
+                            200: '#cbd5e1',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        accent: {
+                            red: '#e11d48',
+                            amber: '#d97706',
+                            emerald: '#059669',
+                            indigo: '#4f46e5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
+
+<!-- Chosen Palette: Warm Editorial Neutral (Slate-50, Slate-900 header, Indigo/Slate accents, Crimson highlight for investigations, Amber for alerts, Emerald for cooperatives) -->
+<!-- Application Structure Plan: Designed as a 6-part interactive analytical application. 
+1. Overview & Crisis (Vue d'Ensemble & Crise Structurelle): Dynamic stat cards and a Chart.js Doughnut depicting the concentration of Belgian media.
+2. Structural Comparison (Comparatif Structurel): Interactive 5-metric comparison matrix contrasting Mainstream, Independent, and Citizen models.
+3. Media Directory & Mapping (Cartographie Filtrie): Filterable interactive catalog of all 12+ media outlets with modal details.
+4. Argued Ranking (Classement & Utilité Sociale): Dynamic multi-tier breakdown supported by a Chart.js comparative performance bar chart.
+5. Investigation Observatory (Observatoire des Enquêtes): Interactive deep-dive viewer for the 8 landmark investigations with real-world legal and social impacts.
+6. Vulnerabilities & Future (Enjeux & Vulnérabilités): Interactive risk explorer highlighting economic precarity, SLAPP suits, and political intimidation.
+This structure prioritizes user exploration, clear comparative analysis, and high-impact data visualization over standard linear reading. -->
+<!-- Visualization & Content Choices:
+- Market Concentration -> Doughnut Chart (Chart.js) -> Illustrates hyper-concentration of mainstream press vs alternatives.
+- Outlet Multidimensional Metrics -> Grouped Bar Chart (Chart.js) -> Evaluates Accountability, Depth, and Independence across tiers.
+- Investigation Themes -> Pie/Polar Area Chart (Chart.js) -> Highlights the main investigative domains (Corruption, Police violence, Agrifood, Housing).
+- Interactive Directory -> JS Filterable Grid + Search Bar -> Enables instant exploration of media outlets by category, governance, and language.
+- Investigation Explorer -> Dynamic Detail Drawer -> Displays context, key players, and concrete impacts for each investigation upon user selection.
+NO SVG graphics used. NO Mermaid JS used. Visual icons and badges rely strictly on HTML text symbols and Tailwind styling. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📰</span>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-wide leading-none">MÉDIAS BELGES</h1>
+                        <p class="text-xs text-slate-400 font-medium">Analyse Systémique &amp; Classement 2026</p>
+                    </div>
+                </div>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-3 text-sm font-medium">
+                    <a href="#contexte" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Contexte</a>
+                    <a href="#comparatif" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Comparatif</a>
+                    <a href="#cartographie" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Cartographie</a>
+                    <a href="#classement" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Classement</a>
+                    <a href="#enquetes" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Enquêtes</a>
+                    <a href="#vulnerabilites" class="px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Vulnérabilités</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+                        <span class="text-xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1 text-sm">
+            <a href="#contexte" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Contexte &amp; Crise</a>
+            <a href="#comparatif" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Comparatif Structurel</a>
+            <a href="#cartographie" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Cartographie des Médias</a>
+            <a href="#classement" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Classement &amp; Utilité</a>
+            <a href="#enquetes" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Les Grandes Enquêtes</a>
+            <a href="#vulnerabilites" class="mobile-link block px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800">Vulnérabilités &amp; Avenir</a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- SECTION 1: CONTEXTE ET CRISE STRUCTURELLE -->
+        <section id="contexte" class="scroll-mt-20">
+            <div class="border-l-4 border-indigo-600 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">État des lieux démocratique</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">La Crise Structurelle de l'Espace Public Belge</h2>
+            </div>
+            
+            <p class="text-base text-slate-700 leading-relaxed mb-8">
+                Dans un marché linguistique exigu d'environ 5 millions d'habitants en Belgique francophone, le paysage médiatique traditionnel fait face à une hyper-concentration sans précédent. Le projet de fusion par absorption entre les géants industriels <strong>IPM</strong> (La Libre, DH) et <strong>Rossel</strong> (Le Soir, Sudinfo), sous l'œil inquiet du Conseil supérieur de l'audiovisuel (CSA) et de l'Autorité belge de la concurrence, matérialise le risque d'un quasi-monopole. Ce phénomène entraîne un recyclage massif des dépêches de l'agence Belga et relègue au second plan la reddition de comptes (accountability). Face à cette dérive, un contre-pouvoir s'est structuré à travers la presse indépendante coopérative et le journalisme citoyen participatif.
+            </p>
+
+            <!-- Key Indicators Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-3xl p-2 bg-indigo-50 rounded-lg">🏢</div>
+                    <div>
+                        <div class="text-2xl font-black text-slate-900">2 Groupes</div>
+                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wide">Quasi-monopole (IPM &amp; Rossel)</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-3xl p-2 bg-emerald-50 rounded-lg">🤝</div>
+                    <div>
+                        <div class="text-2xl font-black text-slate-900">7 Médias</div>
+                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wide">Alliance "Kiosque" (Coopératives)</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-3xl p-2 bg-rose-50 rounded-lg">⚖️</div>
+                    <div>
+                        <div class="text-2xl font-black text-slate-900">8 Enquêtes</div>
+                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wide">Chocs Judiciaires &amp; Politiques</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-3xl p-2 bg-amber-50 rounded-lg">🛡️</div>
+                    <div>
+                        <div class="text-2xl font-black text-slate-900">3 Menaces</div>
+                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wide">Procédure-bâillon, coupes &amp; pression</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization: Market concentration vs Independence -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Concentration de la Presse Quotidienne Francophone</h3>
+                    <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                        Alors que la presse mainstream s'appuie sur la publicité commerciale, les subventions de distribution et la logique de flux rapide ("fast news"), l'écosystème indépendant repose sur le financement citoyen, l'actionnariat coopératif et l'absence totale d'actionnaires réclamant des dividendes.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-sm font-semibold text-slate-700">
+                            <span class="w-4 h-4 rounded-full bg-slate-800 inline-block mr-2"></span>
+                            Presse Dominante Industrielle (IPM / Rossel)
+                        </div>
+                        <div class="flex items-center text-sm font-semibold text-slate-700">
+                            <span class="w-4 h-4 rounded-full bg-indigo-500 inline-block mr-2"></span>
+                            Médias Publics &amp; Institutionnels
+                        </div>
+                        <div class="flex items-center text-sm font-semibold text-slate-700">
+                            <span class="w-4 h-4 rounded-full bg-rose-500 inline-block mr-2"></span>
+                            Médias Indépendants Coopératifs &amp; Citoyens
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="chart-container">
+                        <canvas id="concentrationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 2: COMPARATIF STRUCTUREL DES MODÈLES MÉDIATIQUES -->
+        <section id="comparatif" class="scroll-mt-20">
+            <div class="border-l-4 border-emerald-600 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Modélisation &amp; Taxonomie</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Comparatif Structurel des Trois Modèles</h2>
+            </div>
+
+            <p class="text-base text-slate-700 leading-relaxed mb-6">
+                Pour bien comprendre les enjeux d'indépendance et d'agenda-setting (fixation de l'ordre du jour politique), cette grille d'analyse compare les trois formes d'organisations médiatiques coexistant en Belgique selon 5 axes fondamentaux.
+            </p>
+
+            <!-- Interactive Matrix Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-white font-semibold">
+                                <th class="p-4 border-b border-slate-800 w-1/5">Axe d'Analyse</th>
+                                <th class="p-4 border-b border-slate-800 w-4/15 bg-slate-800">Médias Traditionnels<br><span class="text-xs font-normal text-slate-400">Ex: Le Soir, La Libre</span></th>
+                                <th class="p-4 border-b border-slate-800 w-4/15 text-emerald-300">Médias Indépendants<br><span class="text-xs font-normal text-emerald-400">Ex: Médor, Apache, Tchak!</span></th>
+                                <th class="p-4 border-b border-slate-800 w-4/15 text-rose-300">Médias Citoyens / Militants<br><span class="text-xs font-normal text-rose-400">Ex: Stuut.info, DeWereldMorgen</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-slate-900 bg-slate-50">Gouvernance &amp; Propriété</td>
+                                <td class="p-4 text-slate-700">Oligopoles industriels, actionnariat privé concentré (Rossel, IPM), rachats stratégiques.</td>
+                                <td class="p-4 text-slate-700 bg-emerald-50/30">Coopératives à finalité sociale (SCFS), ASBL, capital partagé entre journalistes et lecteurs.</td>
+                                <td class="p-4 text-slate-700 bg-rose-50/30">Collectifs informels horizontaux, ASBL militantes, gestion participative au consensus.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-slate-900 bg-slate-50">Modèle Économique</td>
+                                <td class="p-4 text-slate-700">Publicité commerciale, abonnements de masse, subventions étatiques de distribution.</td>
+                                <td class="p-4 text-slate-700 bg-emerald-50/30">Financement participatif, abonnements, part coopérative, refus de la publicité.</td>
+                                <td class="p-4 text-slate-700 bg-rose-50/30">Bénévolat, dons de soutien, prix libre, fonctionnement à très faible coût ("low-cost").</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-slate-900 bg-slate-50">Temporalité &amp; Format</td>
+                                <td class="p-4 text-slate-700">Logique de flux, actualité chaude ("fast news"), formats courts et recyclage de dépêches.</td>
+                                <td class="p-4 text-slate-700 bg-emerald-50/30">Temps long de l'investigation ("slow press"), revues trimestrielles, feuilletons web.</td>
+                                <td class="p-4 text-slate-700 bg-rose-50/30">Temporalité asynchrone ou réactionnelle aux mobilisations et luttes locales.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-slate-900 bg-slate-50">Ligne Éditoriale</td>
+                                <td class="p-4 text-slate-700">Agenda institutionnel, neutralité de façade, prépondérance de la politique politicienne.</td>
+                                <td class="p-4 text-slate-700 bg-emerald-50/30">Décryptage systémique, justice sociale, transition écologique, récit littéraire d'enquête.</td>
+                                <td class="p-4 text-slate-700 bg-rose-50/30">Militantisme assumé, anti-fascisme, luttes décoloniales, luttes urbaines, altermondialisme.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-4 font-bold text-slate-900 bg-slate-50">Statut du Producteur</td>
+                                <td class="p-4 text-slate-700">Journalistes professionnels salariés détenant une carte de presse institutionnelle.</td>
+                                <td class="p-4 text-slate-700 bg-emerald-50/30">Journalistes professionnels (souvent pigistes) organisés en collectifs autogérés.</td>
+                                <td class="p-4 text-slate-700 bg-rose-50/30">Citoyens, activistes, experts de terrain, lanceurs d'alerte, souvent sous pseudonymat.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: CARTOGRAPHIE INTERACTIVE DE L'ÉCOSYSTÈME -->
+        <section id="cartographie" class="scroll-mt-20">
+            <div class="border-l-4 border-amber-500 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Répertoire Complet</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Cartographie Détaillée des Médias Alternatifs</h2>
+            </div>
+
+            <p class="text-base text-slate-700 leading-relaxed mb-6">
+                Explorez l'écosystème belge indépendant et citoyen. Filtrez par catégorie ou recherchez un média spécifique pour découvrir sa structure, son modèle et ses spécificités éditoriales.
+            </p>
+
+            <!-- Filter Controls -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl border border-slate-200">
+                <div class="flex flex-wrap gap-2" id="filter-buttons">
+                    <button data-filter="all" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white shadow-sm transition">Tous</button>
+                    <button data-filter="investigation" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Fers de Lance (Investigation)</button>
+                    <button data-filter="thematique" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Décrypteurs Thématiques</button>
+                    <button data-filter="citoyen" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Citoyens &amp; Militants</button>
+                </div>
+                <div class="w-full sm:w-64">
+                    <input type="text" id="search-media" placeholder="🔍 Rechercher un média..." class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+
+            <!-- Media Grid Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="media-grid">
+                <!-- Media cards injected via JS -->
+            </div>
+        </section>
+
+
+        <!-- SECTION 4: CLASSEMENT ET UTILITÉ SOCIALE -->
+        <section id="classement" class="scroll-mt-20">
+            <div class="border-l-4 border-indigo-600 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Évaluation Argumentée</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Classement &amp; Utilité Sociale des Rédactions</h2>
+            </div>
+
+            <p class="text-base text-slate-700 leading-relaxed mb-8">
+                L'évaluation de la presse alternative ne se résume pas aux métriques d'audience. Ce classement hiérarchise les rédactions en fonction de leur impact judiciaire/politique, de la rigueur de leurs investigations, de leur indépendance structurelle et de leur contribution au débat démocratique.
+            </p>
+
+            <!-- Ranking Tiers Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Tier 1 -->
+                <div class="bg-white rounded-xl border-2 border-indigo-500 p-6 shadow-md relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-black uppercase px-3 py-1 rounded-bl-lg">Rang 1</div>
+                    <div>
+                        <div class="flex items-center space-x-2 text-indigo-600 mb-2">
+                            <span class="text-2xl">🏆</span>
+                            <h3 class="font-extrabold text-xl text-slate-900">Les Piliers de l'Accountability</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-4">Standards absolus d'investigation et impact judiciaire direct.</p>
+                        <ul class="space-y-3 text-sm">
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">1. Médor</span>
+                                <p class="text-xs text-slate-600 mt-1">Gouvernance coopérative irréprochable, enquêtes participatives structurantes (Kazakhgate, Scoutisme, Fost Plus).</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">2. Apache (.be)</span>
+                                <p class="text-xs text-slate-600 mt-1">Vigie fondamentale en Flandre contre les lobbys immobiliers et la corruption politique (Anvers/Ogeo Fund).</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">3. Nationale 4</span>
+                                <p class="text-xs text-slate-600 mt-1">Spécialisation chirurgicale sur la justice, les violences policières et les dérives de l'État social.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tier 2 -->
+                <div class="bg-white rounded-xl border-2 border-emerald-500 p-6 shadow-md relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-emerald-600 text-white text-xs font-black uppercase px-3 py-1 rounded-bl-lg">Rang 2</div>
+                    <div>
+                        <div class="flex items-center space-x-2 text-emerald-600 mb-2">
+                            <span class="text-2xl">🔍</span>
+                            <h3 class="font-extrabold text-xl text-slate-900">Les Décrypteurs Systémiques</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-4">Clés intellectuelles et contre-expertise approfondie.</p>
+                        <ul class="space-y-3 text-sm">
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">1. Alter Échos</span>
+                                <p class="text-xs text-slate-600 mt-1">Mémoire sociale inégalée des politiques de logement, de pauvreté et d'austérité.</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">2. Wilfried Magazine</span>
+                                <p class="text-xs text-slate-600 mt-1">Journalisme littéraire et politique au long cours décortiquant la classe dirigeante.</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">3. Tchak!</span>
+                                <p class="text-xs text-slate-600 mt-1">Revue paysanne démontant méthodiquement l'agrobusiness et les dérives alimentaires.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="bg-white rounded-xl border-2 border-rose-500 p-6 shadow-md relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 bg-rose-600 text-white text-xs font-black uppercase px-3 py-1 rounded-bl-lg">Rang 3</div>
+                    <div>
+                        <div class="flex items-center space-x-2 text-rose-600 mb-2">
+                            <span class="text-2xl">✊</span>
+                            <h3 class="font-extrabold text-xl text-slate-900">Démocratie Radicale</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-4">Mediactivisme, visibilisation des luttes et expertise citoyenne.</p>
+                        <ul class="space-y-3 text-sm">
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">1. POUR.press</span>
+                                <p class="text-xs text-slate-600 mt-1">Enquêtes financières d'une technicité redoutable (fraude fiscale, Hopps/Adrexo).</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">2. Bruxelles Dévie / Stuut</span>
+                                <p class="text-xs text-slate-600 mt-1">Vigie des luttes urbaines, de la surveillance numérique et des violences d'État.</p>
+                            </li>
+                            <li class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="font-bold text-slate-900">3. DeWereldMorgen (.be)</span>
+                                <p class="text-xs text-slate-600 mt-1">Portail flamand militant altermondialiste de contre-pouvoir aux discours dominants.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization: Rating Breakdown Chart -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Évaluation Multidimensionnelle par Categorie</h3>
+                <p class="text-sm text-slate-600 mb-4">Comparaison des trois piliers selon trois indicateurs clés (Indice sur 100).</p>
+                <div class="chart-container">
+                    <canvas id="rankingChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 5: RAPPORT QUALITATIF ET LES GRANDES ENQUÊTES -->
+        <section id="enquetes" class="scroll-mt-20">
+            <div class="border-l-4 border-rose-600 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-rose-600">Rapport Qualitatif</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Observatoire des Grandes Enquêtes d'Impact</h2>
+            </div>
+
+            <p class="text-base text-slate-700 leading-relaxed mb-6">
+                La véritable mesure de la plus-value de ces médias réside dans la profondeur de leurs dossiers d'investigation. Cliquez sur une enquête ci-dessous pour afficher l'analyse détaillée de ses révélations et de ses impacts institutionnels ou judiciaires.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Investigation List Selector (Left) -->
+                <div class="lg:col-span-5 space-y-3 custom-scrollbar overflow-y-auto max-h-[550px] pr-2" id="investigation-list">
+                    <!-- Cards dynamically populated by JS -->
+                </div>
+
+                <!-- Investigation Detail Display (Right) -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between" id="investigation-detail">
+                    <!-- Content populated by JS selection -->
+                    <div class="text-center py-16 text-slate-400">
+                        <span class="text-4xl block mb-2">👈</span>
+                        Sélectionnez un dossier dans la liste pour consulter la fiche d'investigation détaillée.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investigation Topics Breakdown Visual -->
+            <div class="mt-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Répartition des Thématiques d'Investigation Majeures</h3>
+                <p class="text-sm text-slate-600 mb-4">Distribution des sujets d'enquêtes portés par la presse indépendante belge.</p>
+                <div class="chart-container">
+                    <canvas id="topicsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 6: VULNÉRABILITÉS ET RECOMMANDATIONS -->
+        <section id="vulnerabilites" class="scroll-mt-20 mb-12">
+            <div class="border-l-4 border-slate-800 pl-4 mb-6">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Perspectives &amp; Risques</span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Vulnérabilités Systémiques &amp; Recommandations</h2>
+            </div>
+
+            <p class="text-base text-slate-700 leading-relaxed mb-8">
+                Malgré leur rôle fondamental dans la préservation de la démocratie, les médias indépendants et citoyens belges évoluent dans un environnement d'une extrême fragilité. Trois menaces majeures guettent leur pérennité.
+            </p>
+
+            <!-- Three Main Vulnerability Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl border-t-4 border-rose-600 shadow-sm border-x border-b border-slate-200">
+                    <div class="text-3xl mb-3">💸</div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">1. Précarité Économique</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Dépendance à des revenus d'abonnements limités. Les coupes budgétaires annoncées par les gouvernements régionaux et fédéraux (coalition Arizona, austérité sociale) menacent l'Éducation Permanente et le biotope associatif qui fait vivre ces titres.
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border-t-4 border-amber-500 shadow-sm border-x border-b border-slate-200">
+                    <div class="text-3xl mb-3">🏛️</div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">2. Pression Politique Asymétrique</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Intimidation administrative et menaces de définancement étatique ciblant des rédactions engagées (ex: demandes d'inspections répétées contre DeWereldMorgen de la part de figures de la N-VA).
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border-t-4 border-indigo-600 shadow-sm border-x border-b border-slate-200">
+                    <div class="text-3xl mb-3">⚖️</div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">3. Procédures-Bâillons (SLAPP)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Harcèlement judiciaire orchestré par des puissances financières ou immobilières (procès répétés contre Apache ou Médor) cherchant à asphyxier les rédactions sous les frais d'avocats.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Conclusion & Recommendations Box -->
+            <div class="bg-slate-900 text-white p-8 rounded-2xl shadow-lg border border-slate-800">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="text-3xl">💡</span>
+                    <h3 class="text-2xl font-bold">Imperatifs pour la Sauvegarde du Pluralisme</h3>
+                </div>
+                <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                    Conformément aux recommandations du Conseil de l'Europe et de la Commission européenne, la survie de cet écosystème ne peut reposer indéfiniment sur l'héroïsme bénévole ou la générosité des lecteurs. Des réformes administratives et législatives s'imposent :
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm font-medium">
+                    <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-emerald-400 font-bold block mb-1">1. Réforme Fiscale</span>
+                        Instauration de cadres fiscaux protecteurs et déductibilité des dons/part-coopératives pour la presse non lucrative.
+                    </div>
+                    <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-indigo-400 font-bold block mb-1">2. Législation Anti-SLAPP</span>
+                        Adoption urgente de sanctions dissuasives contre les poursuites-bâillons intentées par les grands groupes.
+                    </div>
+                    <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                        <span class="text-amber-400 font-bold block mb-1">3. Soutien aux Collectifs</span>
+                        Aide structurelle publique au collectif "Kiosque" pour mutualiser l'impression, la distribution et la défense juridique.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 border-t border-slate-800 py-8 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-2"><strong>Radiographie Systémique des Médias Citoyens et Indépendants en Belgique</strong></p>
+            <p>Développé selon le rapport d'expertise 2026. Réalisé avec HTML, Tailwind CSS &amp; Chart.js (Aucun graphique SVG externe utilisé).</p>
+        </div>
+    </footer>
+
+
+    <!-- JAVASCRIPT LOGIC & DATA STORAGE -->
+    <script>
+        // Data Storage: Media Directory
+        const mediaData = [
+            {
+                id: 'medor',
+                name: 'Médor',
+                type: 'investigation',
+                typeName: 'Fer de Lance',
+                statut: 'Coopérative (SCFS)',
+                langue: 'FR',
+                sub: '2 600+ abonnés',
+                desc: 'Trimestriel et site web d\'investigation au long cours en Belgique francophone. Management horizontal avec présidence tournante et logiciels libres.',
+                tags: ['Investigation', 'Coopérative', 'Kiosque', 'Slow Press'],
+                impact: 'Très Élevé',
+                dossierPhare: 'Kazakhgate, Scoutisme, Fost Plus, UCLouvain'
+            },
+            {
+                id: 'apache',
+                name: 'Apache (.be)',
+                type: 'investigation',
+                typeName: 'Fer de Lance',
+                statut: 'Coopérative',
+                langue: 'NL',
+                sub: 'Fondé en 2009',
+                desc: 'Média d\'enquête indépendant flamand créé par d\'anciens journalistes de De Morgen. Cible récurrente de procédures-bâillons (SLAPP).',
+                tags: ['Investigation', 'Flandre', 'Coopérative', 'SLAPP Target'],
+                impact: 'Très Élevé',
+                dossierPhare: 'Ogeo Fund & Land Invest Group, Scandales Anvers'
+            },
+            {
+                id: 'nationale4',
+                name: 'Nationale 4',
+                type: 'investigation',
+                typeName: 'Fer de Lance',
+                statut: 'Pure Player Indépendant',
+                langue: 'FR',
+                sub: 'Lancé en 2021',
+                desc: 'Fondé par le journaliste Philippe Engels. Média sans publicité spécialisé dans les dysfonctionnements de la justice et les violences policières.',
+                tags: ['Justice', 'Police', 'Feuilletons', 'Sans Pub'],
+                impact: 'Élevé',
+                dossierPhare: 'Violences Policières, Homes Pirates, Kazakhgate'
+            },
+            {
+                id: 'wilfried',
+                name: 'Wilfried Magazine',
+                type: 'investigation',
+                typeName: 'Fer de Lance',
+                statut: 'Coopérative',
+                langue: 'FR',
+                sub: 'Trimestriel',
+                desc: 'Magazine consacré à la politique belge sous un angle narratif et littéraire. Grands entretiens et analyse des dynamiques institutionnelles.',
+                tags: ['Politique', 'Récit', 'Coopérative', 'Kiosque'],
+                impact: 'Modéré / Élevé',
+                dossierPhare: 'Négociations Arizona, Entretiens Politiques'
+            },
+            {
+                id: 'tchak',
+                name: 'Tchak!',
+                type: 'thematique',
+                typeName: 'Décrypteur Thématique',
+                statut: 'Coopérative (500+ coop)',
+                langue: 'FR',
+                sub: 'Trimestriel',
+                desc: 'La revue paysanne et citoyenne qui tranche. Enquêtes approfondies sur l\'agroécologie, la grande distribution et la souveraineté alimentaire.',
+                tags: ['Agriculture', 'Écologie', 'Kiosque', 'Alimentation'],
+                impact: 'Élevé',
+                dossierPhare: 'Lobbying NGT/OGM, Mainmise Grande Distribution'
+            },
+            {
+                id: 'alterechos',
+                name: 'Alter Échos',
+                type: 'thematique',
+                typeName: 'Décrypteur Thématique',
+                statut: 'ASBL',
+                langue: 'FR',
+                sub: 'Mensuel',
+                desc: 'Référence du secteur social-santé. Analyses prospectives et critiques sur le logement, la précarité énergétique et les mutations des CPAS.',
+                tags: ['Social', 'Santé', 'CPAS', 'Logement', 'Kiosque'],
+                impact: 'Élevé',
+                dossierPhare: 'Expulsions Domiciliaires, Logement Social, Bru-Home'
+            },
+            {
+                id: 'daardaar',
+                name: 'DaarDaar',
+                type: 'thematique',
+                typeName: 'Décrypteur Thématique',
+                statut: 'Média Numérique',
+                langue: 'FR / NL',
+                sub: 'Quotidien Web',
+                desc: 'Traduit le meilleur de la presse néerlandophone en français pour faire comprendre la politique et la culture flamandes aux francophones.',
+                tags: ['Traduction', 'Flandre', 'Pont Linguistique'],
+                impact: 'Modéré',
+                dossierPhare: 'Décodage de la politique et des médias flamands'
+            },
+            {
+                id: 'dewereldmorgen',
+                name: 'DeWereldMorgen (.be)',
+                type: 'citoyen',
+                typeName: 'Citoyen / Militant',
+                statut: 'Portail Associatif',
+                langue: 'NL',
+                sub: 'Altermondialiste',
+                desc: 'Portail flamand d\'information citoyenne. Ancré dans les mouvements pacifistes (Vrede VZW) et syndicaux, cible de la N-VA.',
+                tags: ['Altermondialisme', 'Flandre', 'Mediactivisme', 'Militant'],
+                impact: 'Modéré / Élevé',
+                dossierPhare: 'Contre-récit sur les politiques d\'austérité & Moyen-Orient'
+            },
+            {
+                id: 'bruxellesdevie',
+                name: 'Bruxelles Dévie & Stuut',
+                type: 'citoyen',
+                typeName: 'Citoyen Hyper-local',
+                statut: 'Collectif Ouvert',
+                langue: 'FR',
+                sub: 'Prix Libre',
+                desc: 'Plateformes de publication participative et anonyme documentant les luttes urbaines, la gentrification et les dérives sécuritaires bruxelloises.',
+                tags: ['Bruxelles', 'Luttes Urbaines', 'Surveillance', 'Anonymat'],
+                impact: 'Local / Élevé',
+                dossierPhare: 'Protect My Face, Critiques du plan Good Move'
+            },
+            {
+                id: 'pourpress',
+                name: 'POUR.press',
+                type: 'citoyen',
+                typeName: 'Expertise Citoyenne',
+                statut: 'ASBL Associative',
+                langue: 'FR',
+                sub: 'Prix Libre',
+                desc: 'Mobilise des experts citoyens et lanceurs d\'alerte pour publier des enquêtes économiques et fiscales ultra-détaillées.',
+                tags: ['Finance', 'Fraude Fiscale', 'Expertise Citoyenne'],
+                impact: 'Élevé',
+                dossierPhare: 'Scandale Hopps/Adrexo, Succession Verbruggen'
+            },
+            {
+                id: 'demos',
+                name: 'Collectif DEMOS',
+                type: 'citoyen',
+                typeName: 'Citoyen / Jeunesse',
+                statut: 'Collectif Citoyen',
+                langue: 'FR',
+                sub: 'Réseaux Sociaux',
+                desc: 'Accompagne les jeunes bénévoles dans la vulgarisation des enjeux démocratiques pour lutter contre la passivité politique.',
+                tags: ['Jeunesse', 'Pédagogie', 'Réseaux Sociaux'],
+                impact: 'Pédagogique',
+                dossierPhare: 'Décryptages des réformes institutionnelles'
+            },
+            {
+                id: 'pan',
+                name: 'Pan & Revue Politique',
+                type: 'thematique',
+                typeName: 'Satirique & Débat',
+                statut: 'Indépendant',
+                langue: 'FR',
+                sub: 'Hebdo / Trimestriel',
+                desc: 'Pan apporte l\'irrévérence satirique tandis que la Revue Politique propose des analyses de fond pour le camp progressiste.',
+                tags: ['Satire', 'Débat', 'Analyse Politique'],
+                impact: 'Modéré',
+                dossierPhare: 'Critiques des élites et prospectives politiques'
+            }
+        ];
+
+        // Data Storage: 8 Major Investigations
+        const investigationsData = [
+            {
+                id: 'kazakhgate',
+                title: '1. Le Kazakhgate & l\'Affaire Reynders/Fontinoy',
+                sources: 'Médor & Nationale 4 (Philippe Engels)',
+                theme: 'Corruption & Scandale d\'État',
+                icon: '⚖️',
+                summary: 'Une enquête tentaculaire révélant les coulisses de remises d\'enveloppes de 50 000 € en espèces, le gel de fonds libyens et des arrangements pénaux pour des oligarques (Patokh Chodiev) sous la pression de l\'Élysée.',
+                details: 'Ce dossier documente l\'action de l\'ancien ministre des Finances et Commissaire européen Didier Reynders et de son bras droit Jean-Claude Fontinoy. S\'appuyant sur des procès-verbaux d\'auditions explosifs, les journalistes dévoilent des liens suspects entre corruption, blanchiment et marchés publics de la SNCB.',
+                impact: 'Instruction judiciaire menée par les juges Claise et Heusghem, perquisitions au sein du "Clan Reynders" et déstabilisation majeure du paysage politique belge au niveau européen.'
+            },
+            {
+                id: 'ogeofund',
+                title: '2. Siphonnage Public : Ogeo Fund & Land Invest',
+                sources: 'Apache.be (avec Le Vif)',
+                theme: 'Détournement & Immobilier',
+                icon: '🏗️',
+                summary: 'Révélation des connivences secrètes entre barons du PS liégeois (Stéphane Moreau, Alain Mathot) et l\'entourage de la N-VA anversoise (Bart De Wever, Erik Van der Paal).',
+                details: 'Apache a démontré comment Ogeo Fund, gérant 1 milliard d\'euros de pensions publiques, a financé à perte les opérations immobilières de Land Invest Group. Des "management fees" de plus de 1,4 million d\'euros ont été versés à des sociétés écrans.',
+                impact: 'Licenciements majeurs chez Ogeo Fund, ouvertures d\'enquêtes pénales et harcèlement judiciaire intense (SLAPP) contre Apache qui a fini par l\'emporter au tribunal.'
+            },
+            {
+                id: 'uclouvain',
+                title: '3. Toxicité Académique à l\'UCLouvain',
+                sources: 'Médor',
+                theme: 'Sexisme Systémique & Institutions',
+                icon: '🎓',
+                summary: 'Mise en lumière de la culture du harcèlement et de la misogynie institutionnelle dans les laboratoires de recherche de l\'UCLouvain.',
+                details: 'À travers le récit des chercheuses Caroline Nieberding et Bertanne Visser, l\'enquête démontre comment la gouvernance universitaire, sous le recteur Vincent Blondel, a étouffé les plaintes pour protéger sa réputation, ignorant l\'auditorat du travail.',
+                impact: 'Prise de conscience nationale sur les violences sexistes et sexuelles (VSS) dans le milieu académique belge, forçant la révision des procédures d\'alerte interne.'
+            },
+            {
+                id: 'police',
+                title: '4. L\'Octobre Noir des Violences Policières',
+                sources: 'Nationale 4',
+                theme: 'Violences d\'État & Impunité',
+                icon: '🚨',
+                summary: 'Feuilleton en quatre épisodes démontant l\'impunité des brutalités policières et la défaillance des mécanismes de contrôle.',
+                details: 'L\'enquête analyse la chaîne de commandement, l\'inaction du Comité P ("police des polices") et la complaisance des bourgmestres couvrant les dérives d\'agents face aux manifestants et habitants.',
+                impact: 'Documentation systémique utilisée par les observatoires des droits de l\'homme et résonance directe avec les alertes des médias citoyens bruxellois.'
+            },
+            {
+                id: 'hopps',
+                title: '5. Prédation Financière : Hopps & Adrexo',
+                sources: 'POUR.press (Christian Savestre)',
+                theme: 'Fraude Fiscale & Sociale',
+                icon: '💰',
+                summary: 'Autopsie financière démontrant comment des dirigeants ont capté 45 millions d\'euros en siphonnant leur entreprise avant de liquider les emplois.',
+                details: 'Une démonstration clinique par un citoyen expert expliquant le dépeçage d\'Adrexo, l\'organisation d\'une fraude massive au chômage partiel durant la crise sanitaire et la complaisance passive des organes étatiques.',
+                impact: 'Démonstration magistrale de la capacité de l\'expertise citoyenne à suppléer aux carences des services d\'inspection fiscale et financière.'
+            },
+            {
+                id: 'fostplus',
+                title: '6. La Machine du Lobbying Vert : Fost Plus',
+                sources: 'Médor (Cédric Vallet)',
+                theme: 'Écologie & Lobbying',
+                icon: '♻️',
+                summary: 'Enquête révélant le double jeu de l\'ASBL Fost Plus (Colruyt, Danone, Unilever) dans la gestion des déchets ménagers.',
+                details: 'Derrière un discours de promotion du recyclage, Fost Plus a orchestré via des lobbys européens le sabotage des législations environnementales ambitieuses, notamment pour contrer l\'instauration d\'une consigne obligatoire sur le plastique.',
+                impact: 'Démystification des chiffres officiels du recyclage et relance du débat politique sur la consigne en Wallonie et à Bruxelles.'
+            },
+            {
+                id: 'logement',
+                title: '7. Logement Indigne & "Homes Pirates"',
+                sources: 'Nationale 4 & Alter Échos',
+                theme: 'Precarité & Urbanisme',
+                icon: '🏚️',
+                summary: 'Révélation de réseaux de résidences clandestines où sont parquées des personnes vulnérables ou psychiatrisées par des marchands de sommeil.',
+                details: 'Tandis qu\'Alter Échos documentait la fabrique de la pauvreté par les expulsions domiciliaires (projet Bru-Home), Nationale 4 a sorti l\'affaire Rodriguez-Boulatiour exposant des soins fictifs facturés à des résidents démunis.',
+                impact: 'Ouverture de procédures judiciaires pour maltraitance et exercice illégal de la médecine ; prise de conscience des dérives de la gentrification.'
+            },
+            {
+                id: 'scoutisme',
+                title: '8. L\'Omerta dans le Scoutisme Belge',
+                sources: 'Médor (avec Apache)',
+                theme: 'Société & Traditions',
+                icon: '⚜️',
+                summary: 'Appel à témoignages sécurisé ayant recueilli plus de 150 récits de violences, de bizutages extrêmes ("totémisation") et d\'humiliations.',
+                details: 'Analyse sociologique appuyée par des chercheurs démontrant comment la sacralisation de la tradition et le poids des familles ont longtemps couvert des dérives physiques et psychologiques sur les jeunes.',
+                impact: 'Onde de choc dans les mouvements de jeunesse en Belgique, forçant les fédérations de scouts à instaurer de nouvelles chartes de bientraitance.'
+            }
+        ];
+
+        // Render Media Directory Cards
+        function renderMediaGrid(items) {
+            const container = document.getElementById('media-grid');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500">Aucun média ne correspond à votre recherche.</div>`;
+                return;
+            }
+
+            items.forEach(media => {
+                let badgeColor = 'bg-slate-100 text-slate-800';
+                if (media.type === 'investigation') badgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                if (media.type === 'thematique') badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                if (media.type === 'citoyen') badgeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${badgeColor}">${media.typeName}</span>
+                            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">${media.langue}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-1">${media.name}</h3>
+                        <div class="text-xs font-medium text-slate-500 mb-3">${media.statut} • ${media.sub}</div>
+                        <p class="text-sm text-slate-600 mb-4 leading-relaxed">${media.desc}</p>
+                    </div>
+                    <div>
+                        <div class="border-t border-slate-100 pt-3 mb-3">
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Dossiers emblématiques :</span>
+                            <span class="text-xs text-slate-700 font-medium">${media.dossierPhare}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${media.tags.map(t => `<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">#${t}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Investigation List & Handle Selection
+        function initInvestigations() {
+            const listContainer = document.getElementById('investigation-list');
+            listContainer.innerHTML = '';
+
+            investigationsData.forEach((inv, index) => {
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border cursor-pointer transition ${index === 0 ? 'bg-indigo-50 border-indigo-300 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300'}`;
+                item.dataset.id = inv.id;
+                item.innerHTML = `
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-indigo-600">${inv.theme}</span>
+                        <span class="text-sm">${inv.icon}</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm leading-tight mb-1">${inv.title}</h4>
+                    <span class="text-xs text-slate-500 block">${inv.sources}</span>
+                `;
+
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('#investigation-list > div').forEach(el => {
+                        el.classList.remove('bg-indigo-50', 'border-indigo-300', 'shadow-sm');
+                        el.classList.add('bg-white', 'border-slate-200');
+                    });
+                    item.classList.remove('bg-white', 'border-slate-200');
+                    item.classList.add('bg-indigo-50', 'border-indigo-300', 'shadow-sm');
+                    displayInvestigationDetail(inv);
+                });
+
+                listContainer.appendChild(item);
+            });
+
+            // Display first investigation by default
+            if (investigationsData.length > 0) {
+                displayInvestigationDetail(investigationsData[0]);
+            }
+        }
+
+        function displayInvestigationDetail(inv) {
+            const detailContainer = document.getElementById('investigation-detail');
+            detailContainer.innerHTML = `
+                <div>
+                    <div class="flex items-center space-x-2 text-rose-600 font-bold text-xs uppercase tracking-wider mb-2">
+                        <span>${inv.icon}</span>
+                        <span>${inv.theme}</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-900 mb-2 leading-tight">${inv.title}</h3>
+                    <div class="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-md mb-6">
+                        Source(s) : <strong>${inv.sources}</strong>
+                    </div>
+
+                    <div class="space-y-5 text-sm">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-900 mb-1 text-xs uppercase text-slate-400">Résumé du Dossier</h4>
+                            <p class="text-slate-700 leading-relaxed">${inv.summary}</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-1 text-xs uppercase text-slate-400">Révélations &amp; Méthodologie</h4>
+                            <p class="text-slate-700 leading-relaxed">${inv.details}</p>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-4">
+                            <h4 class="font-bold text-emerald-700 mb-1 text-xs uppercase flex items-center space-x-1">
+                                <span>⚡</span>
+                                <span>Impact Démocratique &amp; Judiciaire</span>
+                            </h4>
+                            <p class="text-slate-800 font-medium leading-relaxed bg-emerald-50/60 p-3 rounded-lg border border-emerald-100">${inv.impact}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize Charts (Chart.js)
+        function initCharts() {
+            // Chart 1: Market Concentration
+            const ctx1 = document.getElementById('concentrationChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Oligopoles Industriels (IPM / Rossel)', 'Médias Publics & Institutionnels', 'Presse Indépendante & Citoyenne'],
+                    datasets: [{
+                        data: [72, 18, 10],
+                        backgroundColor: ['#1e293b', '#6366f1', '#f43f5e'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label.substring(0, 30) + ': ~' + context.raw + '% du marché';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Multidimensional Evaluation
+            const ctx2 = document.getElementById('rankingChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Piliers Investigation (Médor, Apache, N4)', 'Décrypteurs (Alter Échos, Wilfried, Tchak)', 'Médias Citoyens (POUR, Stuut, DeWereldMorgen)'],
+                    datasets: [
+                        {
+                            label: 'Impact Judiciaire / Politique',
+                            data: [95, 75, 70],
+                            backgroundColor: '#4f46e5'
+                        },
+                        {
+                            label: 'Profondeur d\'Investigation',
+                            data: [92, 90, 80],
+                            backgroundColor: '#059669'
+                        },
+                        {
+                            label: 'Indépendance Financière',
+                            data: [98, 95, 92],
+                            backgroundColor: '#e11d48'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(val, index) {
+                                    return this.getLabelForValue(index).split(' ')[0] + ' ' + (this.getLabelForValue(index).split(' ')[1] || '');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Investigation Topics Breakdown
+            const ctx3 = document.getElementById('topicsChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Corruption d\'État', 'Fraude Financière', 'Violences Policières', 'Lobbying Écologique', 'Logement & Precarité', 'Abus Institutionnels'],
+                    datasets: [{
+                        data: [25, 20, 18, 15, 12, 10],
+                        backgroundColor: [
+                            'rgba(225, 29, 72, 0.7)',
+                            'rgba(79, 70, 229, 0.7)',
+                            'rgba(217, 119, 6, 0.7)',
+                            'rgba(5, 150, 105, 0.7)',
+                            'rgba(14, 165, 233, 0.7)',
+                            'rgba(107, 114, 128, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners for Filters and Navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMediaGrid(mediaData);
+            initInvestigations();
+            initCharts();
+
+            // Mobile menu toggle
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            });
+
+            // Filter buttons logic
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            let currentFilter = 'all';
+            let searchQuery = '';
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.className = 'filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                    });
+                    btn.className = 'filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white shadow-sm transition';
+                    currentFilter = btn.dataset.filter;
+                    applyFilters();
+                });
+            });
+
+            // Search bar input logic
+            const searchInput = document.getElementById('search-media');
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase().trim();
+                applyFilters();
+            });
+
+            function applyFilters() {
+                const filtered = mediaData.filter(item => {
+                    const matchesCategory = (currentFilter === 'all' || item.type === currentFilter);
+                    const matchesSearch = item.name.toLowerCase().includes(searchQuery) || 
+                                          item.desc.toLowerCase().includes(searchQuery) ||
+                                          item.tags.some(t => t.toLowerCase().includes(searchQuery));
+                    return matchesCategory && matchesSearch;
+                });
+                renderMediaGrid(filtered);
+            }
+        });
+    </script>
+</body>
+</html>

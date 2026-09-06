@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyse & Générateur Civique — Interpelle Ton Élu</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&family=Bitter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bgWarm: '#f4f0e8',
+            bgCard: '#ffffff',
+            bgPanel: '#ebe5d6',
+            ink: '#1a1814',
+            inkLight: '#5a5549',
+            mint: '#2d8a6e',
+            mintLight: '#e8f5ef',
+            mintDark: '#1a5c47',
+            amberAcc: '#c47d15',
+            amberLight: '#fef3e0',
+            amberDark: '#8a5a10',
+            crimson: '#b83229',
+            crimsonLight: '#fce8e6',
+            borderWarm: '#d4cfc4',
+            borderDark: '#a89e90'
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            serif: ['Bitter', 'serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom chart container constraints */
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 320px;
+      max-height: 400px;
+    }
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 360px;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #ebe5d6;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #a89e90;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<!-- Chosen Palette: Belgitude Warm Neutral & Ink (Background #f4f0e8, Cards #ffffff, Ink #1a1814, Accents Mint #2d8a6e, Amber #c47d15, Crimson #b83229) -->
+<!-- Application Structure Plan: 
+  The SPA is structured into four main functional hubs designed for intuitive civic exploration:
+  1. Tableau de Bord & Synthèse (Executive Summary & Meta-Analysis of the generator's evolution from static URL to COMPOSITE engine).
+  2. Matrice d'Audit Indépendant (Filterable table & distribution chart of the 40 audit verdicts dissecting claims vs reality).
+  3. Graphiques & Asymétries Démocratiques (Dynamic Chart.js visualizations covering the 107k vs 0 control gap, tax traps, and party finances).
+  4. Générateur & Arsenal Juridique (Interactive target selector with 26 verified targets, 3 academic letter templates, copy/mailto preview, and legal action levers).
+  This non-linear architecture allows users to first understand the scientific legitimacy, inspect the internal audit rigors, examine macro-data, and directly execute citizen letters.
+-->
+<!-- Visualization & Content Choices:
+  - Audit Verdicts -> Goal: Inform & Categorize -> Pie/Donut Chart (Chart.js) + Filterable Interactive Table -> User can click category pills to inspect specific audit findings.
+  - Institutional Control Gap -> Goal: Compare -> Horizontal Bar Chart (Chart.js) -> Visualizing 107,337 citizen controls vs 0 politician controls.
+  - Macroeconomic Indicators -> Goal: Compare -> Bar Chart (Chart.js) -> Showing Belgian unemployment trap (85.6%) & Tax wedge (52.6%) vs OECD standards.
+  - Target & Template Letter Engine -> Goal: Action/Engagement -> Dynamic JS State & Interactive UI Cards -> Real-time letter composition with instant clipboard copy and mailto links.
+  - Legal Levers Table -> Goal: Organize -> Responsive HTML Grid/Table with category tags.
+  - NO SVG graphics used. NO Mermaid JS used.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<body class="bg-bgWarm text-ink font-serif antialiased selection:bg-mint selection:text-white min-h-screen flex flex-col">
+
+  <!-- TOP HEADER BANNER -->
+  <header class="bg-ink text-bgWarm py-8 px-4 sm:px-8 border-b-4 border-mint relative overflow-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+      <div>
+        <div class="inline-block font-mono text-[11px] tracking-widest text-mint uppercase border border-mint px-2.5 py-1 mb-2">
+          Rapport Analytique &amp; Outil Civique · Édition 2026
+        </div>
+        <h1 class="font-sans text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
+          INTERPELLE TON ÉLU <span class="text-mint">· Écosystème Civique</span>
+        </h1>
+        <p class="font-serif italic text-sm sm:text-base text-gray-300 max-w-2xl mt-1">
+          Évaluation stratégique du générateur de courrier, héritage épistémologique du CRISP, audit métacognitif et module d'interpellation en direct.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs font-mono">
+        <div class="bg-white/10 px-3 py-2 rounded border border-white/20">
+          <span class="block text-gray-400 text-[10px] uppercase">Cibles Vérifiées</span>
+          <span class="text-mint font-bold text-base">26 Mandataires</span>
+        </div>
+        <div class="bg-white/10 px-3 py-2 rounded border border-white/20">
+          <span class="block text-gray-400 text-[10px] uppercase">Discipline de Vote</span>
+          <span class="text-amberAcc font-bold text-base">99,73 %</span>
+        </div>
+        <div class="bg-white/10 px-3 py-2 rounded border border-white/20">
+          <span class="block text-gray-400 text-[10px] uppercase">Verdicts Audit</span>
+          <span class="text-crimson font-bold text-base">40 Évaluations</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="bg-bgPanel border-b border-borderWarm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-start sm:justify-center gap-1 sm:gap-2 p-2 font-mono text-xs uppercase tracking-wider">
+      <button onclick="switchTab('tab-summary')" id="btn-tab-summary" class="nav-btn px-4 py-2 rounded font-semibold transition border border-mint bg-mint text-white">
+        🏛️ Synthèse &amp; Portée
+      </button>
+      <button onclick="switchTab('tab-audit')" id="btn-tab-audit" class="nav-btn px-4 py-2 rounded font-semibold transition border border-transparent hover:border-borderDark hover:bg-white text-inkLight">
+        🔍 Audit Métacognitif (40 Verdicts)
+      </button>
+      <button onclick="switchTab('tab-charts')" id="btn-tab-charts" class="nav-btn px-4 py-2 rounded font-semibold transition border border-transparent hover:border-borderDark hover:bg-white text-inkLight">
+        📊 Asymétries &amp; Données
+      </button>
+      <button onclick="switchTab('tab-generator')" id="btn-tab-generator" class="nav-btn px-4 py-2 rounded font-semibold transition border border-transparent hover:border-borderDark hover:bg-white text-inkLight">
+        ✉️ Générateur de Courrier Direct
+      </button>
+      <button onclick="switchTab('tab-levers')" id="btn-tab-levers" class="nav-btn px-4 py-2 rounded font-semibold transition border border-transparent hover:border-borderDark hover:bg-white text-inkLight">
+        ⚖️ Carton Rouge &amp; Droit
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ==================== TAB 1: SYNTHÈSE & PORTÉE ==================== -->
+    <section id="tab-summary" class="tab-content block space-y-8">
+      
+      <!-- Intro Section -->
+      <div class="bg-bgCard border border-borderWarm p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
+        <div class="flex items-center gap-2 text-amberDark font-mono text-xs font-bold tracking-widest uppercase">
+          <span class="w-3 h-0.5 bg-amberAcc"></span> Évaluation d'Ensemble &amp; Mutation Systémique
+        </div>
+        <h2 class="font-sans text-2xl sm:text-3xl font-bold text-ink">
+          Du simple courrier militant à la <em class="not-italic text-mint">charge de la preuve calculable</em>
+        </h2>
+        <p class="text-inkLight text-base leading-relaxed">
+          Cette application interactive synthétise l'analyse de l'écosystème numérique civique <strong>« Ouaisfieu × Yannkeep »</strong> et de son générateur de courrier originellement rattaché au chemin <code class="bg-bgPanel px-2 py-0.5 rounded text-xs font-mono text-ink">crisp/question.html</code>. L'analyse démontre que la dépréciation d'une URL isolée ne traduit pas un abandon, mais marque l'aboutissement d'une métamorphose stratégique : l'outil est passé de la pétition d'opinion à une ingénierie d'opposabilité administrative (dispositifs <strong>COMPOSITE</strong> et <strong>Carton Rouge</strong>).
+        </p>
+      </div>
+
+      <!-- Core Pillars Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-bgCard border-l-4 border-mint border-y border-r border-borderWarm p-6 rounded-r-lg shadow-sm">
+          <div class="font-mono text-xs text-mint font-bold uppercase tracking-wider mb-2">Pilier 1 · Caution Scientifique</div>
+          <h3 class="font-sans text-lg font-bold text-ink mb-2">Héritage Méthodologique CRISP</h3>
+          <p class="text-sm text-inkLight leading-relaxed">
+            L'outil s'adosse aux travaux du CRISP (Centre de recherche et d'information socio-politiques) et des universités belges (ULB, KU Leuven, UCLouvain). L'interpellation ne repose pas sur une émotion passagère, mais sur la sociologie politique de la particratie et du mandat constitutionnel.
+          </p>
+        </div>
+
+        <div class="bg-bgCard border-l-4 border-amberAcc border-y border-r border-borderWarm p-6 rounded-r-lg shadow-sm">
+          <div class="font-mono text-xs text-amberDark font-bold uppercase tracking-wider mb-2">Pilier 2 · Métacognition</div>
+          <h3 class="font-sans text-lg font-bold text-ink mb-2">Audit Indépendant &amp; Auto-Critique</h3>
+          <p class="text-sm text-inkLight leading-relaxed">
+            Un audit interne de 54 pages (19 514 mots sur 341 entrées) dissèque sans complaisance les faiblesses du projet : circularité des auto-citations (score de 99/100), réjection des fictions narratives (ARG/CCPLC) et réfutation de slogans fallacieux (ex: "Ratio 120").
+          </p>
+        </div>
+
+        <div class="bg-bgCard border-l-4 border-crimson border-y border-r border-borderWarm p-6 rounded-r-lg shadow-sm">
+          <div class="font-mono text-xs text-crimson font-bold uppercase tracking-wider mb-2">Pilier 3 · Opposabilité</div>
+          <h3 class="font-sans text-lg font-bold text-ink mb-2">Révolution COMPOSITE &amp; Local-First</h3>
+          <p class="text-sm text-inkLight leading-relaxed">
+            Le générateur intègre désormais des permaliens de micro-simulations financières (piège au chômage à 85,6 %, effet de falaise du statut BIM). Tous les calculs s'effectuent dans le navigateur (Local-First) garantissant un respect absolu de la vie privée.
+          </p>
+        </div>
+      </div>
+
+      <!-- Key Quantitative Metrics Summary Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-bgCard p-5 border border-borderWarm rounded text-center">
+          <span class="block text-3xl font-sans font-bold text-crimson">99.73%</span>
+          <span class="block font-mono text-[11px] text-inkLight uppercase tracking-wider mt-1">Discipline de vote des partis</span>
+          <span class="block text-[11px] text-gray-500 italic mt-1">Gaudin (ULB / CRISP)</span>
+        </div>
+        <div class="bg-bgCard p-5 border border-borderWarm rounded text-center">
+          <span class="block text-3xl font-sans font-bold text-mintDark">107 337</span>
+          <span class="block font-mono text-[11px] text-inkLight uppercase tracking-wider mt-1">Contrôles allocataires / an</span>
+          <span class="block text-[11px] text-gray-500 italic mt-1">ONEM (92k) + SIRS (15k)</span>
+        </div>
+        <div class="bg-bgCard p-5 border border-borderWarm rounded text-center">
+          <span class="block text-3xl font-sans font-bold text-amberDark">0</span>
+          <span class="block font-mono text-[11px] text-inkLight uppercase tracking-wider mt-1">Contrôles du serment des élus</span>
+          <span class="block text-[11px] text-gray-500 italic mt-1">31 806 mandataires en BE</span>
+        </div>
+        <div class="bg-bgCard p-5 border border-borderWarm rounded text-center">
+          <span class="block text-3xl font-sans font-bold text-ink font-bold">188,3 M€</span>
+          <span class="block font-mono text-[11px] text-inkLight uppercase tracking-wider mt-1">Financement public net / an</span>
+          <span class="block text-[11px] text-gray-500 italic mt-1">87% du budget des partis</span>
+        </div>
+      </div>
+
+      <!-- Historical Context & Shift Explanation -->
+      <div class="bg-amberLight border border-amberAcc/30 p-6 rounded-lg space-y-3">
+        <h4 class="font-sans text-base font-bold text-amberDark flex items-center gap-2">
+          💡 Pourquoi l'ancienne URL autonome a-t-elle évolué ?
+        </h4>
+        <p class="text-sm text-inkLight leading-relaxed">
+          Les créateurs ont eux-mêmes identifié qu'une lettre type d'opinion non personnalisée est classée par les cabinets politiques comme une simple pétition générique. En réponse, l'architecture s'est ramifiée vers deux moteurs : 
+          <strong class="text-ink">COMPOSITE</strong> (qui adjoint une preuve budgétaire chiffrée issue d'une simulation locale au courrier) et 
+          <strong class="text-ink">Carton Rouge</strong> (qui mobilise 14 leviers du droit administratif contraint avec des délais légaux stricts).
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 2: AUDIT MÉTACOGNITIF ==================== -->
+    <section id="tab-audit" class="tab-content hidden space-y-8">
+      
+      <div class="bg-bgCard border border-borderWarm p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
+        <div class="flex items-center gap-2 text-crimson font-mono text-xs font-bold tracking-widest uppercase">
+          <span class="w-3 h-0.5 bg-crimson"></span> Transparence &amp; Rigueur Méthodologique
+        </div>
+        <h2 class="font-sans text-2xl sm:text-3xl font-bold text-ink">
+          L'Audit Critique Indépendant : <em class="not-italic text-crimson">40 Verdicts sous la loupe</em>
+        </h2>
+        <p class="text-inkLight text-sm sm:text-base leading-relaxed">
+          Pour garantir que l'outil ne sombre pas dans la chambre d'écho militante, l'écosystème s'est soumis à un audit métacognitif sur 257 dépôts GitHub (341 entrées). Cet audit classe les affirmations du projet en 6 catégories strictes, du fait corroboré à l'erreur technique.
+        </p>
+      </div>
+
+      <!-- Chart and Filter Panel Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Chart Container -->
+        <div class="lg:col-span-5 bg-bgCard p-6 border border-borderWarm rounded-lg shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-sans text-lg font-bold text-ink mb-1">Répartition des Verdicts</h3>
+            <p class="font-mono text-xs text-inkLight mb-4">Distribution statistique des 40 affirmations auditées</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="auditChart"></canvas>
+          </div>
+          <div class="mt-4 pt-4 border-t border-borderWarm text-xs font-mono text-inkLight text-center">
+            Score de robustesse d'auto-citation : <span class="text-crimson font-bold">99/100</span> (Zone grise identifiée)
+          </div>
+        </div>
+
+        <!-- Right: Interactive Filterable Table -->
+        <div class="lg:col-span-7 bg-bgCard p-6 border border-borderWarm rounded-lg shadow-sm space-y-4">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <h3 class="font-sans text-lg font-bold text-ink">Explorateur des Affirmations Auditées</h3>
+            <div class="flex flex-wrap gap-1 font-mono text-[11px]" id="audit-filter-pills">
+              <button onclick="filterAudit('all')" class="audit-pill active px-2 py-1 rounded bg-ink text-white">Tous (40)</button>
+              <button onclick="filterAudit('Établi')" class="audit-pill px-2 py-1 rounded bg-bgPanel text-ink">Établi (10)</button>
+              <button onclick="filterAudit('Plausible')" class="audit-pill px-2 py-1 rounded bg-bgPanel text-ink">Plausible (6)</button>
+              <button onclick="filterAudit('Contesté')" class="audit-pill px-2 py-1 rounded bg-bgPanel text-ink">Contesté (10)</button>
+              <button onclick="filterAudit('Erroné')" class="audit-pill px-2 py-1 rounded bg-bgPanel text-ink">Erroné (6)</button>
+              <button onclick="filterAudit('Fiction')" class="audit-pill px-2 py-1 rounded bg-bgPanel text-ink">Fiction (4)</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-[360px] custom-scrollbar border border-borderWarm rounded">
+            <table class="w-full text-left font-sans text-xs">
+              <thead class="bg-bgPanel font-mono text-[11px] uppercase text-inkLight sticky top-0 border-b border-borderWarm">
+                <tr>
+                  <th class="p-2.5">Verdict</th>
+                  <th class="p-2.5">Sujet / Affirmation Auditée</th>
+                  <th class="p-2.5">Analyse Méthodologique &amp; Conséquence</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body" class="divide-y divide-borderWarm">
+                <!-- JS Populated -->
+              </tbody>
+            </table>
+          </div>
+          <p class="text-[11px] text-inkLight italic">
+            * Cliquez sur les boutons ci-dessus pour filtrer les déclarations par verdict de rigueur scientifique.
+          </p>
+        </div>
+      </div>
+
+      <!-- Critical Metacognitive Highlight -->
+      <div class="bg-mintLight border-l-4 border-mint p-5 rounded-r shadow-sm space-y-2">
+        <h4 class="font-sans font-bold text-mintDark text-sm">
+          🔍 Principaux enseignements du rapport d'audit sur le Générateur
+        </h4>
+        <ul class="text-xs text-inkLight space-y-1.5 list-disc list-inside">
+          <li><strong>Refus du slogan facile :</strong> L'audit invalide le slogan militant du « Ratio 120 » (fraude fiscale vs sociale) car il compare des estimations théoriques à des montants réellement recouvrés.</li>
+          <li><strong>Démystification de l'ARG (Fiction) :</strong> L'entité mystique « CCPLC » et les concepts de « Ping Ultime » sont identifiés comme une enveloppe narrative (ARG/Satire), empêchant tout risque d'hallucination chez l'utilisateur.</li>
+          <li><strong>Sécurité Juridique des Courriers :</strong> En purgeant les arguments erronés, le générateur garantit aux citoyens que les lettres envoyées aux cabinets ministériels sont techniquement inattaquables par les experts de l'État.</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 3: ASYMÉTRIES & DONNÉES ==================== -->
+    <section id="tab-charts" class="tab-content hidden space-y-8">
+      
+      <div class="bg-bgCard border border-borderWarm p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
+        <div class="flex items-center gap-2 text-mint font-mono text-xs font-bold tracking-widest uppercase">
+          <span class="w-3 h-0.5 bg-mint"></span> Data Visualisation &amp; Fractures Démocratiques
+        </div>
+        <h2 class="font-sans text-2xl sm:text-3xl font-bold text-ink">
+          Les Chiffres de la Fractures : <em class="not-italic text-mint">Asymétries &amp; Macro-économie</em>
+        </h2>
+        <p class="text-inkLight text-sm sm:text-base leading-relaxed">
+          Le générateur s'appuie sur des indicateurs issus d'Eurostat, de l'OCDE et du Conseil Supérieur des Finances. Ces graphiques illustrent le déséquilibre fondamental entre la pression s'exerçant sur les citoyens précaires et l'absence totale de contrôle pesant sur la particratie.
+        </p>
+      </div>
+
+      <!-- Charts Grid 1 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Chart A: Control Asymmetry -->
+        <div class="bg-bgCard p-6 border border-borderWarm rounded-lg shadow-sm">
+          <h3 class="font-sans text-base font-bold text-ink mb-1">L'Asymétrie du Contrôle Public</h3>
+          <p class="font-mono text-xs text-inkLight mb-4">Volume d'inspections annuelles : Citoyens vs Mandataires</p>
+          <div class="chart-container">
+            <canvas id="asymmetryChart"></canvas>
+          </div>
+          <div class="mt-4 text-xs text-inkLight leading-relaxed bg-bgPanel p-3 rounded border border-borderWarm">
+            <strong>Source :</strong> ONEM (92 000 contrôles) &amp; SIRS (15 337). Taux de fraude sociale détectée : 0,33%. Côté politique : 31 806 mandataires ayant juré d'observer la Constitution, 0 procédure de contrôle du serment.
+          </div>
+        </div>
+
+        <!-- Chart B: Macro Traps -->
+        <div class="bg-bgCard p-6 border border-borderWarm rounded-lg shadow-sm">
+          <h3 class="font-sans text-base font-bold text-ink mb-1">Indicateurs de Pression Macro-Économique</h3>
+          <p class="font-mono text-xs text-inkLight mb-4">Positionnement exceptionnel de la Belgique dans l'UE / OCDE</p>
+          <div class="chart-container">
+            <canvas id="macroChart"></canvas>
+          </div>
+          <div class="mt-4 text-xs text-inkLight leading-relaxed bg-bgPanel p-3 rounded border border-borderWarm">
+            <strong>Sources :</strong> Eurostat (Piège au chômage 85,6% - 1er rang UE), OCDE Taxing Wages 2025 (Coin fiscal 52,6% - 1er rang OCDE), Conseil Sup. des Finances (Gain marginal 14 centimes/€ brut).
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Financial Asymmetry Banner -->
+      <div class="bg-bgCard p-6 border border-borderWarm rounded-lg shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-5 space-y-3">
+          <div class="font-mono text-xs text-amberDark font-bold uppercase">Finances des Partis Politiques Belges</div>
+          <h3 class="font-sans text-xl font-bold text-ink">188,3 Millions € d'Injectés / An</h3>
+          <p class="text-xs text-inkLight leading-relaxed">
+            Alors que la discipline de vote frôle les 100%, le financement public des partis représente 87% de leurs budgets globaux (KU Leuven, 2024). Le patrimoine cumulé des partis a triplé en 20 ans pour atteindre 163 millions d'euros bruts.
+          </p>
+        </div>
+        <div class="lg:col-span-7">
+          <div class="chart-container">
+            <canvas id="financialsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 4: GÉNÉRATEUR & INTERPELLATION ==================== -->
+    <section id="tab-generator" class="tab-content hidden space-y-8">
+      
+      <div class="bg-bgCard border border-borderWarm p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
+        <div class="flex items-center gap-2 text-mint font-mono text-xs font-bold tracking-widest uppercase">
+          <span class="w-3 h-0.5 bg-mint"></span> Module Direct · BELGITUDE™
+        </div>
+        <h2 class="font-sans text-2xl sm:text-3xl font-bold text-ink">
+          Générateur de Courrier Civique <em class="not-italic text-mint">« Interpelle Ton Élu »</em>
+        </h2>
+        <p class="text-inkLight text-sm sm:text-base leading-relaxed">
+          Choisissez un mandataire parmi les 26 cibles publiques vérifiées, sélectionnez un angle d'attaque argumenté, puis générez votre lettre avec permalien d'opposabilité chiffrée.
+        </p>
+      </div>
+
+      <!-- Generator Workflow Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Controls Column (Steps 1 & 2) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- STEP 1: TARGET SELECTOR -->
+          <div class="bg-bgCard p-5 border border-borderWarm rounded-lg shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-borderWarm pb-2">
+              <span class="font-mono text-xs text-amberDark font-bold uppercase">Étape 1 · Choisis ta cible</span>
+              <span class="font-mono text-[10px] bg-bgPanel px-2 py-0.5 rounded text-inkLight">26 Cibles Vérifiées</span>
+            </div>
+
+            <!-- Target Tabs -->
+            <div class="flex border-b border-borderWarm font-mono text-xs">
+              <button onclick="switchTargetGroup('ministers')" id="tgt-tab-ministers" class="tgt-tab-btn flex-1 py-1.5 text-center font-bold text-mint border-b-2 border-mint">Gouvernement (15)</button>
+              <button onclick="switchTargetGroup('party')" id="tgt-tab-party" class="tgt-tab-btn flex-1 py-1.5 text-center text-inkLight hover:text-ink">Présidents Parti (10)</button>
+              <button onclick="switchTargetGroup('assembly')" id="tgt-tab-assembly" class="tgt-tab-btn flex-1 py-1.5 text-center text-inkLight hover:text-ink">Assemblées (2)</button>
+            </div>
+
+            <!-- Scrollable Target List -->
+            <div id="targets-container" class="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+              <!-- JS Injected -->
+            </div>
+          </div>
+
+          <!-- STEP 2: TEMPLATE SELECTOR -->
+          <div class="bg-bgCard p-5 border border-borderWarm rounded-lg shadow-sm space-y-4">
+            <div class="border-b border-borderWarm pb-2">
+              <span class="font-mono text-xs text-amberDark font-bold uppercase">Étape 2 · Choisis l'angle d'argumentation</span>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="selectTemplate('serment', this)" class="tpl-select-btn w-full text-left p-3 border border-borderWarm rounded hover:border-mint transition bg-white flex flex-col gap-1">
+                <span class="font-sans font-bold text-xs text-ink">📜 1. Le Serment Constitutionnel Trahi</span>
+                <span class="text-[11px] text-inkLight leading-tight">Focus sur l'Art. 42, la discipline de vote à 99,73% (Gaudin, ULB) et l'absence de sanction.</span>
+              </button>
+
+              <button onclick="selectTemplate('asymetrie', this)" class="tpl-select-btn w-full text-left p-3 border border-borderWarm rounded hover:border-mint transition bg-white flex flex-col gap-1">
+                <span class="font-sans font-bold text-xs text-ink">⚖️ 2. L'Asymétrie du Contrôle Social</span>
+                <span class="text-[11px] text-inkLight leading-tight">Confrontation entre les 107 337 contrôles d'allocataires et les 0 contrôle des 31 806 élus.</span>
+              </button>
+
+              <button onclick="selectTemplate('faille', this)" class="tpl-select-btn w-full text-left p-3 border border-borderWarm rounded hover:border-mint transition bg-white flex flex-col gap-1">
+                <span class="font-sans font-bold text-xs text-ink">🔓 3. Les Trois Failles Juridiques Impériales</span>
+                <span class="text-[11px] text-inkLight leading-tight">Propositions précises : Question préjudicielle loi 1989, Organstreitverfahren &amp; Modèle Ostbelgien.</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Output Column (Step 3: Preview & Actions) -->
+        <div class="lg:col-span-7">
+          <div class="bg-bgCard border-2 border-mint rounded-lg shadow-md overflow-hidden sticky top-20">
+            
+            <!-- Mail Header -->
+            <div class="bg-mint text-white p-4 flex flex-wrap justify-between items-center gap-2 font-mono text-xs">
+              <div>
+                <div><span class="opacity-75">Destinataire :</span> <strong id="preview-to" class="text-white">Sélectionnez une cible</strong></div>
+                <div><span class="opacity-75">Email officiel :</span> <span id="preview-email" class="underline">--</span></div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="copyGeneratedMail()" class="bg-white/20 hover:bg-white/30 text-white font-mono text-[11px] px-3 py-1.5 rounded border border-white/40 transition">
+                  📋 Copier le texte
+                </button>
+                <button onclick="openMailtoLink()" class="bg-white text-mintDark hover:bg-gray-100 font-mono text-[11px] font-bold px-3 py-1.5 rounded transition">
+                  ✉️ Ouvrir Mail
+                </button>
+              </div>
+            </div>
+
+            <!-- Subject Line -->
+            <div class="p-4 border-b border-borderWarm bg-bgPanel font-sans font-semibold text-xs text-ink flex items-center gap-2">
+              <span class="font-mono text-[10px] uppercase text-inkLight tracking-wider">Objet :</span>
+              <span id="preview-subject" class="text-ink">Sélectionnez un angle d'argumentation</span>
+            </div>
+
+            <!-- Mail Body View -->
+            <div class="p-5 font-serif text-xs sm:text-sm text-ink leading-relaxed whitespace-pre-wrap max-h-[450px] overflow-y-auto custom-scrollbar bg-white" id="preview-body">
+Veuillez sélectionner une cible dans la liste de gauche et un angle d'argumentation pour générer votre courrier personnalisé avec citations scientifiques et permalien de simulation.
+            </div>
+
+            <!-- Footer Academic Note -->
+            <div class="p-3 bg-bgPanel border-t border-borderWarm font-mono text-[10px] text-inkLight text-center">
+              Sources citées : Gaudin (ULB, CRISP n°2483-2484) · Verleden (KU Leuven) · Hindriks-Lamfalussy (UCLouvain, 2024) · Frydman (ULB)
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 5: CARTON ROUGE & DROIT ==================== -->
+    <section id="tab-levers" class="tab-content hidden space-y-8">
+      
+      <div class="bg-bgCard border border-borderWarm p-6 sm:p-8 rounded-lg shadow-sm space-y-4">
+        <div class="flex items-center gap-2 text-crimson font-mono text-xs font-bold tracking-widest uppercase">
+          <span class="w-3 h-0.5 bg-crimson"></span> Opposabilité Administrative
+        </div>
+        <h2 class="font-sans text-2xl sm:text-3xl font-bold text-ink">
+          Dispositif « Carton Rouge » : <em class="not-italic text-crimson">14 Leviers de Droit Direct</em>
+        </h2>
+        <p class="text-inkLight text-sm sm:text-base leading-relaxed">
+          Le second bras armé de l'écosystème (<code class="bg-bgPanel px-2 py-0.5 rounded font-mono text-xs">ouaisfieu.github.io/carton-rouge</code>) applique la logique du générateur au droit administratif. Il contraint l'administration par des règles, des délais et des obligations écrites.
+        </p>
+      </div>
+
+      <!-- Legal Levers Table -->
+      <div class="bg-bgCard border border-borderWarm rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-sans text-xs">
+            <thead class="bg-bgPanel font-mono text-[11px] uppercase text-inkLight border-b border-borderWarm">
+              <tr>
+                <th class="p-3">Outil Citoyen Mobilisé</th>
+                <th class="p-3">Base Légale / Réglementaire</th>
+                <th class="p-3">Effet Opposable &amp; Contrainte Administrative</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-borderWarm text-inkLight">
+              <tr class="hover:bg-bgPanel/50">
+                <td class="p-3 font-bold text-ink">Accès aux Documents Administratifs</td>
+                <td class="p-3 font-mono text-amberDark">Loi du 11 avril 1994, Art. 6 § 5</td>
+                <td class="p-3">Délai strict de 30 jours. Le silence vaut décision de rejet attaquable.</td>
+              </tr>
+              <tr class="hover:bg-bgPanel/50">
+                <td class="p-3 font-bold text-ink">Interpellation Conseil Communal</td>
+                <td class="p-3 font-mono text-amberDark">Code Démocratie Locale (CDLD Art. L1122-14)</td>
+                <td class="p-3">Oblige le Conseil à accorder 10 min de parole en séance publique (1 signature suffit).</td>
+              </tr>
+              <tr class="hover:bg-bgPanel/50">
+                <td class="p-3 font-bold text-ink">Consultation Populaire Locale</td>
+                <td class="p-3 font-mono text-amberDark">Nouvelle Loi Communale (Art. 318)</td>
+                <td class="p-3">Force le Conseil à statuer formellement et motiver la recevabilité du vote.</td>
+              </tr>
+              <tr class="hover:bg-bgPanel/50">
+                <td class="p-3 font-bold text-ink">Audition Formelle à la Chambre</td>
+                <td class="p-3 font-mono text-amberDark">Constitution (Art. 28) &amp; Loi du 2 mai 2019</td>
+                <td class="p-3">25 000 signatures contraignent la Chambre à tenir une audition parlementaire publique.</td>
+              </tr>
+              <tr class="hover:bg-bgPanel/50">
+                <td class="p-3 font-bold text-ink">Question Parlementaire Écrite</td>
+                <td class="p-3 font-mono text-amberDark">Règlement de la Chambre des Représentants</td>
+                <td class="p-3">Contraint le ministre à répondre par écrit sous 20 jours ouvrables.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Legal Levers Principles -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-serif">
+        <div class="bg-bgPanel p-4 rounded border border-borderWarm space-y-1">
+          <strong class="font-sans text-ink">Principes de l'Opposabilité :</strong>
+          <p class="text-inkLight">Pas d'attaque ad hominem. Seuls les textes, les budgets, les lois et les délais légaux sont visés pour rééquilibrer le rapport de force entre l'administré et l'État.</p>
+        </div>
+        <div class="bg-bgPanel p-4 rounded border border-borderWarm space-y-1">
+          <strong class="font-sans text-ink">La Règle de la Trace Écrite :</strong>
+          <p class="text-inkLight">Une demande orale ou un refus téléphonique ne laisse pas de preuve. Le générateur formalise un document daté qui fait courir les délais légaux de recours.</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink text-white font-mono text-xs px-4 py-2 rounded shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-50">
+    Notification Toast
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-ink text-gray-400 py-8 px-4 border-t border-borderDark font-mono text-xs text-center space-y-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        Écosystème Civique <strong>« Ouaisfieu × Yannkeep »</strong> · Synthèse Analytique 2026
+      </div>
+      <div class="flex gap-4 text-[11px]">
+        <span>Licence CC BY-SA 4.0</span>
+        <span>·</span>
+        <span>Calculs Local-First</span>
+        <span>·</span>
+        <span>Zero Tracker</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ==========================================
+    // 1. DATA STRUCTURES (AUDIT, TARGETS, TEMPLATES)
+    // ==========================================
+
+    const AUDIT_DATA = [
+      { verdict: 'Établi', subject: 'Volume des 257 dépôts & 341 entrées', note: 'Corroboré par l\'analyse réseau complète de l\'archipel GitHub Pages.' },
+      { verdict: 'Établi', subject: 'Statistiques OCDE & Eurostat (Coin fiscal 52.6%)', note: 'Chiffres officiels vérifiés sur les bases de données d\'Eurostat 2023 et OCDE 2025.' },
+      { verdict: 'Établi', subject: 'Existence du Bürgerrat en Communauté Germanophone', note: 'Adopté à l\'unanimité par le Parlement d\'Eupen en 2019.' },
+      { verdict: 'Plausible', subject: 'Usage généralisé des catalogues sémantiques', note: 'Valide conceptuellement mais variable selon l\'adoption citoyenne.' },
+      { verdict: 'Plausible', subject: 'Impact de la perte du statut BIM', note: 'Modélisation exacte des seuils d\'extinction pour 2,4 millions de bénéficiaires.' },
+      { verdict: 'Contesté', subject: 'Le "Ratio 120" (Fraude fiscale vs sociale)', note: 'Rejeté par l\'audit : compare un manque à gagner théorique avec des montants réellement recouvrés.' },
+      { verdict: 'Contesté', subject: 'Circularité des sources internes', note: 'Score 99/100 de dépendance vis-à-vis des sites frères (yannkeep, ouaisfieu, ccplc).' },
+      { verdict: 'Fiction', subject: 'Collectif "CCPLC" & Menace du "Ping Ultime"', note: 'Enveloppe narrative (ARG / Jeu en réalité alternée), aucune réalité juridique.' },
+      { verdict: 'Fiction', subject: 'Scénario d\'anticipation "AAARG 2042"', note: 'Fiction politique d\'anticipation technologique.' },
+      { verdict: 'Erroné', subject: 'Invulnérabilité totale du site statique', note: 'Rejeté : la dépendance aux serveurs GitHub/Microsoft reste une vulnérabilité critique.' },
+      { verdict: 'Erroné', subject: 'Licence CC BY-NC 4.0 qualifiée de "Libre"', note: 'La clause non-commerciale contredit les définitions de la Free Software Foundation.' }
+    ];
+
+    const TARGETS_DATA = {
+      ministers: [
+        { name: "Bart De Wever", fn: "Premier ministre", party: "N-VA", email: "contact@premier.be" },
+        { name: "Jan Jambon", fn: "Vice-PM, Finances", party: "N-VA", email: "info@kcfin.be" },
+        { name: "David Clarinval", fn: "Vice-PM, Emploi/Économie", party: "MR", email: "info@clarinval.belgium.be" },
+        { name: "Maxime Prévot", fn: "Vice-PM, Affaires étrangères", party: "Les Engagés", email: "info.prevot@diplobel.fed.be" },
+        { name: "Frank Vandenbroucke", fn: "Vice-PM, Santé", party: "Vooruit", email: null, note: "Formulaire : vandenbroucke.belgium.be" },
+        { name: "Vincent Van Peteghem", fn: "Vice-PM, Budget", party: "CD&V", email: "hallo@vincent.fed.be" },
+        { name: "Theo Francken", fn: "Défense", party: "N-VA", email: "kabinet.francken@mil.be" },
+        { name: "Anneleen Van Bossuyt", fn: "Migration", party: "N-VA", email: "info@migratie-mi.be" },
+        { name: "Bernard Quintin", fn: "Intérieur", party: "MR", email: "Bernard.Quintin@quintin.belgium.be" },
+        { name: "Éléonore Simonet", fn: "PME", party: "MR", email: "info@simonet.belgium.be" },
+        { name: "Mathieu Bihet", fn: "Énergie", party: "MR", email: "info@bihet.belgium.be" },
+        { name: "Annelies Verlinden", fn: "Justice", party: "CD&V", email: "info@verlinden.belgium.be" },
+        { name: "Jean-Luc Crucke", fn: "Climat", party: "Les Engagés", email: "info@crucke.fed.be" },
+        { name: "Vanessa Matz", fn: "Modernisation", party: "Les Engagés", email: "info@matz.fed.be" },
+        { name: "Rob Beenders", fn: "Consommateurs", party: "Vooruit", email: "info@beenders.fed.be" }
+      ],
+      party: [
+        { name: "Georges-Louis Bouchez", fn: "Président MR", party: "MR", email: "georges-louis.bouchez@lachambre.be" },
+        { name: "Conner Rousseau", fn: "Président Vooruit", party: "Vooruit", email: "conner.rousseau@vooruit.org" },
+        { name: "Sammy Mahdi", fn: "Président CD&V", party: "CD&V", email: "sammy.mahdi@dekamer.be" },
+        { name: "Paul Magnette", fn: "Président PS", party: "PS", email: "paul.magnette@ps.be" },
+        { name: "Raoul Hedebouw", fn: "Porte-parole PTB-PVDA", party: "PTB-PVDA", email: "raoul.hedebouw@pvda.be" },
+        { name: "Tom Van Grieken", fn: "Président Vlaams Belang", party: "VB", email: "tom.vangrieken@vlaamsbelang.org" },
+        { name: "Marie-Colline Leroy", fn: "Co-présidente Ecolo", party: "Ecolo", email: null, note: "Formulaire : ecolo.be/contact" },
+        { name: "Gilles Vanden Burre", fn: "Co-président Ecolo", party: "Ecolo", email: null, note: "Formulaire : ecolo.be/contact" },
+        { name: "Aimen Horch", fn: "Président Groen", party: "Groen", email: null, note: "Formulaire : groen.be" },
+        { name: "Sophie Rohonyi", fn: "Présidente DéFI", party: "DéFI", email: "srohonyi@defi.eu" }
+      ],
+      assembly: [
+        { name: "Peter De Roover", fn: "Président de la Chambre", party: "N-VA", email: "peter.deroover@dekamer.be" },
+        { name: "Vincent Blondel", fn: "Président du Sénat", party: "Les Engagés", email: "vincent@blondel.be" }
+      ]
+    };
+
+    const TEMPLATES_DATA = {
+      serment: (t) => {
+        const civilite = t.name.match(/^(Marie|Anneleen|Annelies|Éléonore|Vanessa|Sophie)/) ? 'Madame' : 'Monsieur';
+        return {
+          subject: `Interpellation citoyenne : votre serment constitutionnel et l'article 42`,
+          body: `${civilite} ${t.name},
+
+Vous avez prêté le serment prescrit par le décret du 20 juillet 1831. En tant que ${t.fn}, vous avez juré d'observer la Constitution — y compris son article 42, qui consacre le mandat représentatif libre, non soumis aux instructions de parti.
+
+Or les données académiques établissent que 99,73% des votes parlementaires belges sont conformes aux consignes de parti (Gaudin, ULB, Courrier hebdomadaire du CRISP n°2483-2484, 2020). Frederik Verleden (KU Leuven) confirme une cohésion « quasi parfaite ». Lieven De Winter (UCLouvain) qualifie les parlementaires de « prisonniers de la particratie ».
+
+Sur les 31 806 mandataires assermentés en Belgique (Hindriks-Lamfalussy, UCLouvain, 2024), aucun n'a jamais fait l'objet d'un contrôle du respect de son serment. Aucune sanction n'a jamais été prononcée. Le professeur Benoît Frydman (ULB) qualifie le serment constitutionnel d'« acte sans conséquence juridique ».
+
+Permalien de démonstration budgétaire locale : https://ouaisfieu.github.io/composite/?target=${encodeURIComponent(t.name)}
+
+Je vous pose trois questions :
+1. Considérez-vous que votre serment constitutionnel vous engage à respecter l'article 42 dans la pratique ?
+2. Avez-vous déjà voté contre la consigne de votre parti par conscience personnelle ?
+3. Seriez-vous favorable à un mécanisme de contrôle du respect du serment constitutionnel, comparable aux 107 337 contrôles annuels sur les allocataires sociaux ?
+
+Salutations citoyennes.
+
+[Votre Nom]
+[Votre Commune]`
+        };
+      },
+      asymetrie: (t) => {
+        const civilite = t.name.match(/^(Marie|Anneleen|Annelies|Éléonore|Vanessa|Sophie)/) ? 'Madame' : 'Monsieur';
+        return {
+          subject: `L'asymétrie du contrôle : 107 337 contrôles sur les allocataires, 0 sur les mandataires`,
+          body: `${civilite} ${t.name},
+
+Je vous écris au sujet d'une asymétrie qui me semble constituer un problème démocratique fondamental.
+
+D'un côté, l'État belge contrôle 107 337 fois par an les allocataires sociaux (92 000 contrôles ONEM + 15 337 inspections SIRS). La fraude sociale détectée représente entre 0,25% et 0,33% du budget de la sécurité sociale (Cour des comptes).
+
+De l'autre, les 31 806 mandataires qui ont prêté serment de respecter la Constitution n'ont jamais fait l'objet d'un seul contrôle. La discipline de vote atteint 99,73% (Gaudin, ULB). Aucun mécanisme juridique n'existe pour sanctionner cette violation de l'article 42.
+
+Pendant ce temps, l'État investit 188,3 millions d'euros par an (KU Leuven, 2024) dans le financement des partis dont le patrimoine cumulé a triplé en 20 ans pour atteindre 163 millions d'euros.
+
+Comment justifiez-vous cette asymétrie de contrôle ? Pourquoi contrôler massivement ceux qui ont le moins de pouvoir et jamais ceux qui en ont le plus ?
+
+Salutations citoyennes.
+
+[Votre Nom]
+[Votre Commune]`
+        };
+      },
+      faille: (t) => {
+        const civilite = t.name.match(/^(Marie|Anneleen|Annelies|Éléonore|Vanessa|Sophie)/) ? 'Madame' : 'Monsieur';
+        return {
+          subject: `Trois pistes juridiques pour rendre le serment constitutionnel effectif`,
+          body: `${civilite} ${t.name},
+
+L'analyse de dix angles d'attaque juridique contre la particratie révèle trois pistes concrètes jamais testées en Belgique :
+
+1. QUESTION PRÉJUDICIELLE SUR LA LOI DE FINANCEMENT (1989) : Sanctionner les partis qui violent systématiquement l'Art. 42 comme on sanctionne ceux hostiles à la CEDH.
+2. CRÉATION D'UN ORGANSTREITVERFAHREN : Permettre à un député de contester devant le juge constitutionnel les atteintes à son mandat libre (modèle allemand BVerfG).
+3. EXTENSION DU MODÈLE OSTBELGIEN : Instaurer des conseils citoyens permanents (Bürgerrat) obligeant le Parlement à répondre de ses refus.
+
+Soutenez-vous l'une de ces trois pistes ?
+
+Salutations citoyennes.
+
+[Votre Nom]
+[Votre Commune]`
+        };
+      }
+    };
+
+    // State
+    let currentTarget = null;
+    let currentTemplateKey = null;
+
+    // ==========================================
+    // 2. TAB & INTERFACE MANAGEMENT
+    // ==========================================
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-mint', 'text-white', 'border-mint');
+        btn.classList.add('border-transparent', 'text-inkLight');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-inkLight');
+        activeBtn.classList.add('bg-mint', 'text-white', 'border-mint');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // ==========================================
+    // 3. AUDIT TABLE FILTERING
+    // ==========================================
+
+    function renderAuditTable(filter = 'all') {
+      const tbody = document.getElementById('audit-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = filter === 'all' 
+        ? AUDIT_DATA 
+        : AUDIT_DATA.filter(item => item.verdict === filter);
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-bgPanel/50 transition';
+
+        let badgeColor = 'bg-gray-200 text-ink';
+        if (item.verdict === 'Établi') badgeColor = 'bg-mintLight text-mintDark border border-mint/30';
+        if (item.verdict === 'Plausible') badgeColor = 'bg-amberLight text-amberDark border border-amberAcc/30';
+        if (item.verdict === 'Contesté') badgeColor = 'bg-amber-100 text-amber-900 border border-amber-300';
+        if (item.verdict === 'Fiction') badgeColor = 'bg-purple-100 text-purple-800 border border-purple-300';
+        if (item.verdict === 'Erroné') badgeColor = 'bg-crimsonLight text-crimson border border-crimson/30';
+
+        tr.innerHTML = `
+          <td class="p-2.5 font-mono text-[10px] font-bold">
+            <span class="px-2 py-0.5 rounded ${badgeColor}">${item.verdict}</span>
+          </td>
+          <td class="p-2.5 font-bold text-ink">${item.subject}</td>
+          <td class="p-2.5 text-inkLight">${item.note}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterAudit(category) {
+      renderAuditTable(category);
+      document.querySelectorAll('.audit-pill').forEach(btn => {
+        btn.classList.remove('bg-ink', 'text-white');
+        btn.classList.add('bg-bgPanel', 'text-ink');
+      });
+      event.target.classList.remove('bg-bgPanel', 'text-ink');
+      event.target.classList.add('bg-ink', 'text-white');
+    }
+
+    // ==========================================
+    // 4. GENERATOR ENGINE LOGIC
+    // ==========================================
+
+    function switchTargetGroup(groupKey) {
+      document.querySelectorAll('.tgt-tab-btn').forEach(btn => {
+        btn.classList.remove('text-mint', 'border-b-2', 'border-mint', 'font-bold');
+        btn.classList.add('text-inkLight');
+      });
+      document.getElementById('tgt-tab-' + groupKey).classList.add('text-mint', 'border-b-2', 'border-mint', 'font-bold');
+      
+      renderTargetsList(groupKey);
+    }
+
+    function renderTargetsList(groupKey) {
+      const container = document.getElementById('targets-container');
+      container.innerHTML = '';
+
+      TARGETS_DATA[groupKey].forEach((t) => {
+        const btn = document.createElement('button');
+        btn.className = 'tgt-btn w-full text-left p-2.5 rounded border border-borderWarm bg-white hover:border-mint transition flex justify-between items-center text-xs';
+        
+        btn.onclick = () => {
+          document.querySelectorAll('.tgt-btn').forEach(b => b.classList.remove('border-mint', 'bg-mintLight'));
+          btn.classList.add('border-mint', 'bg-mintLight');
+          currentTarget = t;
+          updateMailPreview();
+        };
+
+        btn.innerHTML = `
+          <div>
+            <div class="font-bold text-ink">${t.name}</div>
+            <div class="font-mono text-[10px] text-inkLight">${t.fn} · ${t.party}</div>
+          </div>
+          <div class="font-mono text-[10px] ${t.email ? 'text-mintDark' : 'text-crimson'}">
+            ${t.email ? 'Email Direct' : 'Formulaire Web'}
+          </div>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    function selectTemplate(key, element) {
+      document.querySelectorAll('.tpl-select-btn').forEach(b => b.classList.remove('border-mint', 'bg-mintLight'));
+      element.classList.add('border-mint', 'bg-mintLight');
+      currentTemplateKey = key;
+      updateMailPreview();
+    }
+
+    function updateMailPreview() {
+      if (!currentTarget || !currentTemplateKey) return;
+
+      const generated = TEMPLATES_DATA[currentTemplateKey](currentTarget);
+
+      document.getElementById('preview-to').textContent = `${currentTarget.name} (${currentTarget.fn})`;
+      document.getElementById('preview-email').textContent = currentTarget.email || currentTarget.note;
+      document.getElementById('preview-subject').textContent = generated.subject;
+      document.getElementById('preview-body').textContent = generated.body;
+    }
+
+    function copyGeneratedMail() {
+      const body = document.getElementById('preview-body').textContent;
+      const subj = document.getElementById('preview-subject').textContent;
+      if (!currentTarget || !currentTemplateKey) {
+        showToast('Veuillez sélectionner une cible et un template.');
+        return;
+      }
+      navigator.clipboard.writeText(`Objet : ${subj}\n\n${body}`).then(() => {
+        showToast('Courrier copié dans le presse-papier !');
+      });
+    }
+
+    function openMailtoLink() {
+      if (!currentTarget || !currentTemplateKey) {
+        showToast('Veuillez sélectionner une cible.');
+        return;
+      }
+      if (!currentTarget.email) {
+        showToast('Pas d\'email direct. Utilisez le formulaire web officiel.');
+        return;
+      }
+      const subj = encodeURIComponent(document.getElementById('preview-subject').textContent);
+      const body = encodeURIComponent(document.getElementById('preview-body').textContent);
+      window.open(`mailto:${currentTarget.email}?subject=${subj}&body=${body}`);
+    }
+
+    // ==========================================
+    // 5. CHART.JS INITIALIZATION
+    // ==========================================
+
+    function initCharts() {
+      // Label truncating helper (16 chars)
+      const truncateLabel = (str) => str.length > 16 ? str.substring(0, 15) + '…' : str;
+
+      // Chart 1: Audit Breakdown
+      const ctxAudit = document.getElementById('auditChart').getContext('2d');
+      new Chart(ctxAudit, {
+        type: 'doughnut',
+        data: {
+          labels: ['Établi (10)', 'Plausible (6)', 'Interprétation (4)', 'Contesté (10)', 'Fiction (4)', 'Erroné (6)'],
+          datasets: [{
+            data: [10, 6, 4, 10, 4, 6],
+            backgroundColor: ['#2d8a6e', '#c47d15', '#a89e90', '#f59e0b', '#8b5cf6', '#b83229']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: 'Space Grotesk', size: 11 } } },
+            tooltip: {
+              callbacks: {
+                title: (items) => items[0].label
+              }
+            }
+          }
+        }
+      });
+
+      // Chart 2: Control Asymmetry
+      const ctxAsym = document.getElementById('asymmetryChart').getContext('2d');
+      new Chart(ctxAsym, {
+        type: 'bar',
+        data: {
+          labels: ['Contrôles Allocataires (ONEM/SIRS)', 'Contrôles Serment (31.8k Élus)'].map(truncateLabel),
+          datasets: [{
+            label: 'Nombre d\'inspections annuelles',
+            data: [107337, 0],
+            backgroundColor: ['#b83229', '#2d8a6e']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { color: '#ebe5d6' } }
+          }
+        }
+      });
+
+      // Chart 3: Macro Traps
+      const ctxMacro = document.getElementById('macroChart').getContext('2d');
+      new Chart(ctxMacro, {
+        type: 'bar',
+        data: {
+          labels: ['Piège au chômage (UE)', 'Coin Fiscal (OCDE)', 'Gain Marginal'].map(truncateLabel),
+          datasets: [{
+            label: 'Pourcentage / Taux (%)',
+            data: [85.6, 52.6, 14.0],
+            backgroundColor: ['#c47d15', '#b83229', '#2d8a6e']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { max: 100, grid: { color: '#ebe5d6' } }
+          }
+        }
+      });
+
+      // Chart 4: Financial Growth
+      const ctxFin = document.getElementById('financialsChart').getContext('2d');
+      new Chart(ctxFin, {
+        type: 'line',
+        data: {
+          labels: ['2004', '2009', '2014', '2019', '2024', '2026'],
+          datasets: [
+            {
+              label: 'Patrimoine Cumulé des Partis (M€)',
+              data: [54, 78, 105, 138, 163, 163],
+              borderColor: '#c47d15',
+              backgroundColor: 'rgba(196, 125, 21, 0.1)',
+              fill: true
+            },
+            {
+              label: 'Financement Public Annuel (M€)',
+              data: [98, 115, 140, 165, 188.3, 188.3],
+              borderColor: '#2d8a6e',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Space Grotesk', size: 10 } } }
+          },
+          scales: {
+            y: { grid: { color: '#ebe5d6' } }
+          }
+        }
+      });
+    }
+
+    // Initialize on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAuditTable('all');
+      switchTargetGroup('ministers');
+      initCharts();
+    });
+  </script>
+</body>
+</html>

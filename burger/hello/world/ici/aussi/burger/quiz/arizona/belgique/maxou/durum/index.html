@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Systémique des Vulnérabilités Institutionnelles de la Belgique</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            600: '#2563eb',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            600: '#d97706',
+                            700: '#b45309',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 bg-slate-50 flex flex-col">
+
+<!-- Chosen Palette: Warm Civic Neutral (Background: Slate/Sand neutrals #f8fafc, Primary: Deep Indigo #1e293b, Accent: Crimson Danger #dc2626, Muted Gold #d97706, Emerald #059669) -->
+
+<!-- Application Structure Plan: The application is designed as an interactive, multi-tab analytical portal to allow non-linear exploration of Belgium's multifaceted systemic crisis. Instead of a flat document reader, it organizes content into six distinct operational domains (Dashboard Overview, Corruption & Integrity, Particracy & Institutions, Justice & Prisons, Security & Narcotics, Budget & Debt). Each section features high-level metrics, interactive Chart.js visualizations, searchable structured tables, and expandable deep-dive cards. This architecture transforms a complex legal/political report into an actionable diagnostic tool for researchers, journalists, and citizens. -->
+
+<!-- Visualization & Content Choices: 
+     - KPI Overview Cards -> Instantly convey critical numbers (CPI Score, Carceral rate, Budget deficit, Missing police).
+     - Bar Chart (Chart.js) -> Compare public funding vs net assets across Belgian political parties.
+     - Line/Bar Combo (Chart.js) -> Chart prison capacity vs real population explosion (2023-2026).
+     - Bar Chart (Chart.js) -> Compare Belgian Justice expenditure (% GDP) against EU average.
+     - Line Chart (Chart.js) -> Public Debt & Deficit Trajectory (2024-2029) under EU Excessive Deficit Procedure.
+     - Interactive Searchable Data Tables -> Filter and inspect GRECO recommendations and legal status.
+     - Modal Deep-Dives -> Detailed analysis for complex scandals (Kazakhgate, Qatargate, Mugemangango, Sky ECC) without cluttering the main flow.
+     - NO SVG / NO Mermaid used. Icons rendered with Unicode & Tailwind CSS badges. -->
+
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-600 text-white font-bold text-lg shadow">
+                        🇧🇪
+                    </span>
+                    <div>
+                        <h1 class="font-bold text-base md:text-lg tracking-tight leading-tight">Défis Institutionnels de la Belgique</h1>
+                        <p class="text-xs text-slate-400 hidden sm:block">Observatoire Systémique des Vulnérabilités & Gouvernance</p>
+                    </div>
+                </div>
+                
+                <!-- Search & Actions -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-48 sm:w-64">
+                        <input type="text" id="globalSearch" placeholder="Rechercher un dossier, mot-clé..." 
+                            class="w-full bg-slate-800 text-slate-200 text-xs rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-slate-700">
+                        <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+                    </div>
+                    <button onclick="resetFilters()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 transition">
+                        Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-slate-800 text-slate-300 text-xs sm:text-sm font-medium border-t border-slate-700/50 overflow-x-auto custom-scrollbar">
+            <div class="max-w-7xl mx-auto px-4 flex space-x-1 sm:space-x-4 min-w-max">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab px-3 py-2.5 border-b-2 border-red-500 text-white font-semibold flex items-center space-x-1.5">
+                    <span>📊</span> <span>Synthèse Globale</span>
+                </button>
+                <button onclick="switchTab('integrity')" id="tab-integrity" class="nav-tab px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                    <span>🏛️</span> <span>GRECO & Scandales</span>
+                </button>
+                <button onclick="switchTab('particracy')" id="tab-particracy" class="nav-tab px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                    <span>🗳️</span> <span>Particratie & Financement</span>
+                </button>
+                <button onclick="switchTab('justice')" id="tab-justice" class="nav-tab px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                    <span>⚖️</span> <span>Justice & Carcéral</span>
+                </button>
+                <button onclick="switchTab('security')" id="tab-security" class="nav-tab px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                    <span>🛡️</span> <span>Sécurité & Narcotrafic</span>
+                </button>
+                <button onclick="switchTab('budget')" id="tab-budget" class="nav-tab px-3 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                    <span>💶</span> <span>Budget & Tutelle UE</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- SECTION 1: DASHBOARD / SYNTHÈSE GLOBALE -->
+        <section id="sec-dashboard" class="tab-content space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Diagnostic de l'État Belge : Une Crise Systémique Interconnectée</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Ce tableau de bord offre une synthèse analytique des failles institutionnelles de la Belgique. Bien qu'abritant les institutions clés de l'UE et de l'OTAN, le pays cumule les mises en garde des organes de surveillance internationaux (GRECO, Commission Européenne, CEDH, CPT). L'imbrication entre la particratie hyper-financée, le sous-investissement régalien, la surpopulation carcérale, le narcotrafic et le déficit budgétaire crée un étau institutionnel qui menace l'État de droit et la stabilité républicaine.
+                </p>
+            </div>
+
+            <!-- Key Indicators Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Perception Corruption</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">69 <span class="text-xs text-red-600 font-medium">/100</span></div>
+                    <p class="text-[11px] text-slate-500 mt-1">Transparency Intl (Recul)</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Surpopulation Carcérale</div>
+                    <div class="text-2xl font-extrabold text-red-600 mt-1">124%</div>
+                    <p class="text-[11px] text-slate-500 mt-1">> 13 400 détenus / 11k places</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Déficit Public (2024)</div>
+                    <div class="text-2xl font-extrabold text-amber-600 mt-1">5,8% <span class="text-xs font-normal text-slate-500">PIB</span></div>
+                    <p class="text-[11px] text-red-600 mt-1">Sous Procédure UE (PDE)</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Budget Justice (% PIB)</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">0,22%</div>
+                    <p class="text-[11px] text-slate-500 mt-1">Moyenne UE : 0,43%</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition col-span-2 md:col-span-1">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Manque PJF (Enquêteurs)</div>
+                    <div class="text-2xl font-extrabold text-red-700 mt-1">-800</div>
+                    <p class="text-[11px] text-slate-500 mt-1">Sur 4 800 requises</p>
+                </div>
+            </div>
+
+            <!-- Overview Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Multi-System Vulnerability Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-base font-bold text-slate-900">Niveau de Pression Réglementaire et International</h3>
+                            <span class="text-xs bg-red-100 text-red-800 font-semibold px-2 py-0.5 rounded">Critique</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Évaluation synthétique des alertes émises par les instances internationales sur les piliers régaliens.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="overviewRadarChart"></canvas>
+                    </div>
+                    <div class="mt-3 text-[11px] text-slate-400 text-center">Score de gravité (0 à 100) basé sur les résolutions et procédures d'infraction.</div>
+                </div>
+
+                <!-- International Surveillance Map/Cards -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 mb-2">Les 4 Organes de Surveillance sous Tension</h3>
+                        <p class="text-xs text-slate-500 mb-4">Instance, nature des sanctions et violations documentées.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-amber-500 hover:bg-slate-100 transition cursor-pointer" onclick="openModal('greco')">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-amber-900">GRECO (Conseil de l'Europe)</span>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Décembre 2025</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1">Majorité des 22 recommandations ignorées. Opacité du lobbying, cabinets ministériels hypertrophiés, absence d'encadrement des 'revolving doors'.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-red-500 hover:bg-slate-100 transition cursor-pointer" onclick="openModal('cedh')">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-red-900">CEDH (Cour Européenne des Droits de l'Homme)</span>
+                                <span class="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded">Arrêts Récurrents</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1">Condamnations pour violation du délai raisonnable (Art 6) et régime électoral partisan (Arrêt <i>Mugemangango</i>). Traitements dégradants en prison (Art 3).</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-blue-500 hover:bg-slate-100 transition cursor-pointer" onclick="openModal('cpt')">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-blue-900">CPT (Prévention de la Torture)</span>
+                                <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Rapports Prison</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1">Prisons qualifiées d'"entrepôts humains". 525 détenus dorment au sol. Soins psychiatriques et médicaux notoirement insuffisants.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border-l-4 border-purple-500 hover:bg-slate-100 transition cursor-pointer" onclick="openModal('ue-pde')">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-purple-900">Commission Européenne</span>
+                                <span class="text-[10px] bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">Juillet 2024</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1">Ouverture formelle de la Procédure pour Déficit Excessif (PDE). Exigence de 11 à 28 milliards € d'ajustement structurel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: INTÉGRITÉ, GRECO & SCANDALES -->
+        <section id="sec-integrity" class="tab-content space-y-6 hidden">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Transparence Publique & Pénétration des Réseaux d'Influence</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    La détérioration de la perception de l'intégrité (score 69/100 chez Transparency International) s'enracine dans des défaillances législatives structurelles. Malgré les injonctions du GRECO, l'absence de registre contraignant des lobbyistes, le manque de contrôle indépendant des patrimoines des élus et le poids des cabinets ministériels créent des zones d'ombre majeures. Ces vulnérabilités se sont concrétisées par des affaires majeures touchant le cœur de l'État (Kazakhgate, Qatargate).
+                </p>
+            </div>
+
+            <!-- GRECO Status Table & Interactive Filter -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-slate-100 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Tableau de Conformité aux Normes d'Intégrité (Évaluations 2025)</h3>
+                        <p class="text-xs text-slate-500">Statut des dispositifs légaux contre la corruption et conflits d'intérêts.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="filterIntegrityTable('all')" class="px-2.5 py-1 text-xs rounded bg-white font-medium border border-slate-300 shadow-sm hover:bg-slate-50">Tous</button>
+                        <button onclick="filterIntegrityTable('Inexistant')" class="px-2.5 py-1 text-xs rounded bg-red-100 text-red-800 font-medium border border-red-200 hover:bg-red-200">Inexistant</button>
+                        <button onclick="filterIntegrityTable('Partiel')" class="px-2.5 py-1 text-xs rounded bg-amber-100 text-amber-800 font-medium border border-amber-200 hover:bg-amber-200">Partiel</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Indicateur d'Intégrité</th>
+                                <th class="p-3">Statut Législatif Belge</th>
+                                <th class="p-3">Conséquences Identifiées (GRECO / UE)</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="integrityTableBody" class="divide-y divide-slate-200">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Scandals Cards Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Kazakhgate Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-2 py-0.5 bg-red-100 text-red-800 text-[10px] font-bold uppercase rounded">Scandale d'État</span>
+                            <span class="text-xs text-slate-400">Loi d'Avril 2011</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Le Kazakhgate : Privatisation de la Loi</h3>
+                        <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                            Intervention de réseaux d'influence (entourage Sarkozy, Patokh Chodiev) et rôle de l'ancien président du Sénat Armand De Decker pour précipiter le vote de la "transaction pénale élargie", permettant à des inculpés de fraude de payer pour éteindre l'action publique.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs space-y-1">
+                        <div class="font-semibold text-slate-800">Impact Institutionnel :</div>
+                        <p class="text-slate-600">Démontre l'absence totale d'empreinte législative. Critiques sévères du Conseil d'État sur la constitutionnalité de la transaction pénale.</p>
+                        <button onclick="openModal('kazakhgate')" class="mt-2 text-blue-600 font-semibold hover:underline block text-right w-full">Lire l'analyse complète &rarr;</button>
+                    </div>
+                </div>
+
+                <!-- Qatargate Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-bold uppercase rounded">Ingérence Étrangère</span>
+                            <span class="text-xs text-slate-400">Réseau Bruxellois</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Le Qatargate : Corruption & Conflit Judiciaire</h3>
+                        <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                            Réseau de pots-de-vin massifs (Qatar/Maroc via l'ONG Fight Impunity) impliquant des élus belges (Marc Tarabella, Marie Arena). Révélation de la vulnérabilité de l'appareil judiciaire bruxellois.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs space-y-1">
+                        <div class="font-semibold text-slate-800">Récusation du Juge Claise :</div>
+                        <p class="text-slate-600">Le retrait du juge d'instruction phare pour liens d'affaires familiaux a souligné les risques de conflits d'intérêts dans les hautes sphères.</p>
+                        <button onclick="openModal('qatargate')" class="mt-2 text-blue-600 font-semibold hover:underline block text-right w-full">Lire l'analyse complète &rarr;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Whistleblower Box -->
+            <div class="bg-blue-900 text-white p-5 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="space-y-1">
+                    <h3 class="font-bold text-base">Protection des Lanceurs d'Alerte : Transposition Élargie</h3>
+                    <p class="text-xs text-blue-200 max-w-3xl">
+                        Malgré un retard initial, la transposition belge de la Directive UE 2019/1937 intègre la fraude fiscale et sociale, supprime l'exigence de "bonne foi", et lève le secret professionnel (hors avocats/médecins). L'IFDH est désigné comme point central d'appui.
+                    </p>
+                </div>
+                <span class="bg-blue-800 text-blue-100 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-700 whitespace-nowrap">
+                    Rôle Central IFDH
+                </span>
+            </div>
+        </section>
+
+        <!-- SECTION 3: PARTICRATIE & INSTITUTIONS -->
+        <section id="sec-particracy" class="tab-content space-y-6 hidden">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Particratie, Surcharge Institutionnelle & Mandat Libéral</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Le modèle consociatif belge, conçu pour apaiser les divisions communautaires, s'est ossifié en une particratie omniprésente. Les présidents de partis contrôlent la formation des gouvernements, les listes électorales et la ligne de vote, neutralisant le mandat libre garanti par l'Art. 42 de la Constitution. Ce verrouillage s'appuie sur une dotation publique directe et indirecte colosale (~83,7 M€ en 2024), tandis que le "millefeuille" administratif (6 gouvernements) paralyse la décision publique.
+                </p>
+            </div>
+
+            <!-- Party Financing Chart & Table Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Party Assets Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 mb-1">Patrimoine Net & Dépendance Publique des Partis (2024)</h3>
+                        <p class="text-xs text-slate-500 mb-3">Opulence financière accumulée via la loi de 1989 sur le financement public.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="partyFinancingChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-400 text-center">Données : Cour des comptes & KU Leuven (2024)</div>
+                </div>
+
+                <!-- Electoral & Constitutional Focus -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold uppercase rounded">Arrêt Historique CEDH</span>
+                        <h3 class="text-base font-bold text-slate-900 mt-2">L'Arrêt Mugemangango c. Belgique (2020)</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            La CEDH a formellement condamné la Belgique suite au recours de Germain Mugemangango (PTB). En confiant la vérification des pouvoirs et la validation des élections aux parlementaires eux-mêmes, le système belge faisait des élus des "juges de leur propre élection", violant le droit à un recours impartial.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs space-y-1">
+                        <div class="font-bold text-red-900">Violation de l'Article 42 de la Constitution</div>
+                        <p class="text-red-800">
+                            La discipline de vote imposée par les états-majors de partis transforme les parlementaires en exécuteurs. Toute dissidence expose l'élu à l'exclusion des listes, invalidant le mandat représentatif national.
+                        </p>
+                    </div>
+
+                    <!-- Ostbelgien Counter Model -->
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-900">L'Alternative Citoyenne : Ostbelgien</span>
+                            <span class="text-[10px] bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Modèle Permanent</span>
+                        </div>
+                        <p class="text-emerald-800">
+                            La Communauté germanophone a instauré un <i>Bürgerrat</i> (24 citoyens tirés au sort) et des <i>Bürgerversammlungen</i>, avec obligation légale pour le Parlement de débattre et motiver la mise en œuvre de leurs recommandations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Party Funding Data Breakdown Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-slate-100 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-900 text-sm">Détail des Dotations Directes et Patrimoine Net (Exercice 2024)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Parti Politique</th>
+                                <th class="p-3 text-center">Part du Financement Public (%)</th>
+                                <th class="p-3 text-right">Patrimoine Net (Millions €)</th>
+                                <th class="p-3">Spécificité / Modèle</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">N-VA</td>
+                                <td class="p-3 text-center font-medium">84,4 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">26,3 M€</td>
+                                <td class="p-3 text-slate-500">Premier patrimoine immobilier et numérique</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">PTB-PVDA</td>
+                                <td class="p-3 text-center font-medium">54,3 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">13,6 M€</td>
+                                <td class="p-3 text-slate-500">Fortes cotisations obligatoires des mandataires</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">PS</td>
+                                <td class="p-3 text-center font-medium">70,1 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">13,4 M€</td>
+                                <td class="p-3 text-slate-500">Ancrage historique et structures associées</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">Vlaams Belang</td>
+                                <td class="p-3 text-center font-medium">81,8 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">11,8 M€</td>
+                                <td class="p-3 text-slate-500">Dépenses massives en propagande ciblée</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">MR</td>
+                                <td class="p-3 text-center font-medium">80,9 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">11,3 M€</td>
+                                <td class="p-3 text-slate-500">Dépendance élevée aux dotations parlementaires</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">CD&V</td>
+                                <td class="p-3 text-center font-medium">82,4 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">8,5 M€</td>
+                                <td class="p-3 text-slate-500">Héritage du pilier chrétien en régression</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-slate-900">Ecolo</td>
+                                <td class="p-3 text-center font-medium">67,6 %</td>
+                                <td class="p-3 text-right font-bold text-slate-900">8,3 M€</td>
+                                <td class="p-3 text-slate-500">Recul des dotations suite aux résultats 2024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: JUSTICE & SYSTÈME PÉNITENTIAIRE -->
+        <section id="sec-justice" class="tab-content space-y-6 hidden">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Carence Régalienne, Naufrage Numérique & Crise Carcérale</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    L'appareil judiciaire belge souffre d'un sous-financement chronique (budget égal à la moitié de la moyenne européenne). Cet encombrement provoque des retards de jugement de 5 à 8 ans à Bruxelles (violation répétée de l'Art. 6 CEDH). Parallèlement, l'échec du pilotage de la transformation numérique (audit dévastateur de la Cour des comptes de janvier 2025) et le recours excessif à la détention préventive (32.6%) ont propulsé la population carcérale à plus de 13 400 détenus pour 11 000 places.
+                </p>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Prison Population Explosion Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-base font-bold text-slate-900">Évolution de la Population Carcérale vs Capacité</h3>
+                            <span class="text-xs bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded">+21% en 2 ans</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">Taux d'occupation de 124% (Fin 2025 - Début 2026).</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="prisonChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-400 text-center">Données : Administration Pénitentiaire Belge & CPT</div>
+                </div>
+
+                <!-- Justice Budget Comparison Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 mb-1">Budget Régalien de la Justice (% du PIB)</h3>
+                        <p class="text-xs text-slate-500 mb-3">Comparaison Belgique vs Moyenne de l'Union Européenne.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="justiceBudgetChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-400 text-center">Source : CEPEJ / Commission Européenne</div>
+                </div>
+            </div>
+
+            <!-- Deep Dive Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-red-600 uppercase">Audit Cour des Comptes (Jan. 2025)</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Le Naufrage de l'e-Justice & I-Police</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Gestion erratique sans vision transversale. Dépendance massive envers des consultants externes coûteux, perte de compétence interne et arrêt quasi-technique de projets majeurs.
+                    </p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-amber-600 uppercase">Droits Humains (Art. 3 CEDH)</div>
+                    <h4 class="font-bold text-slate-900 text-sm">525 Détenus Matelas au Sol</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Des centaines de détenus contraints de dormir au sol, y compris dans les sanitaires. Le CPT dénonce l'absence de "recours préventif effectif" pour attaquer ces conditions indignes.
+                    </p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-blue-600 uppercase">Organes de Répression</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Vulnérabilité de l'OCRC</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        L'Office central de répression de la corruption manque d'indépendance structurelle et d'effectifs pour attaquer les réseaux financiers et les hauts responsables publics.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: SÉCURITÉ & NARCOTRAFIC -->
+        <section id="sec-security" class="tab-content space-y-6 hidden">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Plaque Tournante du Narcotrafic & Violences Institutionnelles</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Le port d'Anvers s'est imposé comme l'épicentre européen de la cocaïne. L'adaptation des cartels (petits envois fragmentés, tirs à la grenade, enlèvements) frappe les centres urbains. Face à cette "mocro-maffia", la Police Judiciaire Fédérale (PJF) accuse un déficit critique de 800 enquêteurs spécialisés. En parallèle, les dérapages dans le maintien de l'ordre et le chiffre record de 94% de classement sans suite des plaintes pour violences policières minent la confiance citoyenne.
+                </p>
+            </div>
+
+            <!-- Key Numbers & Sky ECC Banner -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Antwerp Port Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-400">Anvers 2024</span>
+                        <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded">44 Tonnes Confisquées</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-base">Adaptation Tactique des Cartels</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        La baisse relative des saisies massives masque une fragmentation des flux (envois plus petits, délocalisation vers d'autres ports) et une corruption ciblée des dockers et fonctionnaires.
+                    </p>
+                </div>
+
+                <!-- Sky ECC Results Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-400">Opération Majeure</span>
+                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">195 M€ Saisis</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-base">Le Démantèlement Sky ECC</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Succès judiciaire historique avec la saisie de millions de messages cryptés. Cependant, la PJF se trouve noyée sous les données sans ressources pour suivre le blanchiment.
+                    </p>
+                </div>
+
+                <!-- Missing Officers Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-400">Déficit Humain</span>
+                        <span class="px-2 py-0.5 bg-red-100 text-red-800 text-[10px] font-bold rounded">-800 Enquêteurs</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-base">Pénurie d'Experts PJF</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Sur un cadre légal de 4 800 agents, la PJF manque dramatiquement d'analystes financiers, d'experts en cybercriminalité et d'enquêteurs de long terme.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Police Violence & Impunity Focus -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-2">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Maintien de l'Ordre, Affaires Retentissantes & Impunité</h3>
+                        <p class="text-xs text-slate-500">Données du Comité P & constats du Comité Européen pour la Prévention de la Torture (CPT).</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-red-100 text-red-800 text-xs font-bold rounded">94% Classements sans suite</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+                        <div class="font-bold text-slate-900">L'Affaire Jozef Chovanec (2018 - Requisitoir 2024)</div>
+                        <p class="text-slate-600">
+                            Étouffé lors d'une intervention policière à l'aéroport de Charleroi. L'étirement de l'enquête pendant 6 ans et le réquisitoire de non-lieu du parquet en 2024 ont provoqué une vive émotion internationale.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
+                        <div class="font-bold text-slate-900">Rapports du Comité P & du CPT</div>
+                        <p class="text-slate-600">
+                            Le CPT relève la persistance de mauvais traitements (coups, gifles sur suspects maîtrisés) et souligne la renonciation massive des victimes à porter plainte par peur de représailles ou sentiment d'inutilité.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: BUDGET & TUTELLE UE -->
+        <section id="sec-budget" class="tab-content space-y-6 hidden">
+            <!-- Intro Paragraph -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Asphyxie Budgétaire & Procédure pour Déficit Excessif</h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    La dérive des finances publiques belges a franchi un cap critique. Avec un déficit à 5.8% du PIB en 2024 et une dette publique projetée au-delà de 116% d'ici 2029, la Commission européenne a placé la Belgique sous Procédure pour Déficit Excessif (PDE) le 26 juillet 2024. Les exigences de réduction budgétaire (11 à 28 milliards €) risquent de frapper de plein fouet les services régaliens déjà sous-financés, alors que les agences de notation dégradent les entités fédérées (Moody's sur la Wallonie).
+                </p>
+            </div>
+
+            <!-- Debt Trajectory Chart & Plan Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Trajectory Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 mb-1">Trajectoire du Déficit & Charges d'Intérêts (% PIB)</h3>
+                        <p class="text-xs text-slate-500 mb-3">Impact sur les finances publiques jusqu'en 2029.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="budgetTrajectoryChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-400 text-center">Source : Bureau Fédéral du Plan & BNB (2024-2026)</div>
+                </div>
+
+                <!-- Structural Plan & Moody's Downgrade -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="px-2 py-0.5 bg-red-100 text-red-800 text-[10px] font-bold uppercase rounded">Sanction des Marchés</span>
+                        <h3 class="text-base font-bold text-slate-900 mt-2">Pression des Agences de Notation</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Si la note souveraine fédérale (AA-/Aa3) résiste grâce à l'épargne privée des ménages, la dette des entités fédérées inquiète. En avril 2026, Moody's a dégradé la note de crédit de la Wallonie en raison de l'insoutenabilité de sa trajectoire d'endettement.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-purple-50 border border-purple-200 rounded-lg text-xs space-y-1">
+                        <div class="font-bold text-purple-900">Plan Structurel à Moyen Terme (2025-2029)</div>
+                        <p class="text-purple-800">
+                            Pour étaler l'effort d'ajustement sur 7 ans au lieu de 4, la Belgique s'est engagée auprès de la Commission à plafonner la croissance des dépenses primaires et à engager des réformes des pensions et du marché du travail.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-1">
+                        <div class="font-bold text-amber-900">L'Insolubilité du Dilemme Belge</div>
+                        <p class="text-amber-800">
+                            Des coupes budgétaires linéaires pour satisfaire aux critères du Pacte de Stabilité européen risquent d'achever l'effondrement des fonctions régaliennes (Police, Justice, Prisons) déjà dénoncé par les instances internationales.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Component -->
+    <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+            <!-- Modal Header -->
+            <div class="p-5 bg-slate-900 text-white flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span id="modalBadge" class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-red-600 text-white">Dossier</span>
+                    <h3 id="modalTitle" class="font-bold text-base">Titre du Dossier</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <!-- Modal Body -->
+            <div id="modalBody" class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700 leading-relaxed custom-scrollbar">
+                <!-- Dynamic Content -->
+            </div>
+            <!-- Modal Footer -->
+            <div class="p-4 bg-slate-100 border-t border-slate-200 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg transition">
+                    Fermer la fenêtre
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-8">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-semibold text-slate-200">Analyse Systémique des Vulnérabilités Institutionnelles de la Belgique</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Basé sur les rapports GRECO, Commission Européenne, CPT, CEDH et Cour des comptes (2024-2026).</p>
+            </div>
+            <div class="flex space-x-4 text-[11px]">
+                <span class="text-slate-500">Projet d'Information Citoyenne</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-500">Mis à jour en 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Data Models
+        const integrityData = [
+            {
+                indicator: "Registre des lobbyistes & Empreinte législative",
+                status: "Inexistant",
+                impact: "Opacité des processus législatifs et exposition au trafic d'influence (ex: Kazakhgate).",
+                modalId: "lobbying"
+            },
+            {
+                indicator: "Contrôle indépendant des déclarations de patrimoine",
+                status: "Inexistant",
+                impact: "Déclarations déposées sous pli scellé non vérifiées. Impossibilité de repérer l'enrichissement illicite.",
+                modalId: "patrimony"
+            },
+            {
+                indicator: "Encadrement du pantouflage (revolving doors)",
+                status: "Inexistant",
+                impact: "Passage immédiat d'anciens ministres vers le secteur privé régulé.",
+                modalId: "revolving"
+            },
+            {
+                indicator: "Transparence des cabinets ministériels",
+                status: "Partiel",
+                impact: "Politisation de la préparation des décisions au détriment de l'administration neutre.",
+                modalId: "cabinets"
+            }
+        ];
+
+        const modalDetails = {
+            'greco': {
+                title: "Rapport GRECO - 5ème Cycle d'Évaluation",
+                badge: "Conseil de l'Europe",
+                badgeBg: "bg-amber-600",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">Diagnostic de Décembre 2025 :</p>
+                    <p class="mb-3">Le Groupe d'États contre la corruption (GRECO) a publié un addendum particulièrement critique à l'égard de la Belgique. Sur les 22 recommandations formulées concernant la prévention de la corruption au sein du gouvernement central et des forces de police, la grande majorité n'a été que partiellement ou pas du tout mise en œuvre.</p>
+                    <div class="bg-amber-50 p-3 rounded border border-amber-200 mb-3">
+                        <strong class="text-amber-900">Griefs Principaux :</strong>
+                        <ul class="list-disc pl-4 mt-1 text-amber-800 space-y-1">
+                            <li>Absence de registre de transparence commun au gouvernement et au Parlement.</li>
+                            <li>Inexistence d'une "empreinte législative" retraçant l'origine des amendements.</li>
+                            <li>Poids exorbitant des cabinets ministériels (organes stratégiques) échappant aux règles de recrutement public.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'cedh': {
+                title: "Arrêts CEDH : Justice & Système Électoral",
+                badge: "Cour Européenne",
+                badgeBg: "bg-red-600",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">Principales Condamnations de l'État Belge :</p>
+                    <p class="mb-2"><strong>Article 6 § 1 (Procès Équitable dans un Délai Raisonnable) :</strong> L'arriéré judiciaire abyssal à Bruxelles entraîne des fixations de plaidoiries jusqu'à 8 ans après la fin de la mise en état, violant le droit des citoyens à voir leur cause entendue dans un délai raisonnable.</p>
+                    <p class="mb-2"><strong>Arrêt Mugemangango c. Belgique (10 juillet 2020) :</strong> Condamnation du système de validation des élections par les députés eux-mêmes, considéré comme intrinsèquement partisan et dépourvu de garanties d'impartialité.</p>
+                    <p><strong>Article 3 (Traitements Inhumains et Dégradants) :</strong> Condamnations répétées pour la surpopulation carcérale et la présence de détenus dormant sur des matelas au sol.</p>
+                `
+            },
+            'cpt': {
+                title: "Comité de Prévention de la Torture (CPT)",
+                badge: "Inspection CPT",
+                badgeBg: "bg-blue-600",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">Constats sur les Prisons Belges :</p>
+                    <p class="mb-3">À l'issue de ses dernières visites inopinées, le CPT qualifie certains établissements pénitentiaires belges d'"entrepôts humains" où la surpopulation détruit la dignité et annihile toute perspective de réinsertion.</p>
+                    <div class="bg-blue-50 p-3 rounded border border-blue-200 mb-2">
+                        <strong class="text-blue-900">Points d'Alerte :</strong>
+                        <ul class="list-disc pl-4 mt-1 text-blue-800 space-y-1">
+                            <li>Plus de 525 détenus contraints de dormir sur des matelas posés à même le sol.</li>
+                            <li>Pénurie dramatique de médecins, dentistes et psychiatres en milieu carcéral.</li>
+                            <li>Absence de recours préventif effectif permettant à un détenu d'exiger l'arrêt de conditions dégradantes.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'ue-pde': {
+                title: "Procédure pour Déficit Excessif (PDE)",
+                badge: "Commission Européenne",
+                badgeBg: "bg-purple-600",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">Mise sous Tutelle Budgétaire (26 Juillet 2024) :</p>
+                    <p class="mb-3">La Commission européenne a enclenché la PDE contre la Belgique en raison d'un déficit public de 5,8% du PIB en 2024 et d'une dette sur une trajectoire dépassant 116% à l'horizon 2029.</p>
+                    <p class="mb-2">L'effort de correction exigé par Bruxelles est estimé entre <strong>11 et 28 milliards d'euros</strong>. La Belgique tente de négocier un étalement sur 7 ans (2025-2029) via un plan structurel de limitation des dépenses primaires.</p>
+                `
+            },
+            'kazakhgate': {
+                title: "Affaire Kazakhgate : Analyse Approfondie",
+                badge: "Scandale d'État",
+                badgeBg: "bg-red-700",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">Rétroactes et Dérives :</p>
+                    <p class="mb-2">Le Kazakhgate concerne l'adoption précipitée en avril 2011 de la loi sur la "transaction pénale élargie". Ce texte a permis au milliardaire Patokh Chodiev d'éteindre des poursuites pour corruption en échange d'une somme d'argent, évitant ainsi un casier judiciaire.</p>
+                    <p class="mb-2">L'implication d'Armand De Decker, alors vice-président du Sénat agissant comme avocat du milliardaire, a révélé un conflit d'intérêts et un trafic d'influence au sommet de l'État.</p>
+                    <p class="text-slate-500 italic">Conclusion : Cette affaire a démontré qu'en l'absence de registre de lobbying et d'empreinte législative, l'élaboration de la norme juridique pouvait être influencée par des intérêts financiers privés.</p>
+                `
+            },
+            'qatargate': {
+                title: "Affaire Qatargate & Récusation Judiciaire",
+                badge: "Réseau Européen",
+                badgeBg: "bg-purple-700",
+                content: `
+                    <p class="font-bold text-slate-900 mb-2">L'Épicentre Bruxellois :</p>
+                    <p class="mb-2">Le Qatargate a mis au jour des versements massifs d'argent liquide par le Qatar et le Maroc pour influencer les décisions du Parlement européen. L'enquête menée par le parquet fédéral a impliqué des figures politiques belges comme Marc Tarabella et Marie Arena.</p>
+                    <p class="mb-2"><strong>Le Pas de Côté du Juge Claise :</strong> Le juge d'instruction Michel Claise a dû se récuser en raison des liens d'affaires entre son fils et celui de Marie Arena, jetant un doute sur l'impartialité de la procédure et exposant la porosité des milieux d'influence à Bruxelles.</p>
+                `
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIntegrityTable(integrityData);
+            initCharts();
+            setupSearch();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('border-red-500', 'text-white', 'font-semibold');
+                el.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeTabBtn = document.getElementById(`tab-${tabId}`);
+            activeTabBtn.classList.remove('border-transparent', 'text-slate-400');
+            activeTabBtn.classList.add('border-red-500', 'text-white', 'font-semibold');
+        }
+
+        // Integrity Table Rendering
+        function renderIntegrityTable(data) {
+            const tbody = document.getElementById('integrityTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                const badgeClass = item.status === 'Inexistant' 
+                    ? 'bg-red-100 text-red-800 border-red-200' 
+                    : 'bg-amber-100 text-amber-800 border-amber-200';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-900">${item.indicator}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-slate-600">${item.impact}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="openModal('greco')" class="text-blue-600 hover:underline text-xs font-semibold">Détails</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterIntegrityTable(status) {
+            if (status === 'all') {
+                renderIntegrityTable(integrityData);
+            } else {
+                const filtered = integrityData.filter(d => d.status === status);
+                renderIntegrityTable(filtered);
+            }
+        }
+
+        // Search Engine Logic
+        function setupSearch() {
+            const input = document.getElementById('globalSearch');
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (!query) {
+                    renderIntegrityTable(integrityData);
+                    return;
+                }
+                const filtered = integrityData.filter(d => 
+                    d.indicator.toLowerCase().includes(query) || 
+                    d.impact.toLowerCase().includes(query) || 
+                    d.status.toLowerCase().includes(query)
+                );
+                renderIntegrityTable(filtered);
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('globalSearch').value = '';
+            filterIntegrityTable('all');
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            const data = modalDetails[id] || {
+                title: "Dossier d'Analyse Institutionnelle",
+                badge: "Information",
+                badgeBg: "bg-slate-700",
+                content: "<p>Informations détaillées en cours de mise à jour.</p>"
+            };
+
+            document.getElementById('modalTitle').innerText = data.title;
+            const badgeEl = document.getElementById('modalBadge');
+            badgeEl.innerText = data.badge;
+            badgeEl.className = `px-2 py-0.5 text-[10px] font-bold uppercase rounded text-white ${data.badgeBg}`;
+            
+            document.getElementById('modalBody').innerHTML = data.content;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Charts Initialization
+        function initCharts() {
+            // Chart 1: Radar Vulnerability
+            const ctxRadar = document.getElementById('overviewRadarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Lutte Anti-Corruption (GRECO)', 
+                        'Délais Justice (Art 6 CEDH)', 
+                        'Conditions Carcérales (CPT)', 
+                        'Discipline Policière', 
+                        'Dispositif Narcotrafic (PJF)', 
+                        'Soutenabilité Budgétaire'
+                    ],
+                    datasets: [{
+                        label: 'Niveau de Pression / Gravité (sur 100)',
+                        data: [85, 90, 95, 75, 80, 88],
+                        backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                        borderColor: 'rgba(220, 38, 38, 0.9)',
+                        pointBackgroundColor: 'rgba(185, 28, 28, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Chart 2: Party Financing & Assets
+            const ctxParty = document.getElementById('partyFinancingChart').getContext('2d');
+            new Chart(ctxParty, {
+                type: 'bar',
+                data: {
+                    labels: ['N-VA', 'PTB', 'PS', 'Vlaams Belang', 'MR', 'CD&V', 'Ecolo'],
+                    datasets: [{
+                        label: 'Patrimoine Net (Millions €)',
+                        data: [26.3, 13.6, 13.4, 11.8, 11.3, 8.5, 8.3],
+                        backgroundColor: '#1e3a8a',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Millions €' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Prison Population Expansion
+            const ctxPrison = document.getElementById('prisonChart').getContext('2d');
+            new Chart(ctxPrison, {
+                type: 'line',
+                data: {
+                    labels: ['2022', '2023', '2024', '2025', 'Début 2026'],
+                    datasets: [
+                        {
+                            label: 'Détenus Réels',
+                            data: [10800, 11100, 12200, 13100, 13400],
+                            borderColor: '#dc2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Capacité Opérationnelle',
+                            data: [10500, 10700, 10800, 10900, 11000],
+                            borderColor: '#64748b',
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 9000
+                        }
+                    }
+                }
+            });
+
+            // Chart 4: Justice Budget % GDP
+            const ctxBudget = document.getElementById('justiceBudgetChart').getContext('2d');
+            new Chart(ctxBudget, {
+                type: 'bar',
+                data: {
+                    labels: ['Belgique', 'Moyenne Union Européenne'],
+                    datasets: [{
+                        label: '% du PIB consacré à la Justice',
+                        data: [0.22, 0.43],
+                        backgroundColor: ['#dc2626', '#2563eb'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 0.6,
+                            ticks: {
+                                callback: function(value) { return value + '%'; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 5: Budget Deficit Trajectory
+            const ctxTraj = document.getElementById('budgetTrajectoryChart').getContext('2d');
+            new Chart(ctxTraj, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025 (P)', '2026 (P)', '2027 (P)', '2028 (P)', '2029 (P)'],
+                    datasets: [
+                        {
+                            label: 'Déficit Public (% PIB)',
+                            data: [5.8, 5.2, 4.8, 4.2, 3.8, 3.1],
+                            borderColor: '#d97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Charges d\'Intérêts (% PIB)',
+                            data: [2.3, 2.6, 2.9, 3.1, 3.3, 3.5],
+                            borderColor: '#7c3aed',
+                            borderDash: [3, 3],
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: '% du PIB' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

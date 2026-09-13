@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Observatoire Politique Arizona 2025-2026 | Analyse Critique & Signaux de Rupture</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Observatoire Politique Coalition Arizona (2025-2026) | Analyse Critique</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        nva: '#d97706',      <!-- Amber/Yellow -->
-                        mr: '#1d4ed8',       <!-- Blue -->
-                        vooruit: '#dc2626',  <!-- Red -->
-                        cdv: '#ea580c',      <!-- Orange -->
-                        engages: '#059669',  <!-- Green -->
+                        nva: '#d97706',
+                        mr: '#1d4ed8',
+                        vooruit: '#dc2626',
+                        cdv: '#ea580c',
+                        engages: '#059669',
                         slateDark: '#0f172a',
                         cardBg: '#ffffff',
                         creamBg: '#f8fafc'
@@ -41,7 +39,6 @@
                 height: 360px;
             }
         }
-        /* Custom scrollbar for clean visual appearance */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -63,13 +60,13 @@
     <!-- Chosen Palette: Slate & Amber Friction (Warm Slate, Deep Navy, Amber/Terracotta Accent, Soft Cream/Grey background) -->
     <!-- Application Structure Plan:
         1. Sticky Header & Live Status Bar: Gives immediate snapshot of political tension (88% Crisis Index), key metrics, and nav tabs.
-        2. View 1 - Baromètre & Vue d'Ensemble: Executive dashboard with macro metrics, interactive stability calculator, deficit trajectory chart, and key alerts.
-        3. View 2 - Architecture & Particratie: Ideological breakdown of the 5 coalition parties, N-VA confederalism strategy radar, and governance Ultimatums.
+        2. View 1 - Baromètre & Vue d'Ensemble: Executive dashboard with macro metrics, interactive stability overview, deficit trajectory chart, and key alerts.
+        3. View 2 - Architecture & Particratic Ideology: Ideological radar breakdown of the 5 coalition parties, N-VA confederalism strategy, and Kern Ultimatums.
         4. View 3 - Étau Budgétaire & Audit Cour des Comptes: Analysis of the 23.3B€ budget gap, EU Excessive Deficit Procedure, and Cour des Comptes debunking of gov receipts.
-        5. View 4 - Démantèlement Social & Transfert CPAS: Timeline of 6 unemployment exclusion waves, CPAS financial transfer calculator, and pension malus rules.
+        5. View 4 - Démantèlement Social & Transfert CPAS: Timeline of 6 unemployment exclusion waves, CPAS financial transfer simulator, and pension malus rules.
         6. View 5 - Fracture Fiscale & Veto TVA: Interactive Capital Gains Tax simulator (calculating 'photo moment' exemptions & brackets) + TVA vs Cuts deadlock.
         7. View 6 - Mobilisation Sociale & Front Commun: Filterable calendar of Autumn 2026 strikes and 'Commune Colère' citizen-labor movement.
-        8. View 7 - Scénarios de Rupture & Signaux d'Alerte: 3 detailed collapse scenarios (Douzièmes provisoires, Regional revolt, Sovereign N-VA pivot) with warning checklist.
+        8. View 7 - Scénarios de Rupture & Signaux d'Alerte: 3 detailed collapse scenarios (Douzièmes provisoires, Regional revolt, Sovereign N-VA pivot) with dynamic failure simulator.
     -->
     <!-- Visualization & Content Choices:
         - Deficit Trajectory: Line Chart comparing Status Quo vs Arizona Plan vs EU Ceiling.
@@ -81,7 +78,6 @@
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
-    <!-- Top Status Banner -->
     <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 shadow-md">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
             <div class="flex items-center gap-2">
@@ -96,7 +92,6 @@
         </div>
     </div>
 
-    <!-- Main Navigation Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -110,8 +105,7 @@
                     </div>
                 </div>
 
-                <!-- Desktop Navigation Tabs -->
-                <nav class="hidden lg:flex space-x-1 text-sm font-medium" id="main-nav">
+                <nav class="hidden lg:flex space-x-1 text-xs font-medium" id="main-nav">
                     <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn px-3 py-2 rounded-md text-amber-700 bg-amber-50 font-semibold border-b-2 border-amber-600 transition">Vue d'Ensemble</button>
                     <button onclick="switchTab('architecture')" id="nav-architecture" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Particratie & Idéologie</button>
                     <button onclick="switchTab('budget')" id="nav-budget" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Étau Budgétaire & Audit</button>
@@ -121,9 +115,8 @@
                     <button onclick="switchTab('scenarios')" id="nav-scenarios" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Signaux de Rupture</button>
                 </nav>
 
-                <!-- Mobile Menu Button -->
                 <div class="lg:hidden">
-                    <select onchange="switchTab(this.value)" class="bg-slate-100 border border-slate-300 text-slate-800 text-sm rounded-lg p-2 font-medium">
+                    <select onchange="switchTab(this.value)" class="bg-slate-100 border border-slate-300 text-slate-800 text-xs rounded-lg p-2 font-medium">
                         <option value="overview">Vue d'Ensemble</option>
                         <option value="architecture">Particratie & Idéologie</option>
                         <option value="budget">Étau Budgétaire & Audit</option>
@@ -137,22 +130,19 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= SECTION 1: VUE D'ENSEMBLE & BAROMÈTRE ================= -->
-        <section id="tab-overview" class="space-y-6">
-            <!-- Introduction block -->
+        <!-- SECTION 1: VUE D'ENSEMBLE & BAROMÈTRE -->
+        <section id="tab-overview" class="tab-content space-y-6">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                    <span class="text-amber-600">📌</span> Décodage Synthetique de la Crise Politico-Économique Belge
+                    <span class="text-amber-600">📌</span> Décodage Synthétique de la Crise Politico-Économique Belge
                 </h2>
                 <p class="text-slate-600 text-sm leading-relaxed">
                     Installé le 3 février 2025 sous la conduite de Bart De Wever (N-VA), le gouvernement fédéral « Arizona » réunit la N-VA, le MR, Vooruit, le CD&V et Les Engagés. En cet automne 2026, l'exécutif fait face à une triple impasse : une <strong>procédure européenne pour déficit excessif</strong> exigeant 23,3 milliards d'euros d'économie d'ici 2029, un <strong>conflit idéologique irréconciliable</strong> sur la fiscalité (hausse de TVA vs impôt sur les plus-values), et une <strong>mobilisation citoyenne et syndicale d'ampleur historique</strong>. Ce tableau de bord offre une exploration analytique complète et interactive des dynamiques et risques d'effondrement de cette majorité.
                 </p>
             </div>
 
-            <!-- Key Metric Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
                     <div class="flex justify-between items-start">
@@ -162,1073 +152,877 @@
                         </div>
                         <span class="p-2 bg-red-100 text-red-700 rounded-lg text-lg">📉</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-2">Déficit estimé à politique constante (6% du PIB)</p>
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Effort Exigé (Arizona)</p>
-                        <h3 class="text-2xl font-black text-amber-600 mt-1">23,3 Mrd €</h3>
-                    </div>
-                    <span class="p-2 bg-amber-100 text-amber-700 rounded-lg text-lg">⚖️</span>
+                    <p class="text-xs text-slate-500 mt-2">Déficit estimé à politique constante (6% du PIB) sans réformes majeures.</p>
                 </div>
-                <p class="text-xs text-slate-500 mt-2">Trajectoire d'assainissement d'ici 2029 imposée par l'UE/CSF</p>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Effort Exigé (UE / CSF)</p>
+                            <h3 class="text-2xl font-black text-amber-600 mt-1">23,3 Mrd €</h3>
+                        </div>
+                        <span class="p-2 bg-amber-100 text-amber-800 rounded-lg text-lg">⚖️</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">Plafond de croissance des dépenses primaires fixé à 2,5%/an par le CSF.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Exclusions Chômage</p>
+                            <h3 class="text-2xl font-black text-slate-900 mt-1">125 000</h3>
+                        </div>
+                        <span class="p-2 bg-slate-100 text-slate-700 rounded-lg text-lg">⚠️</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">Personnes perdant leurs allocations d'ici 2027 (dont 55 000 en Wallonie).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-red-400 transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Indice de Tension</p>
+                            <h3 class="text-2xl font-black text-red-600 mt-1">88 / 100</h3>
+                        </div>
+                        <span class="p-2 bg-red-100 text-red-700 rounded-lg text-lg">💥</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">Risque élevé de chute du gouvernement ou passage aux douzièmes provisoires.</p>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Basculement vers CPAS</p>
-                        <h3 class="text-2xl font-black text-red-600 mt-1">125.000</h3>
-                    </div>
-                    <span class="p-2 bg-blue-100 text-blue-700 rounded-lg text-lg">👥</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-2">Chômeurs exclus transférés vers le RIS (dont 55k en Wallonie)</p>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Échéance Capitale</p>
-                        <h3 class="text-2xl font-black text-slate-900 mt-1">13 Oct. 2026</h3>
-                    </div>
-                    <span class="p-2 bg-slate-100 text-slate-700 rounded-lg text-lg">🚨</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-2">Déclaration de Politique Générale & Épure Budgétaire Bruxelles</p>
-            </div>
-        </div>
-
-        <!-- Interactive Risk Simulator & Deficit Chart Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Interactive Stability Barometer (5 cols) -->
-            <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <span>⚡</span> Baromètre Synthetique de Stabilité
-                        </h3>
-                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase">Seuil Critique</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mb-4">
-                        Ajustez les facteurs de friction politique pour simuler le risque d'implosion de l'exécutif De Wever d'ici fin 2026 :
-                    </p>
-
-                    <div class="space-y-4">
                         <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span>Veto MR sur la TVA (21%➜22%)</span>
-                                <span id="val-tva" class="text-blue-700">Bloqué (90%)</span>
-                            </div>
-                            <input type="range" id="slider-tva" min="0" max="100" value="90" oninput="updateRiskCalculator()" class="w-full accent-blue-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <h3 class="text-base font-bold text-slate-900">Trajectoire du Déficit Public Belge (2025-2029)</h3>
+                            <p class="text-xs text-slate-500">Comparaison entre Scénario Tendanciel vs Exigences de la Commission Européenne</p>
                         </div>
+                        <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded font-mono">En % du PIB</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartDeficitTrajectory"></canvas>
+                    </div>
+                </div>
 
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span>Pression Syndicale & "Commune Colère"</span>
-                                <span id="val-social" class="text-red-700">Maximale (85%)</span>
-                            </div>
-                            <input type="range" id="slider-social" min="0" max="100" value="85" oninput="updateRiskCalculator()" class="w-full accent-red-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Alerte Gouvernance</span>
+                        <h3 class="text-lg font-bold mt-1 text-white">L'Échéance du 13 Octobre 2026</h3>
+                        <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                            Le Premier ministre Bart De Wever est sous la contrainte d'un double couperet : présenter sa Déclaration de Politique Générale à la Chambre des représentants et transmettre l'épure budgétaire pluriannuelle à la Commission européenne. Le véto libéral du MR sur la TVA et le refus de Vooruit d'amputer les soins de santé menacent directement la stabilité du régime.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400">Consensus Interne Kern :</span>
+                            <span class="text-red-400 font-bold">Rupture Majeure</span>
                         </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span>Surcharge Financière des CPAS / Régions</span>
-                                <span id="val-cpas" class="text-amber-700">Élevée (80%)</span>
-                            </div>
-                            <input type="range" id="slider-cpas" min="0" max="100" value="80" oninput="updateRiskCalculator()" class="w-full accent-amber-600 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400">Pression Syndicale :</span>
+                            <span class="text-amber-400 font-bold">Grève Générale Annoncée</span>
                         </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold mb-1">
-                                <span>Intransigeance N-VA (Ultimatums Kern)</span>
-                                <span id="val-nva" class="text-amber-800">Très Fort (95%)</span>
-                            </div>
-                            <input type="range" id="slider-nva" min="0" max="100" value="95" oninput="updateRiskCalculator()" class="w-full accent-amber-700 h-2 bg-slate-200 rounded-lg cursor-pointer">
-                        </div>
+                        <button onclick="switchTab('scenarios')" class="w-full mt-3 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs rounded transition text-center">
+                            Tester les Scénarios de Rupture →
+                        </button>
                     </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-lg">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="text-xs font-bold text-slate-700 uppercase">Indice Global de Rupture :</span>
-                        <span id="risk-score" class="text-3xl font-black text-red-600">88 %</span>
-                    </div>
-                    <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
-                        <div id="risk-bar" class="bg-gradient-to-r from-amber-500 to-red-600 h-full transition-all duration-300" style="width: 88%"></div>
-                    </div>
-                    <p id="risk-interpretation" class="text-xs text-slate-600 mt-2 font-medium">
-                        Implosion quasi-certaine d'ici décembre 2026 sans compromis budgétaire majeur sur la fiscalité ou les dépenses de santé.
-                    </p>
                 </div>
             </div>
+        </section>
 
-            <!-- Deficit Trajectory Chart (7 cols) -->
-            <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
-                        <span>📊</span> Trajectoire du Déficit Public Belge (2025 - 2029)
-                    </h3>
-                    <p class="text-xs text-slate-500 mb-4">
-                        Comparaison entre le scénario à politique constante, l'objectif d'assainissement Arizona et la norme européenne (CSF).
-                    </p>
-                </div>
-
-                <div class="chart-container">
-                    <canvas id="deficitChart"></canvas>
-                </div>
-
-                <div class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100 flex justify-between">
-                    <span>Source : Banque Nationale de Belgique (BNB) & CSF</span>
-                    <span class="font-semibold text-slate-700">Procédure PDE active depuis juin 2024</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================= SECTION 2: ARCHITECTURE & PARTICRATIE ================= -->
-    <section id="tab-architecture" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">🏛️</span> Architecture Particratique & Tensions Idéologiques
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Définie par la politologie (Delwit, Faniel/CRISP) comme un « néolibéralisme aux accents autoritaires », la coalition Arizona est pilotée par un Premier ministre nationaliste flamand dont l'objectif statutaire ultime demeure le confédéralisme et la scission de l'État belge. La cohésion de l'alliance repose sur des ultimatums récurrents en Comité restreint (Kern) plutôt que sur une vision commune.
-            </p>
-        </div>
-
-        <!-- Matrix of Coalition Parties -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <!-- N-VA -->
-            <div class="bg-white p-4 rounded-xl border-t-4 border-amber-500 shadow-sm border-x border-b border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-900">N-VA</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">24 Sièges</span>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500 mb-2">Bart De Wever (Premier ministre)</p>
-                    <p class="text-xs text-slate-600 leading-normal mb-3">
-                        Assainissement par la rigueur, responsabilisation des entités, préparation d'arguments pour la 7e réforme de l'État (confédéralisme).
-                    </p>
-                </div>
-                <div class="text-xs font-semibold text-amber-800 bg-amber-50 p-2 rounded border border-amber-200">
-                    Ligne rouge : Pas de recul sur la rigueur budgétaire et le modèle flamand.
-                </div>
-            </div>
-
-            <!-- MR -->
-            <div class="bg-white p-4 rounded-xl border-t-4 border-blue-600 shadow-sm border-x border-b border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-900">MR</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">20 Sièges</span>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500 mb-2">Georges-Louis Bouchez</p>
-                    <p class="text-xs text-slate-600 leading-normal mb-3">
-                        Ultra-libéralisme décomplexé. Veto absolu contre toute hausse d'impôt (TVA) et attaques contre la taxe plus-values.
-                    </p>
-                </div>
-                <div class="text-xs font-semibold text-blue-800 bg-blue-50 p-2 rounded border border-blue-200">
-                    Ligne rouge : Zéro nouvel impôt sur les ménages / entreprises.
-                </div>
-            </div>
-
-            <!-- Vooruit -->
-            <div class="bg-white p-4 rounded-xl border-t-4 border-red-600 shadow-sm border-x border-b border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-900">Vooruit</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">13 Sièges</span>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500 mb-2">Conner Rousseau</p>
-                    <p class="text-xs text-slate-600 leading-normal mb-3">
-                        Social-démocratie flamande sous pression syndicale. Exige une contribution juste du capital et défend les soins de santé.
-                    </p>
-                </div>
-                <div class="text-xs font-semibold text-red-800 bg-red-50 p-2 rounded border border-red-200">
-                    Ligne rouge : Maintien de la taxe sur le capital & santé préservée.
-                </div>
-            </div>
-
-            <!-- CD&V -->
-            <div class="bg-white p-4 rounded-xl border-t-4 border-orange-500 shadow-sm border-x border-b border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-900">CD&V</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-800">11 Sièges</span>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500 mb-2">Sammy Mahdi</p>
-                    <p class="text-xs text-slate-600 leading-normal mb-3">
-                        Chrétiens-démocrates flamands. Tiraillés entre le soutien aux familles/communes et la proximité avec le syndicat CSC.
-                    </p>
-                </div>
-                <div class="text-xs font-semibold text-orange-800 bg-orange-50 p-2 rounded border border-orange-200">
-                    Ligne rouge : Protection des pouvoirs locaux et du pouvoir d'achat moyen.
-                </div>
-            </div>
-
-            <!-- Les Engagés -->
-            <div class="bg-white p-4 rounded-xl border-t-4 border-emerald-600 shadow-sm border-x border-b border-slate-200 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-900">Les Engagés</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">14 Sièges</span>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500 mb-2">Yvan Verougstraete / Maxime Prévot</p>
-                    <p class="text-xs text-slate-600 leading-normal mb-3">
-                        Centristes francophones. Pragmatisme budgétaire mais inquiétude marquée sur l'impact financier en Wallonie.
-                    </p>
-                </div>
-                <div class="text-xs font-semibold text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-200">
-                    Ligne rouge : Viabilité des finances régionales & communales wallonnes.
-                </div>
-            </div>
-        </div>
-
-        <!-- Radar Chart & Strategy Focus Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Radar Chart (6 cols) -->
-            <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="font-bold text-slate-900 text-base mb-1">
-                    🎯 Divergence Idéologique au sein du Kern
-                </h3>
-                <p class="text-xs text-slate-500 mb-4">
-                    Évaluation des lignes de fracture sur 5 axes stratégiques (Échelle de 0 à 100).
+        <!-- SECTION 2: PARTICRATIE ET ARCHITECTURE IDÉOLOGIQUE -->
+        <section id="tab-architecture" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">🏛️</span> La Particratie d'Arizona : Divergences & Ultimatums du Kern
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Cette section analyse l'équilibre des forces politiques au sein de la coalition. Qualifié par le CRISP et le Cevipol de « néolibéralisme aux accents autoritaires », l'exécutif fonctionne selon une particratie exacerbée où Bart De Wever recourt systématiquement aux ultimatums. Explorez la matrice de divergence idéologique et la stratégie confédérale sous-jacente de la N-VA.
                 </p>
-                <div class="chart-container">
-                    <canvas id="partyRadarChart"></canvas>
-                </div>
             </div>
 
-            <!-- Strategic Focus Card (6 cols) -->
-            <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
-                        <span>🕵️</span> La Stratégie de « Scission Larvée » de la N-VA
-                    </h3>
-                    <p class="text-slate-600 text-xs leading-relaxed mb-3">
-                        L'analyse politologique démontre que Bart De Wever applique une stratégie à double détente. Bien que l'accord de gouvernement ne prévoie pas de réforme institutionnelle immédiate, les coupes drastiques imposées aux départements fédéraux (coopération -25%, politique scientifique -15%) asphyxient le niveau national.
-                    </p>
-                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 text-xs space-y-2 text-amber-900">
-                        <p class="font-bold text-amber-950">Le piège de la gouvernabilité fédérale :</p>
-                        <p>
-                            Si la coalition échoue à combler le déficit en raison des blocages entre le MR et Vooruit, la N-VA pourra démontrer devant l'électeur flamand que la Belgique est structurellement ingouvernable. Cet « échec » servirait alors de tremplin pour exiger la <strong>7e réforme de l'État (Confédéralisme)</strong> avec la scission définitive des soins de santé et de l'emploi.
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-2">Profils Idéologiques Comparés</h3>
+                    <p class="text-xs text-slate-500 mb-4">Positionnement des 5 partis sur les 5 axes stratégiques de négociations.</p>
+                    <div class="chart-container">
+                        <canvas id="chartRadarIdeology"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-white rounded-xl border border-amber-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-900 text-sm">N-VA (Jaune)</span>
+                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono"> Premier Parti</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2">
+                                <strong>Ligne :</strong> Rigueur budgétaire, activation stricte, réforme des pensions et promotion d'une scission larvée des compétences vers les Régions.
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-white rounded-xl border border-blue-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-900 text-sm">MR (Bleu)</span>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono"> G.L. Bouchez</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2">
+                                <strong>Ligne :</strong> Orthodoxie libérale, veto absolu contre toute hausse d'impôt (TVA/Capital), coupes massives dans la santé et le secteur public.
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-white rounded-xl border border-red-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-900 text-sm">Vooruit (Rouge)</span>
+                                <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded font-mono"> Conner Rousseau</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2">
+                                <strong>Ligne :</strong> Exigence d'un impôt effectif sur le capital (plus-values), protection relative des soins de santé, très forte pression des syndicats (FGTB).
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-white rounded-xl border border-orange-200 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-900 text-sm">CD&V & Les Engagés</span>
+                                <span class="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-mono"> Centre Chrétien</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2">
+                                <strong>Ligne :</strong> Protection des familles et des pouvoirs locaux/CPAS, crispations face aux transferts de charges vers les communes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-900 text-slate-200 rounded-xl border border-slate-800">
+                        <h4 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+                            <span>🔍</span> Le Confédéralisme sous-jacent : L'Échec Fédéral comme Stratégie
+                        </h4>
+                        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                            Selon les analyses du CRISP et de politologues de l'ULB, la stratégie de la N-VA repose sur une forme d'asymétrie calculée. Si le gouvernement fédéral échoue à combler le trou budgétaire en raison des vétos croisés du MR et de Vooruit, Bart De Wever disposera de l'argument ultime auprès de l'opinion flamande : démontrer l'ingouvernabilité structurelle de l'État belge pour imposer une 7e Réforme de l'État fondée sur le confédéralisme intégral.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ÉTAU BUDGÉTAIRE ET AUDIT COUR DES COMPTES -->
+        <section id="tab-budget" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">📉</span> Procédure Européenne & Audit Cinglant de la Cour des Comptes
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Sous le coup d'une Procédure pour Déficit Excessif (PDE) initiée par la Commission européenne en juin 2024, la Belgique doit restreindre la croissance de ses dépenses primaires nettes à 2,5 %/an (1,45 % pour la Wallonie). Cependant, le rapport de la Cour des comptes publié au printemps 2026 dénonce les artifices comptables et l'absence de méthodologie scientifique dans le budget initial.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">Les 4 Fictions Comptables Démasquées par la Cour</h3>
+
+                    <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-r">
+                        <h4 class="text-xs font-bold text-red-900">1. L'Hypothèse Floue du "Tiers" au Chômage</h4>
+                        <p class="text-xs text-red-700 mt-1">
+                            Le gouvernement table sur 33% de retour spontané à l'emploi des chômeurs exclus. La Cour rappelle que la BNB fixe ce taux à seulement 10-20%, entraînant un transfert massif non budgétisé vers le RIS des CPAS.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r">
+                        <h4 class="text-xs font-bold text-amber-900">2. Rentrées Antifraude sans Méthodologie</h4>
+                        <p class="text-xs text-amber-700 mt-1">
+                            L'exécutif inscrit 300 M€ en 2026 et 600 M€ en 2029 de recettes liées à la lutte contre la fraude. Le SPF Finances n'a fourni aucun plan d'action concrétisé pour valider ces montants.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 border-l-4 border-slate-500 rounded-r">
+                        <h4 class="text-xs font-bold text-slate-900">3. Volatilité de la Taxe Plus-Values</h4>
+                        <p class="text-xs text-slate-700 mt-1">
+                            Les 236 M€ espérés sont jugés très incertains en raison de l'option d'opt-out déclaratif et de l'amnistie historique sur les actifs acquis avant le 31/12/2025.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 border-l-4 border-slate-500 rounded-r">
+                        <h4 class="text-xs font-bold text-slate-900">4. Erreur de Calcul sur les Accises Gaz</h4>
+                        <p class="text-xs text-slate-700 mt-1">
+                            Les recettes tirées de la hausse des accises sur le gaz naturel sont surestimées de 195 M€ par rapport aux projections directes de l'administration fiscale.
                         </p>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>Analyse : Pascal Delwit (ULB) & Jean Faniel (CRISP)</span>
-                    <span class="font-mono bg-slate-100 px-2 py-1 rounded">Confédéralisme Téléologique</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================= SECTION 3: ÉTAU BUDGÉTAIRE & AUDIT ================= -->
-    <section id="tab-budget" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">📉</span> L'Étau Budgétaire Européen & L'Audit de la Cour des Comptes
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Placée sous Procédure pour Déficit Excessif (PDE) par la Commission européenne en juin 2024, la Belgique est contrainte de respecter une norme stricte formulée par le Conseil Supérieur des Finances (CSF) : la croissance des dépenses primaires nettes ne peut excéder 2,5% par an en moyenne (1,45% pour la Wallonie).
-            </p>
-        </div>
-
-        <!-- Debunking Cards Grid (Cour des Comptes Audit) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Card 1 -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-red-600 font-bold text-lg">⚠️</span>
-                    <h3 class="font-bold text-slate-900 text-sm">L'Illusion du Retour à l'Emploi</h3>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed mb-3">
-                    Le gouvernement postule la <strong>« règle du tiers »</strong> : 1/3 des chômeurs exclus retrouvent un emploi, 1/3 vont au CPAS, 1/3 disparaissent des statistiques.
-                </p>
-                <div class="bg-red-50 p-3 rounded-lg border border-red-200 text-xs text-red-900">
-                    <strong>Réfutation Cour des comptes / BNB :</strong> Le taux réel de retour à l'emploi ne sera que de 10% à 20%. Le basculement vers le CPAS atteindra 40% à 50% en zone urbaine/wallonne, provoquant un trou budgétaire non provisionné au RIS.
-                </div>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-amber-600 font-bold text-lg">⚡</span>
-                    <h3 class="font-bold text-slate-900 text-sm">Recettes Anti-Fraude Fantômes</h3>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed mb-3">
-                    Le budget 2026 inscrit 300 M€ de recettes immédiates (visant 600 M€ en 2029) tirées de la lutte contre la fraude fiscale.
-                </p>
-                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-900">
-                    <strong>Réfutation Cour des comptes :</strong> Aucune méthodologie du SPF Finances n'a été fournie pour étayer ces chiffres. Le plan d'action anti-fraude n’est tout simplement pas concrétisé dans la loi.
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-blue-600 font-bold text-lg">📊</span>
-                    <h3 class="font-bold text-slate-900 text-sm">Erreur de Calcul sur les Accises</h3>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed mb-3">
-                    Le gouvernement table sur des rentrées massives grâce à la hausse des accises sur le gaz naturel et à la taxe sur les plus-values.
-                </p>
-                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs text-blue-900">
-                    <strong>Réfutation Cour des comptes :</strong> Les recettes d'accises sont surestimées de 195 M€. De plus, la taxe plus-values (estimée à 236 M€) est sapée par l'effet de l'Opt-Out bancaire.
-                </div>
-            </div>
-        </div>
-
-        <!-- Key Financial Breakdown Table -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <span>📋</span> Tableau de Bord Macro-Économique (Projections 2025 - 2029)
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left text-slate-600">
-                    <thead class="text-xs text-slate-700 uppercase bg-slate-100 font-semibold border-b">
-                        <tr>
-                            <th class="px-4 py-3">Indicateur Financier</th>
-                            <th class="px-4 py-3">Valeur Réelle / Projetée</th>
-                            <th class="px-4 py-3">Source & Statut</th>
-                            <th class="px-4 py-3">Appréciation des Économistes (Colmant / de Callataÿ)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 font-bold text-slate-900">Déficit Public 2029 (Politique Constante)</td>
-                            <td class="px-4 py-3 text-red-600 font-mono font-bold">~42 Milliards € (6% PIB)</td>
-                            <td class="px-4 py-3">BNB / SPF Finances</td>
-                            <td class="px-4 py-3">Risque de récession auto-entretenue par frein de la dépense publique.</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 font-bold text-slate-900">Effort d'Assainissement Annoncé</td>
-                            <td class="px-4 py-3 text-amber-700 font-mono font-bold">23,3 Milliards €</td>
-                            <td class="px-4 py-3">Gouvernement Arizona</td>
-                            <td class="px-4 py-3">« Mirage budgétaire » fondé sur des effets retours surestimés.</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 font-bold text-slate-900">Croissance Max Dépenses Primaires (CSF)</td>
-                            <td class="px-4 py-3 text-blue-700 font-mono font-bold">Max +2,5% / an (Wallonie: +1,45%)</td>
-                            <td class="px-4 py-3">Norme Européenne / CSF</td>
-                            <td class="px-4 py-3">Norme asphyxiante pour les entités fédérées déjà lourdement endettées.</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 font-bold text-slate-900">Prêt Emprunt Sécurité / Défense</td>
-                            <td class="px-4 py-3 text-slate-800 font-mono font-bold">+8,34 Milliards €</td>
-                            <td class="px-4 py-3">Loi-programme Défense</td>
-                            <td class="px-4 py-3">Augmente la dette alors que les services sociaux de base sont coupés.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================= SECTION 4: IMPACT SOCIAL & CPAS ================= -->
-    <section id="tab-social" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">💥</span> Démantèlement Social & Transfert de Charge vers les CPAS
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                La réforme du chômage (loi-programme de juillet 2025) limite le droit aux allocations d'insertion à 1 an et le chômage complet à 24 mois maximum. Ce démantèlement s'opère par vagues successives d'exclusions en 2026, transférant la facture du fédéral vers les CPAS communaux.
-            </p>
-        </div>
-
-        <!-- Waves Timeline Interactive Component -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <span>📅</span> Calendrier des Vagues d'Exclusion du Chômage (Année 2026)
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-red-500">
-                    <span class="text-xs font-bold text-red-600 uppercase">Vague 1 — 1er Janvier 2026</span>
-                    <h4 class="font-bold text-slate-900 text-sm mt-1">Chômeurs > 20 ans d'ancienneté</h4>
-                    <p class="text-xs text-slate-600 mt-2">Radiation immédiate des registres de l'ONEM pour les profils accumulant plus de deux décennies de chômage complet.</p>
-                </div>
-
-                <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-amber-500">
-                    <span class="text-xs font-bold text-amber-600 uppercase">Vague 2 — 1er Mars 2026</span>
-                    <h4 class="font-bold text-slate-900 text-sm mt-1">Chômeurs entre 8 et 20 ans</h4>
-                    <p class="text-xs text-slate-600 mt-2">Fin des allocations pour la tranche intermédiaire d'allocataires de longue durée.</p>
-                </div>
-
-                <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                    <span class="text-xs font-bold text-yellow-600 uppercase">Vague 3 — 1er Avril 2026</span>
-                    <h4 class="font-bold text-slate-900 text-sm mt-1">Chômeurs < 8 ans (3e période)</h4>
-                    <p class="text-xs text-slate-600 mt-2">Exclusion des travailleurs en troisième période d'indemnisation.</p>
-                </div>
-            </div>
-
-            <div class="mt-4 bg-slate-100 p-3 rounded-lg text-xs text-slate-600 text-center font-medium">
-                ⚡ <strong>Vagues 4, 5 et 6 (Juillet 2026 à Juillet 2027) :</strong> Allocataires d'insertion, travailleurs à temps partiel avec garantie de revenus et passés récents.
-            </div>
-        </div>
-
-        <!-- CPAS Transfer Impact Chart & Pensions Card -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- CPAS Cost Bar Chart (7 cols) -->
-            <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base mb-1">
-                        📊 Impact Financier Net sur les CPAS Wallons (UVCW)
-                    </h3>
-                    <p class="text-xs text-slate-500 mb-4">
-                        Surcoût en millions d'euros supporté par les communes (subventions fédérales dégressives de 100% à 75%).
-                    </p>
-                </div>
-
-                <div class="chart-container">
-                    <canvas id="cpasCostChart"></canvas>
-                </div>
-
-                <p class="text-xs text-slate-500 mt-2">
-                    *L'Union des Villes et Communes de Wallonie (UVCW) chiffre l'impact global à <strong>1 Milliard €</strong> sur la législature.
-                </p>
-            </div>
-
-            <!-- Pensions & Long Term Sick Card (5 cols) -->
-            <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                    <span>👴</span> Réformes des Pensions & Malades
-                </h3>
-
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs space-y-2">
-                    <h4 class="font-bold text-slate-900">Pensions : Conditions d'Accès Durcies</h4>
-                    <p class="text-slate-600">
-                        Loi du 28 mai 2026 (Moniteur du 1er juin 2026) :
-                    </p>
-                    <ul class="list-disc pl-4 text-slate-700 space-y-1">
-                        <li><strong>Retraite anticipée à 60 ans :</strong> Exige 35 ans de carrière comprenant 156 jours prestés/an (soit <strong>7.020 jours effectifs</strong>).</li>
-                        <li><strong>Malus Pension :</strong> Pénalité financière permanente en cas de départ anticipé sans remplir la double condition.</li>
-                        <li><strong>Bonus Pension :</strong> Majoration de +4% à +5% par an en cas de prolongation.</li>
-                    </ul>
-                </div>
-
-                <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-xs space-y-2 text-red-950">
-                    <h4 class="font-bold">Malades de Longue Durée (INAMI)</h4>
-                    <p>
-                        Dès la <strong>8e semaine d'absence</strong>, évaluation obligatoire du potentiel de travail. Sanctions financières allant jusqu'à la suspension des indemnités en cas de « non-coopération » perçue.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================= SECTION 5: FRACTURE FISCALE & TVA ================= -->
-    <section id="tab-fiscal" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">⚖️</span> La Fracture Fiscale : Plus-Values vs Blocage sur la TVA
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Tiraillé entre le dogme libéral du MR (anti-taxes) et l'exigence social-démocrate de Vooruit (contribution du capital), le gouvernement subit un blocage total sur la fiscalité indirecte (TVA) et a produit un impôt sur les plus-values criblé d'exemptions.
-            </p>
-        </div>
-
-        <!-- Interactive Capital Gains Calculator Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Calculator Inputs & Output (6 cols) -->
-            <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
-                        <span>🧮</span> Simulateur d'Impôt sur les Plus-Values (Loi du 3 avril 2026)
-                    </h3>
-                    <p class="text-xs text-slate-500 mb-4">
-                        Testez l'impact des échappatoires (Amnistie moment photo, franchise 10k€, régimes >20%).
-                    </p>
-
-                    <div class="space-y-4 text-xs">
-                        <div>
-                            <label class="font-semibold text-slate-700 block mb-1">Plus-value brute réalisée sur l'actif (€) :</label>
-                            <input type="number" id="calc-gain" value="50000" oninput="calculateCapitalGainsTax()" class="w-full p-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-900">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="font-semibold text-slate-700 block mb-1">Part de capital détenue :</label>
-                                <select id="calc-share" onchange="calculateCapitalGainsTax()" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
-                                    <option value="normal">Standard (< 20%)</option>
-                                    <option value="substantial">Substantielle (> 20%)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-slate-700 block mb-1">Option d'imposition :</label>
-                                <select id="calc-optout" onchange="calculateCapitalGainsTax()" class="w-full p-2 border border-slate-300 rounded-lg bg-white">
-                                    <option value="withholding">Précompte bancaire</option>
-                                    <option value="optout">Opt-Out (Déclaration pers.)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
-                            <div class="flex justify-between">
-                                <span>Moment Photo (Valeur au 31/12/2025 Exonérée) :</span>
-                                <span class="font-bold text-emerald-600">Active</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Franchise de base annuelle :</span>
-                                <span class="font-bold text-slate-800">10 000 € (Indexable)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-slate-100 bg-amber-50 p-4 rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-700">Impôt Effectif Estimé :</span>
-                        <span id="tax-result-amount" class="text-2xl font-black text-amber-700 font-mono">4 000 €</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-slate-600 mt-1">
-                        <span>Taux Effectif d'Imposition :</span>
-                        <span id="tax-result-rate" class="font-bold text-slate-900">8.0 %</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tax Brackets for >20% Shares & VAT Clash (6 cols) -->
-            <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <h3 class="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
-                        <span>💥</span> Le Crash sur la TVA (21%➜22% vs Veto MR)
-                    </h3>
-
-                    <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-xs space-y-2 mb-4 text-red-950">
-                        <h4 class="font-bold">Projet Bart De Wever (N-VA) :</h4>
-                        <p>
-                            Augmentation du taux normal de TVA de <strong>21% à 22%</strong> et fusion des taux réduits (6% et 12%) vers un taux intermédiaire unique de <strong>9%</strong> pour générer des liquidités immédiates.
-                        </p>
-                        <h4 class="font-bold pt-2 border-t border-red-200">Veto Absolu Georges-Louis Bouchez (MR) :</h4>
-                        <p>
-                            Refus public catégorique. Le MR exige 16 à 17 milliards € de coupes pures dans les dépenses publiques et la santé.
-                        </p>
-                    </div>
-
-                    <h4 class="font-bold text-slate-900 text-xs mb-2">Barème Dégressif pour Participations Substantielles (>20%) :</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs text-left text-slate-600 border border-slate-200 rounded-lg">
-                            <thead class="bg-slate-100 font-semibold text-slate-700">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2 mb-4">Cadre de Trajectoire Fixé par le CSF</h3>
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-100 text-slate-700 font-bold uppercase">
                                 <tr>
-                                    <th class="p-2">Tranche de Plus-Value</th>
-                                    <th class="p-2">Taux Appliqué</th>
+                                    <th class="p-2">Indicateur Budgétaire</th>
+                                    <th class="p-2 text-right">Valeur / Norme</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                <tr><td class="p-2">0 à 1 000 000 €</td><td class="p-2 font-bold text-emerald-600">0 % (Exonération)</td></tr>
-                                <tr><td class="p-2">1 000 000 € à 2 500 000 €</td><td class="p-2 font-bold text-slate-800">1,25 %</td></tr>
-                                <tr><td class="p-2">2 500 000 € à 5 000 000 €</td><td class="p-2 font-bold text-slate-800">2,50 %</td></tr>
-                                <tr><td class="p-2">5 000 000 € à 10 000 000 €</td><td class="p-2 font-bold text-slate-800">5,00 %</td></tr>
-                                <tr><td class="p-2">> 10 000 000 €</td><td class="p-2 font-bold text-red-600">10,00 %</td></tr>
+                                <tr>
+                                    <td class="p-2">Déficit estimé 2029 (sans réformes)</td>
+                                    <td class="p-2 text-right font-mono font-bold text-red-600">42,0 Mrd € (6,0% PIB)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Effort d'ajustement global (2025-2029)</td>
+                                    <td class="p-2 text-right font-mono font-bold text-amber-600">23,3 Mrd €</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Plafond croissance dépense primaire (Fédéral)</td>
+                                    <td class="p-2 text-right font-mono">Max 2,50% / an</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Plafond croissance dépense primaire (Wallonie)</td>
+                                    <td class="p-2 text-right font-mono">Max 1,45% / an</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Cible Déficit Structurel de Sécurité</td>
+                                    <td class="p-2 text-right font-mono text-emerald-600">1,50% du PIB</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900">
+                        <strong>Critique des Économistes (Bruno Colmant & Etienne de Callataÿ) :</strong>
+                        Le plan d'austérité de l'Arizona s'apparente à un « mirage budgétaire ». Vouloir couper dans les dépenses publiques au moment où l'industrie souffre menace de provoquer une récession auto-entretenue qui réduira les rentrées fiscales effectives.
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-
-    <!-- ================= SECTION 6: RIPOSTE SOCIALE ================= -->
-    <section id="tab-strikes" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">🪧</span> La Riposte Sociale & L'Agenda des Grèves (Automne 2026)
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Face aux mesures de l'Arizona, le Front Commun Syndical (FGTB, CSC, CGSLB) et le mouvement citoyen radical <strong>« Commune Colère »</strong> ont engagé une épreuve de force extra-parlementaire.
-            </p>
-        </div>
-
-        <!-- Strike Action Interactive Timeline Component -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
-                <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                    <span>📅</span> Calendrier d'Escalade des Actions Syndicales & Citoyennes
-                </h3>
-                <div class="flex gap-2">
-                    <button onclick="filterEvents('all')" class="px-3 py-1 bg-slate-200 text-slate-800 rounded text-xs font-semibold hover:bg-slate-300">Tous</button>
-                    <button onclick="filterEvents('syndical')" class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold hover:bg-red-200">Front Syndical</button>
-                    <button onclick="filterEvents('commune')" class="px-3 py-1 bg-amber-100 text-amber-800 rounded text-xs font-semibold hover:bg-amber-200">Commune Colère</button>
-                </div>
-            </div>
-
-            <div class="space-y-4" id="events-container">
-                <!-- Event 1 -->
-                <div class="event-card event-syndical bg-slate-50 p-4 rounded-xl border-l-4 border-red-600 flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="p-2 bg-red-100 text-red-700 rounded-lg font-bold text-xs">12 MARS</span>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Manifestation Nationale Massique à Bruxelles</h4>
-                            <p class="text-xs text-slate-600 mt-1">Près de 100 000 personnes dans la rue contre la chasse aux chômeurs, le malus pension et le centenindex.</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-slate-500 self-start md:self-center bg-white px-2 py-1 rounded border">Réalisé</span>
-                </div>
-
-                <!-- Event 2 -->
-                <div class="event-card event-syndical bg-slate-50 p-4 rounded-xl border-l-4 border-red-600 flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="p-2 bg-red-100 text-red-700 rounded-lg font-bold text-xs">10 SEPT</span>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Manifestation Intersyndicale à Liège</h4>
-                            <p class="text-xs text-slate-600 mt-1">Mobilisation ciblée pour la défense du secteur de l'enseignement.</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-red-600 self-start md:self-center bg-red-50 px-2 py-1 rounded border border-red-200">En Cours</span>
-                </div>
-
-                <!-- Event 3 -->
-                <div class="event-card event-commune bg-slate-50 p-4 rounded-xl border-l-4 border-amber-500 flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="p-2 bg-amber-100 text-amber-800 rounded-lg font-bold text-xs">14-16 SEPT</span>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Rentrée Sociale Enseignement Supérieur & Boycott</h4>
-                            <p class="text-xs text-slate-600 mt-1">Appel au boycott du minerval et manifestations étudiantes à Bruxelles emmenées par Commune Colère.</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-amber-700 self-start md:self-center bg-amber-50 px-2 py-1 rounded border border-amber-200">Imminent</span>
-                </div>
-
-                <!-- Event 4 -->
-                <div class="event-card event-commune bg-slate-50 p-4 rounded-xl border-l-4 border-amber-500 flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="p-2 bg-amber-100 text-amber-800 rounded-lg font-bold text-xs">25 SEPT</span>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Action Ciblée Belfius (Anti-Privatisation)</h4>
-                            <p class="text-xs text-slate-600 mt-1">Opération contre les velléités de privatisation partielle de la banque publique par l'État.</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-amber-700 self-start md:self-center bg-amber-50 px-2 py-1 rounded border border-amber-200">Planifié</span>
-                </div>
-
-                <!-- Event 5 -->
-                <div class="event-card event-syndical bg-slate-50 p-4 rounded-xl border-l-4 border-red-600 flex flex-col md:flex-row justify-between gap-4">
-                    <div class="flex items-start gap-3">
-                        <span class="p-2 bg-red-100 text-red-700 rounded-lg font-bold text-xs">9 OCT</span>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Grande Manifestation Nationale FGTB / CSC</h4>
-                            <p class="text-xs text-slate-600 mt-1">Dernière sommation syndicale à Bruxelles avant le discours de politique générale du Premier ministre.</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-red-600 self-start md:self-center bg-red-50 px-2 py-1 rounded border border-red-200">Jour J Politico-Syndical</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Focus Commune Colère -->
-        <div class="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 flex flex-col md:flex-row gap-6 items-center justify-between">
-            <div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="bg-amber-500 text-slate-950 font-black text-xs px-2 py-0.5 rounded">FOCUS</span>
-                    <h3 class="font-bold text-base">Le Phénomène « Commune Colère » & L'Occupation de la FEB</h3>
-                </div>
-                <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
-                    Regroupant syndicalistes de terrain, précaires, étudiants et militants écologistes/féministes, ce mouvement citoyen prône la grève générale reconductible. L'occupation spectaculaire du siège de la Fédération des Entreprises de Belgique (FEB) symbolise le refus de toute concession négociée avec ce qu'ils qualifient de « bras armé du patronat ».
+        <!-- SECTION 4: IMPACT SOCIAL ET CPAS -->
+        <section id="tab-social" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">⚠️</span> Démantèlement Social & Transfert de Charges vers les Communes
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    La limitation du chômage à 24 mois maximum (et 12 mois pour l'insertion) provoque l'exclusion de 125 000 personnes. Loin d'opérer un retour magique à l'emploi, cette réforme transfère le coût social directement vers les CPAS communaux. Utilisez le calculateur ci-dessous pour évaluer l'impact financier local de cette politique.
                 </p>
             </div>
-            <div class="whitespace-nowrap">
-                <span class="text-amber-400 font-mono text-sm font-bold border border-amber-500/30 px-3 py-2 rounded-lg bg-slate-800">
-                    Objectif : Chute du Gouvernement
-                </span>
-            </div>
-        </div>
-    </section>
 
-
-    <!-- ================= SECTION 7: SCÉNARIOS DE RUPTURE ================= -->
-    <section id="tab-scenarios" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <span class="text-amber-600">🚨</span> Signaux d'Alerte & Scénarios d'Effondrement du Gouvernement
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Synthèse des trois trajectoires critiques susceptibles de provoquer la chute de l'exécutif Arizona d'ici la fin de l'année 2026.
-            </p>
-        </div>
-
-        <!-- Scenarios Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Scenario 1 -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-red-400 transition">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="px-2.5 py-1 bg-red-100 text-red-800 font-bold text-xs rounded-full">Scénario 1</span>
-                        <span class="text-xs font-mono text-slate-500">Probabilité : 45%</span>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Timeline Exclusions -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">Calendrier des 6 Vagues d'Exclusion (2026)</h3>
+                    
+                    <div class="relative pl-6 border-l-2 border-amber-500 space-y-3 text-xs">
+                        <div>
+                            <span class="font-mono text-amber-700 font-bold">1er Janvier 2026</span>
+                            <p class="font-semibold text-slate-800">Vague 1 : > 20 ans de chômage</p>
+                            <p class="text-slate-500">Exclusion immédiate des allocataires de très longue durée.</p>
+                        </div>
+                        <div>
+                            <span class="font-mono text-amber-700 font-bold">1er Mars 2026</span>
+                            <p class="font-semibold text-slate-800">Vague 2 : 8 à 20 ans de chômage</p>
+                            <p class="text-slate-500">Pression accrue sur les agglomérations urbaines.</p>
+                        </div>
+                        <div>
+                            <span class="font-mono text-amber-700 font-bold">1er Avril 2026</span>
+                            <p class="font-semibold text-slate-800">Vague 3 : < 8 ans (3e période)</p>
+                            <p class="text-slate-500">Basculement accéléré des profils isolés.</p>
+                        </div>
+                        <div>
+                            <span class="font-mono text-amber-700 font-bold">Juillet 2026 - Juillet 2027</span>
+                            <p class="font-semibold text-slate-800">Vagues 4, 5 & 6</p>
+                            <p class="text-slate-500">Fin des allocations d'insertion et contrats temps partiel avec GRD.</p>
+                        </div>
                     </div>
-                    <h3 class="font-bold text-slate-900 text-base mb-2">Paralysie & Douzièmes Provisoires</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                        Impasse totale entre le MR (veto TVA) et Vooruit (refus coupes santé) au Kern d'octobre. Incapable de déposer le budget 2027 à la Chambre et à Bruxelles, l'État bascule sous le régime des douzièmes provisoires.
+                </div>
+
+                <!-- CPAS Calculator -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h3 class="text-base font-bold text-slate-900">Simulateur d'Impact sur les CPAS & Finances Communales</h3>
+                        <span class="text-xs bg-red-100 text-red-800 font-bold px-2 py-1 rounded">Estimation UVCW</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sélectionnez la Taille de la Commune :</label>
+                            <select id="selectCommune" onchange="calculateCPAS()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg p-2.5 font-medium">
+                                <option value="petite">Petite commune (~15 000 habitants)</option>
+                                <option value="moyenne">Ville moyenne (~50 000 habitants)</option>
+                                <option value="grande">Grande ville (~200 000 habitants)</option>
+                                <option value="wallonie">Total Région Wallonne (Global)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Taux de Reconversion Effectif vers l'Emploi :</label>
+                            <select id="selectEmpRate" onchange="calculateCPAS()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg p-2.5 font-medium">
+                                <option value="0.15">15% (Estimation BNB / Cour des comptes)</option>
+                                <option value="0.33">33% (Hypothèse optimiste du Gouvernement)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                            <span class="text-xs text-slate-500 block">Chômeurs Exclus</span>
+                            <span id="resExcluded" class="text-xl font-black text-slate-900 mt-1 block">0</span>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-lg border border-red-200 text-center">
+                            <span class="text-xs text-red-700 block">Nouveaux Dossiers RIS (CPAS)</span>
+                            <span id="resRIS" class="text-xl font-black text-red-600 mt-1 block">0</span>
+                        </div>
+                        <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 text-center">
+                            <span class="text-xs text-amber-800 block">Surcoût Annuel Net</span>
+                            <span id="resCost" class="text-xl font-black text-amber-700 mt-1 block">0 €</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-900 text-slate-300 rounded-lg text-xs leading-relaxed">
+                        <strong>⚡ Conséquence Politique (Avertissement Dolimont) :</strong> 
+                        Le Ministre-Président wallon Adrien Dolimont (MR) a dénoncé une « bombe sociale ». Les communes, acculées par le financement des CPAS, se verront contraintes d'augmenter l'Impôt des Personnes Physiques (IPP) et le Précompte Immobilier (PRI), annulant le gain de pouvoir d'achat promis au niveau fédéral.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: FRACTURE FISCALE ET VETO TVA -->
+        <section id="tab-fiscal" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">⚖️</span> Fracture Fiscale : Impôt sur les Plus-Values vs Veto TVA
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    La fiscalité est la faille tectonique majeure de l'Arizona. D'un côté, Vooruit a exigé un impôt sur les plus-values financières (vôté le 3 avril 2026), mais celui-ci a été largement vidé de sa substance sous la pression du MR (amnistie du "moment photo", franchise de 10k€, régimes dégressifs >20%). De l'autre, Bart De Wever propose une hausse de TVA à 22%, frappée d'un veto absolu par Georges-Louis Bouchez.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Capital Gains Tax Simulator -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="text-base font-bold text-slate-900">Simulateur d'Impôt sur les Plus-Values Financières</h3>
+                        <p class="text-xs text-slate-500">Applique les règles de la Loi du 3 Avril 2026 (Effet rétroactif 01/01/2026)</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Valeur du portefeuille au 31/12/2025 ("Moment Photo") :</label>
+                            <input type="number" id="valInit" value="100000" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg p-2.5 font-mono" oninput="calculateTax()">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Prix de revente effectif en 2026 :</label>
+                            <input type="number" id="valSale" value="150000" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg p-2.5 font-mono" oninput="calculateTax()">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Type de Participation :</label>
+                            <select id="typeShare" onchange="calculateTax()" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg p-2.5 font-medium">
+                                <option value="standard">Portefeuille Privé Classique (< 20% du capital)</option>
+                                <option value="substantial">Participation Substantielle (> 20% des parts de l'entreprise)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Plus-value brute réalisée :</span>
+                            <span id="txtGain" class="font-mono font-bold text-slate-900">50 000 €</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Franchise & Exonérations légales :</span>
+                            <span id="txtExempt" class="font-mono text-emerald-600 font-bold">- 10 000 €</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-200 pt-2">
+                            <span class="font-bold text-slate-900">Impôt Final Dû (Loi Arizona) :</span>
+                            <span id="txtTax" class="font-mono font-black text-red-600 text-sm">4 000 €</span>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-500">
+                            <span>Taux Effectif d'Imposition :</span>
+                            <span id="txtEffectiveRate" class="font-mono font-bold">8.0 %</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TVA Deadlock -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5 flex flex-col justify-between">
+                    <div>
+                        <div class="border-b border-slate-100 pb-3 mb-4">
+                            <h3 class="text-base font-bold text-slate-900">L'Impasse Frontale de la TVA (Budget 2027)</h3>
+                            <p class="text-xs text-slate-500">Conflit direct N-VA vs MR dans le Kern</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                                <span class="text-xs font-bold text-amber-900 uppercase">Proposition De Wever (N-VA)</span>
+                                <ul class="text-xs text-amber-800 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Hausse du taux normal : 21% → <strong>22%</strong></li>
+                                    <li>Fusion des taux 6% et 12% vers <strong>9%</strong></li>
+                                    <li>Rentrées rapides pour l'UE</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                <span class="text-xs font-bold text-blue-900 uppercase">Veto Bouchez (MR)</span>
+                                <ul class="text-xs text-blue-800 mt-2 space-y-1 list-disc list-inside">
+                                    <li>Refus total de toute hausse de taxe</li>
+                                    <li>Exigence de 16-17 Mrd € de coupes brutes</li>
+                                    <li>Cible : Soins de santé & statut BIM</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-red-900 text-slate-100 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold uppercase text-red-300">Statut de la Négociation Kern :</span>
+                            <span class="bg-red-800 text-white px-2 py-0.5 rounded font-mono font-bold">BLOCAGE TOTAL</span>
+                        </div>
+                        <p class="text-xs text-slate-300">
+                            L'échec à s'accorder avant l'été reporte la crise au 13 octobre 2026. L'absence de compromis menace le vote du budget et précipitera l'activation des douzièmes provisoires.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: RIPOSTE SOCIALE -->
+        <section id="tab-strikes" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">✊</span> Mobilisation Sociale, Front Commun & Mouvement "Commune Colère"
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Face au démantèlement des acquis sociaux et au "Malus Pension", les syndicats (FGTB, CSC, CGSLB) ont reconstitué un Front Commun offensif. Parallèlement, le mouvement citoyen "Commune Colère" orchestre une riposte extra-parlementaire, marquée par des manifestations de 100 000 personnes et l'occupation symbolique du siège de la FEB à Bruxelles.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Strike Filter Calendar -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
+                        <h3 class="text-base font-bold text-slate-900">Calendrier des Actions & Grèves (Automne 2026)</h3>
+                        <div class="flex gap-1" id="strikeFilters">
+                            <button onclick="filterStrikes('all')" class="px-2.5 py-1 text-xs rounded bg-slate-900 text-white font-medium">Tous</button>
+                            <button onclick="filterStrikes('education')" class="px-2.5 py-1 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Enseignement</button>
+                            <button onclick="filterStrikes('finance')" class="px-2.5 py-1 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Finance</button>
+                            <button onclick="filterStrikes('national')" class="px-2.5 py-1 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">National</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" id="strikeList">
+                        <div class="strike-item p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-4" data-cat="education">
+                            <div class="bg-amber-100 text-amber-800 font-bold px-3 py-2 rounded-lg text-center min-w-[80px]">
+                                <span class="block text-xs uppercase">Sept</span>
+                                <span class="text-lg font-black">10</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Manifestation Intersyndicale Enseignement (Liège)</h4>
+                                <p class="text-xs text-slate-600 mt-1">Protestation contre le gel des recrutements et les coupes dans la recherche (15%).</p>
+                                <span class="inline-block mt-2 text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Front Commun Enseignement</span>
+                            </div>
+                        </div>
+
+                        <div class="strike-item p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-4" data-cat="education">
+                            <div class="bg-amber-100 text-amber-800 font-bold px-3 py-2 rounded-lg text-center min-w-[80px]">
+                                <span class="block text-xs uppercase">Sept</span>
+                                <span class="text-lg font-black">14-16</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Rentrée Sociale du Supérieur & Boycott Minerval</h4>
+                                <p class="text-xs text-slate-600 mt-1">Actions d'étudiants et précarisés soutenus par Commune Colère à Bruxelles.</p>
+                                <span class="inline-block mt-2 text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded font-mono">Commune Colère / Collectifs</span>
+                            </div>
+                        </div>
+
+                        <div class="strike-item p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-4" data-cat="finance">
+                            <div class="bg-blue-100 text-blue-800 font-bold px-3 py-2 rounded-lg text-center min-w-[80px]">
+                                <span class="block text-xs uppercase">Sept</span>
+                                <span class="text-lg font-black">25</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">Action Ciblée Belfius & Secteur Financier</h4>
+                                <p class="text-xs text-slate-600 mt-1">Riposte syndicale contre les velléités de privatisation partielle de la banque publique.</p>
+                                <span class="inline-block mt-2 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono">CNE / CGSLB</span>
+                            </div>
+                        </div>
+
+                        <div class="strike-item p-4 bg-red-50 rounded-xl border border-red-200 flex items-start gap-4" data-cat="national">
+                            <div class="bg-red-600 text-white font-bold px-3 py-2 rounded-lg text-center min-w-[80px]">
+                                <span class="block text-xs uppercase">Oct</span>
+                                <span class="text-lg font-black">09</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-red-900">Grande Manifestation Nationale Interprofessionnelle</h4>
+                                <p class="text-xs text-red-700 mt-1">Paralysie des transports et services publics à Bruxelles à 4 jours du couperet budgétaire.</p>
+                                <span class="inline-block mt-2 text-[10px] bg-red-200 text-red-900 px-2 py-0.5 rounded font-mono">FGTB / CSC / CGSLB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commune Colere & FEB Card -->
+                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-red-400">Convergence des Luttes</span>
+                        <h3 class="text-lg font-bold mt-1 text-white">Le Phénomène "Commune Colère"</h3>
+                        <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                            Mouvement citoyen et syndical de terrain, Commune Colère rassemble militants, sans-papiers, féministes et étudiants. Leur coup de force — l'occupation du siège de la Fédération des Entreprises de Belgique (FEB) — symbolise la rupture radicale avec le modèle de concertation sociale classique.
+                        </p>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-slate-800 rounded-lg border border-slate-700 text-xs text-slate-300">
+                        <strong class="text-amber-400">Pression sur Vooruit & CD&V :</strong>
+                        Pris en tenaille entre leur participation gouvernementale et leur base syndicale (FGTB/CSC), les dirigeants socialistes et chrétiens-démocrates voient leur capital politique s'effondrer, accentuant le risque de défection.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: SCÉNARIOS DE RUPTURE -->
+        <section id="tab-scenarios" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">💥</span> Simulateur d'Instabilité & 3 Scénarios d'Effondrement
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Combinez les facteurs de friction politique pour mesurer le risque d'implosion de l'Arizona. Retrouvez ensuite le détail des trois scénarios de crise systémique identifiés par les politologues pour la fin de l'année 2026.
+                </p>
+            </div>
+
+            <!-- Stability Simulator -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">Simulateur Dynamique d'Effondrement du Gouvernement</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Blocage Fiscal TVA (MR vs N-VA) :</label>
+                        <input type="range" id="simTVA" min="0" max="100" value="85" class="w-full" oninput="updateStability()">
+                        <span class="text-[11px] text-slate-500 font-mono">Niveau : <span id="valTVA">85</span>%</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Pression UE (Déficit / PDE) :</label>
+                        <input type="range" id="simUE" min="0" max="100" value="90" class="w-full" oninput="updateStability()">
+                        <span class="text-[11px] text-slate-500 font-mono">Niveau : <span id="valUE">90</span>%</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ampleur des Grèves (Front Commun) :</label>
+                        <input type="range" id="simStrikes" min="0" max="100" value="80" class="w-full" oninput="updateStability()">
+                        <span class="text-[11px] text-slate-500 font-mono">Niveau : <span id="valStrikes">80</span>%</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Fronde des Régions / CPAS :</label>
+                        <input type="range" id="simCPAS" min="0" max="100" value="75" class="w-full" oninput="updateStability()">
+                        <span class="text-[11px] text-slate-500 font-mono">Niveau : <span id="valCPAS">75</span>%</span>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-xl border flex flex-col md:flex-row justify-between items-center gap-4" id="stabilityBox">
+                    <div>
+                        <span class="text-xs uppercase font-bold tracking-wider text-slate-500">Probabilité d'Implosion d'ici Décembre 2026 :</span>
+                        <h4 class="text-3xl font-black mt-1" id="stabilityScore">83.5 %</h4>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-3 py-1 text-xs font-bold rounded-full uppercase" id="stabilityBadge">CRITIQUE - RUPTURE IMMINENTE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Collapse Scenarios Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Scenario 1 -->
+                <div class="bg-white p-5 rounded-xl border border-red-200 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 text-red-600 font-bold text-sm">
+                        <span>🚨</span> Scénario 1 : Douzièmes Provisoires
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-900">Impasse Budgétaire & Sanction Européenne</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        L'incapacité de trancher entre hausse de TVA (N-VA) et coupes dans la santé (MR) empêche le vote du budget avant le 31 décembre. La Belgique passe aux douzièmes provisoires, déclenchant des amendes européennes et une sanction des agences de notation.
                     </p>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
-                    <strong>Impact :</strong> Sanction immédiate de la Commission UE et crise de confiance des marchés sur la dette belge.
-                </div>
-            </div>
 
-            <!-- Scenario 2 -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-full">Scénario 2</span>
-                        <span class="text-xs font-mono text-slate-500">Probabilité : 35%</span>
+                <!-- Scenario 2 -->
+                <div class="bg-white p-5 rounded-xl border border-amber-200 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 text-amber-700 font-bold text-sm">
+                        <span>🏛️</span> Scénario 2 : Révolte des Régions
                     </div>
-                    <h3 class="font-bold text-slate-900 text-base mb-2">Implosion des CPAS & Fronde Régionale</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                        L'explosion des charges du RIS accule les finances locales. Le Ministre-Président wallon Adrien Dolimont (MR) et l'UVCW dénoncent la « bombe sociale » fédérale. Les régionales de partis forcent leurs ministres à rompre la solidarité fédérale.
+                    <h4 class="text-sm font-bold text-slate-900">Faillite des CPAS & Implosion Interne</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Face au transfert d'un milliard de charges d'exclusion vers les communes wallonnes et bruxelloises, le Ministre-Président Dolimont et les élus locaux bloquent l'application des réformes. CD&V et Les Engagés quittent le gouvernement sous la pression de leurs bases localistes.
                     </p>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
-                    <strong>Impact :</strong> Rupture du dogme de la « coalition miroir » et blocage institutionnel inter-niveaux.
-                </div>
-            </div>
 
-            <!-- Scenario 3 -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-400 transition">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-full">Scénario 3</span>
-                        <span class="text-xs font-mono text-slate-500">Probabilité : 20%</span>
+                <!-- Scenario 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-800 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                        <span>🎯</span> Scénario 3 : Pivot N-VA
                     </div>
-                    <h3 class="font-bold text-slate-900 text-base mb-2">Pivot Souverainiste N-VA</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                        Bart De Wever prend acte de l'ingouvernabilité fédérale. La N-VA provoque la chute du gouvernement pour imposer le confédéralisme comme unique sujet des prochaines élections.
+                    <h4 class="text-sm font-bold text-slate-900">L'Échec Fédéral comme Levier Confédéral</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Bart De Wever prend acte de l'ingouvernabilité de l'Arizona, fait sauter l'alliance et retourne aux urnes. La N-VA fait de l'impossibilité de gérer le pays le thème central de sa campagne pour imposer une 7e Réforme de l'État actant la scission définitive.
                     </p>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
-                    <strong>Impact :</strong> Ouverture d'une crise existentielle sur la viabilité même du cadre institutionnel belge.
-                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <p class="font-bold text-slate-200">Observatoire Politique Coalition Arizona (2025-2026)</p>
+                <p class="text-slate-500 mt-0.5">Application d'Analyse Synthetique & Exploration Interactives des Données</p>
+            </div>
+            <div class="flex gap-4 text-slate-400">
+                <span>Sources : CRISP, Cevipol, Cour des comptes, BNB, UVCW</span>
             </div>
         </div>
+    </footer>
 
-        <!-- Warning Checklist -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <span>🔍</span> Liste de Contrôle des Signaux d'Alerte Décelés
-            </h3>
+    <script>
+        // Tab switching functionality
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div class="flex items-start gap-2 p-3 bg-red-50 text-red-900 rounded-lg border border-red-200">
-                    <span class="font-bold text-red-600 text-sm">✓</span>
-                    <div>
-                        <strong>Ultimatums publics dans le Kern :</strong> Bart De Wever lient systématiquement le maintien du gouvernement à des arbitrages budgétaires sans concession.
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-2 p-3 bg-red-50 text-red-900 rounded-lg border border-red-200">
-                    <span class="font-bold text-red-600 text-sm">✓</span>
-                    <div>
-                        <strong>Attaques publiques inter-présidents :</strong> Georges-Louis Bouchez (MR) jurant la démolition de la taxe plus-values voulue par Vooruit.
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-2 p-3 bg-red-50 text-red-900 rounded-lg border border-red-200">
-                    <span class="font-bold text-red-600 text-sm">✓</span>
-                    <div>
-                        <strong>Désaveu de la Cour des comptes :</strong> Budget initial 2026 qualifié de cavalerie comptable sans base méthodologique.
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-2 p-3 bg-red-50 text-red-900 rounded-lg border border-red-200">
-                    <span class="font-bold text-red-600 text-sm">✓</span>
-                    <div>
-                        <strong>Jection du dialogue social vers la rue :</strong> Front commun syndical massif et émergence d'assemblées de lutte radicales (« Commune Colère »).
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<!-- Footer -->
-<footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-            <p class="font-bold text-slate-200 text-sm">Observatoire Politico-Économique Belge (2025-2026)</p>
-            <p class="text-slate-500 mt-1">Application interactive de synthèse critique basée sur les données du Cevipol (ULB), du CRISP, de la BNB, du CSF et de la Cour des comptes.</p>
-        </div>
-        <div class="flex gap-4 text-slate-400">
-            <span class="font-mono bg-slate-800 px-2 py-1 rounded">Mise à jour : Automne 2026</span>
-            <span class="font-mono bg-slate-800 px-2 py-1 rounded">Régime : Arizona Federal</span>
-        </div>
-    </div>
-</footer>
-
-<!-- JavaScript Logic & Chart Initializations -->
-<script>
-    // Global State & Tab Switcher Logic
-    function switchTab(tabId) {
-        // Hide all sections
-        const sections = ['overview', 'architecture', 'budget', 'social', 'fiscal', 'strikes', 'scenarios'];
-        sections.forEach(id => {
-            const el = document.getElementById('tab-' + id);
-            if (el) el.classList.add('hidden');
-
-            const btn = document.getElementById('nav-' + id);
-            if (btn) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('text-amber-700', 'bg-amber-50', 'font-semibold', 'border-b-2', 'border-amber-600');
-                btn.classList.add('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('text-amber-700', 'bg-amber-50', 'font-semibold', 'border-b-2', 'border-amber-600');
+                activeBtn.classList.remove('text-slate-600');
             }
-        });
 
-        // Show selected section
-        const activeSection = document.getElementById('tab-' + tabId);
-        if (activeSection) activeSection.classList.remove('hidden');
-
-        const activeBtn = document.getElementById('nav-' + tabId);
-        if (activeBtn) {
-            activeBtn.classList.remove('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
-            activeBtn.classList.add('text-amber-700', 'bg-amber-50', 'font-semibold', 'border-b-2', 'border-amber-600');
+            // Trigger chart renders when tab is shown
+            if (tabId === 'overview') renderDeficitChart();
+            if (tabId === 'architecture') renderRadarChart();
         }
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        // Global Chart Instance store
+        let chartDeficit = null;
+        let chartRadar = null;
 
-    // Risk Calculator Logic
-    function updateRiskCalculator() {
-        const tva = parseInt(document.getElementById('slider-tva').value);
-        const social = parseInt(document.getElementById('slider-social').value);
-        const cpas = parseInt(document.getElementById('slider-cpas').value);
-        const nva = parseInt(document.getElementById('slider-nva').value);
-
-        // Update UI Labels
-        document.getElementById('val-tva').textContent = tva > 75 ? 'Bloqué (' + tva + '%)' : 'Négociable (' + tva + '%)';
-        document.getElementById('val-social').textContent = social > 75 ? 'Maximale (' + social + '%)' : 'Modérée (' + social + '%)';
-        document.getElementById('val-cpas').textContent = cpas > 75 ? 'Élevée (' + cpas + '%)' : 'Moyenne (' + cpas + '%)';
-        document.getElementById('val-nva').textContent = nva > 75 ? 'Très Fort (' + nva + '%)' : 'Souple (' + nva + '%)';
-
-        // Calculate Score (weighted average)
-        const score = Math.round((tva * 0.35) + (social * 0.25) + (cpas * 0.20) + (nva * 0.20));
-
-        const scoreEl = document.getElementById('risk-score');
-        const barEl = document.getElementById('risk-bar');
-        const interpEl = document.getElementById('risk-interpretation');
-
-        scoreEl.textContent = score + ' %';
-        barEl.style.width = score + '%';
-
-        if (score >= 80) {
-            scoreEl.className = 'text-3xl font-black text-red-600';
-            interpEl.textContent = 'Implosion quasi-certaine d\'ici décembre 2026 sans compromis budgétaire majeur sur la fiscalité ou la santé.';
-        } else if (score >= 60) {
-            scoreEl.className = 'text-3xl font-black text-amber-600';
-            interpEl.textContent = 'Friction critique : Risque d\'installation du régime des douzièmes provisoires et blocage des réformes.';
-        } else {
-            scoreEl.className = 'text-3xl font-black text-emerald-600';
-            interpEl.textContent = 'Stabilité précaire : L\'exécutif survit grâce à des concessions tactiques temporaires.';
+        function renderDeficitChart() {
+            if (chartDeficit) chartDeficit.destroy();
+            const ctx = document.getElementById('chartDeficitTrajectory').getContext('2d');
+            chartDeficit = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2025', '2026', '2027', '2028', '2029'],
+                    datasets: [
+                        {
+                            label: 'Déficit Tendanciel Sans Réformes (6% PIB en 2029)',
+                            data: [3.1, 3.8, 4.5, 5.2, 6.0],
+                            borderColor: '#dc2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Objectif Trajectoire Arizona / UE (3% PIB)',
+                            data: [3.1, 2.9, 2.4, 1.9, 1.5],
+                            borderColor: '#059669',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: '% du PIB' }, min: 0, max: 7 }
+                    }
+                }
+            });
         }
-    }
 
-    // Capital Gains Tax Calculator Logic
-    function calculateCapitalGainsTax() {
-        const gain = parseFloat(document.getElementById('calc-gain').value) || 0;
-        const shareType = document.getElementById('calc-share').value;
-        const optOut = document.getElementById('calc-optout').value;
+        function renderRadarChart() {
+            if (chartRadar) chartRadar.destroy();
+            const ctx = document.getElementById('chartRadarIdeology').getContext('2d');
+            chartRadar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Rigueur Budgétaire',
+                        'Taxation Capital',
+                        'Flexibilité Travail',
+                        'Sécurité / Migr.',
+                        'Confédéralisme'
+                    ],
+                    datasets: [
+                        {
+                            label: 'N-VA',
+                            data: [90, 20, 85, 95, 100],
+                            borderColor: '#d97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.2)'
+                        },
+                        {
+                            label: 'MR',
+                            data: [95, 10, 95, 75, 20],
+                            borderColor: '#1d4ed8',
+                            backgroundColor: 'rgba(29, 78, 216, 0.2)'
+                        },
+                        {
+                            label: 'Vooruit',
+                            data: [50, 85, 30, 40, 30],
+                            borderColor: '#dc2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.2)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+                    },
+                    scales: {
+                        r: { min: 0, max: 100, ticks: { display: false } }
+                    }
+                }
+            });
+        }
 
-        const baseExemption = 10000; // 10k€ exemption
-        let taxableGain = Math.max(0, gain - baseExemption);
-        let taxOwed = 0;
+        // CPAS Calculator Logic
+        function calculateCPAS() {
+            const commune = document.getElementById('selectCommune').value;
+            const empRate = parseFloat(document.getElementById('selectEmpRate').value);
 
-        if (shareType === 'normal') {
-            taxOwed = taxableGain * 0.10; // Flat 10%
-        } else {
-            // Substantial participation (>20%) progressive brackets
-            if (taxableGain <= 1000000) {
-                taxOwed = 0;
-            } else if (taxableGain <= 2500000) {
-                taxOwed = (taxableGain - 1000000) * 0.0125;
-            } else if (taxableGain <= 5000000) {
-                taxOwed = (1500000 * 0.0125) + ((taxableGain - 2500000) * 0.025);
-            } else if (taxableGain <= 10000000) {
-                taxOwed = (1500000 * 0.0125) + (2500000 * 0.025) + ((taxableGain - 5000000) * 0.05);
+            let baseExcluded = 0;
+            let costPerRIS = 8500; // Annual cost per RIS after federal decreasing subsidy
+
+            if (commune === 'petite') baseExcluded = 120;
+            else if (commune === 'moyenne') baseExcluded = 650;
+            else if (commune === 'grande') baseExcluded = 3500;
+            else if (commune === 'wallonie') baseExcluded = 55000;
+
+            const newRIS = Math.round(baseExcluded * (1 - empRate));
+            const totalCost = newRIS * costPerRIS;
+
+            document.getElementById('resExcluded').innerText = baseExcluded.toLocaleString('fr-BE');
+            document.getElementById('resRIS').innerText = newRIS.toLocaleString('fr-BE');
+            document.getElementById('resCost').innerText = totalCost.toLocaleString('fr-BE') + ' €';
+        }
+
+        // Capital Gains Tax Calculator Logic
+        function calculateTax() {
+            const vInit = parseFloat(document.getElementById('valInit').value) || 0;
+            const vSale = parseFloat(document.getElementById('valSale').value) || 0;
+            const shareType = document.getElementById('typeShare').value;
+
+            const grossGain = Math.max(0, vSale - vInit);
+            let tax = 0;
+            let exempt = 0;
+
+            if (shareType === 'standard') {
+                const franchise = 10000;
+                exempt = Math.min(grossGain, franchise);
+                const taxable = Math.max(0, grossGain - franchise);
+                tax = taxable * 0.10;
             } else {
-                taxOwed = (1500000 * 0.0125) + (2500000 * 0.025) + (5000000 * 0.05) + ((taxableGain - 10000000) * 0.10);
+                // Substantial shareholding (>20%) progressive rules
+                if (grossGain <= 1000000) {
+                    exempt = grossGain;
+                    tax = 0;
+                } else {
+                    exempt = 1000000;
+                    let rem = grossGain - 1000000;
+
+                    // 1M to 2.5M at 1.25%
+                    let t1 = Math.min(rem, 1500000);
+                    tax += t1 * 0.0125;
+                    rem -= t1;
+
+                    // 2.5M to 5M at 2.5%
+                    if (rem > 0) {
+                        let t2 = Math.min(rem, 2500000);
+                        tax += t2 * 0.025;
+                        rem -= t2;
+                    }
+
+                    // 5M to 10M at 5%
+                    if (rem > 0) {
+                        let t3 = Math.min(rem, 5000000);
+                        tax += t3 * 0.05;
+                        rem -= t3;
+                    }
+
+                    // > 10M at 10%
+                    if (rem > 0) {
+                        tax += rem * 0.10;
+                    }
+                }
+            }
+
+            const effectiveRate = grossGain > 0 ? ((tax / grossGain) * 100).toFixed(1) : '0.0';
+
+            document.getElementById('txtGain').innerText = grossGain.toLocaleString('fr-BE') + ' €';
+            document.getElementById('txtExempt').innerText = '- ' + exempt.toLocaleString('fr-BE') + ' €';
+            document.getElementById('txtTax').innerText = tax.toLocaleString('fr-BE') + ' €';
+            document.getElementById('txtEffectiveRate').innerText = effectiveRate + ' %';
+        }
+
+        // Strikes Filter Logic
+        function filterStrikes(cat) {
+            const items = document.querySelectorAll('.strike-item');
+            items.forEach(item => {
+                if (cat === 'all' || item.getAttribute('data-cat') === cat) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Dynamic Stability Simulator Logic
+        function updateStability() {
+            const tva = parseInt(document.getElementById('simTVA').value);
+            const ue = parseInt(document.getElementById('simUE').value);
+            const strikes = parseInt(document.getElementById('simStrikes').value);
+            const cpas = parseInt(document.getElementById('simCPAS').value);
+
+            document.getElementById('valTVA').innerText = tva;
+            document.getElementById('valUE').innerText = ue;
+            document.getElementById('valStrikes').innerText = strikes;
+            document.getElementById('valCPAS').innerText = cpas;
+
+            const score = (tva * 0.35) + (ue * 0.25) + (strikes * 0.20) + (cpas * 0.20);
+            const scoreFormatted = score.toFixed(1);
+
+            const scoreEl = document.getElementById('stabilityScore');
+            const badgeEl = document.getElementById('stabilityBadge');
+            const boxEl = document.getElementById('stabilityBox');
+
+            scoreEl.innerText = scoreFormatted + ' %';
+
+            if (score > 75) {
+                badgeEl.innerText = 'CRITIQUE - RUPTURE IMMINENTE';
+                badgeEl.className = 'px-3 py-1 text-xs font-bold rounded-full uppercase bg-red-100 text-red-800';
+                boxEl.className = 'p-5 rounded-xl border border-red-300 bg-red-50 flex flex-col md:flex-row justify-between items-center gap-4';
+            } else if (score > 45) {
+                badgeEl.innerText = 'TENSION SÉVÈRE - CONCLAVE BLOQUÉ';
+                badgeEl.className = 'px-3 py-1 text-xs font-bold rounded-full uppercase bg-amber-100 text-amber-800';
+                boxEl.className = 'p-5 rounded-xl border border-amber-300 bg-amber-50 flex flex-col md:flex-row justify-between items-center gap-4';
+            } else {
+                badgeEl.innerText = 'ACCORD FRAGILE SOUS COMPROMIS';
+                badgeEl.className = 'px-3 py-1 text-xs font-bold rounded-full uppercase bg-emerald-100 text-emerald-800';
+                boxEl.className = 'p-5 rounded-xl border border-emerald-300 bg-emerald-50 flex flex-col md:flex-row justify-between items-center gap-4';
             }
         }
 
-        const effectiveRate = gain > 0 ? ((taxOwed / gain) * 100).toFixed(1) : 0;
-
-        document.getElementById('tax-result-amount').textContent = Math.round(taxOwed).toLocaleString('fr-FR') + ' €';
-        document.getElementById('tax-result-rate').textContent = effectiveRate + ' %';
-    }
-
-    // Strike Events Filter Logic
-    function filterEvents(type) {
-        const cards = document.querySelectorAll('.event-card');
-        cards.forEach(card => {
-            if (type === 'all') {
-                card.classList.remove('hidden');
-            } else if (type === 'syndical') {
-                if (card.classList.contains('event-syndical')) card.classList.remove('hidden');
-                else card.classList.add('hidden');
-            } else if (type === 'commune') {
-                if (card.classList.contains('event-commune')) card.classList.remove('hidden');
-                else card.classList.add('hidden');
-            }
-        });
-    }
-
-    // Initialize Charts when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // 1. Deficit Trajectory Line Chart
-        const ctxDeficit = document.getElementById('deficitChart').getContext('2d');
-        new Chart(ctxDeficit, {
-            type: 'line',
-            data: {
-                labels: ['2025', '2026', '2027', '2028', '2029 (Projection)'],
-                datasets: [
-                    {
-                        label: 'Politique Constante (Sans Rigueur)',
-                        data: [20.0, 25.2, 30.5, 36.0, 42.0],
-                        borderColor: '#dc2626',
-                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Objectif Gouvernement Arizona',
-                        data: [20.0, 18.5, 16.0, 14.2, 12.0],
-                        borderColor: '#d97706',
-                        borderWidth: 3,
-                        borderDash: [5, 5],
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Plafond Sécurité CSF / UE (1.5% Déficit Struct.)',
-                        data: [15.0, 14.0, 13.0, 11.5, 10.0],
-                        borderColor: '#2563eb',
-                        borderWidth: 2,
-                        tension: 0.1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) { return context.dataset.label + ': ' + context.parsed.y + ' Mrd €'; }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        title: { display: true, text: 'Milliards € (Déficit)', font: { size: 11 } },
-                        grid: { color: '#f1f5f9' }
-                    },
-                    x: { grid: { color: '#f1f5f9' } }
-                }
-            }
-        });
-
-        // 2. Party Ideological Radar Chart
-        const ctxRadar = document.getElementById('partyRadarChart').getContext('2d');
-        new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: [
-                    'Axe Rigueur Budgétaire',
-                    'Axe Libéralisme / Anti-Taxe',
-                    'Axe Justice Fiscale (Capital)',
-                    'Axe Régionalisme / Confédéralisme',
-                    'Axe Défense Protection Sociale'
-                ],
-                datasets: [
-                    {
-                        label: 'N-VA (De Wever)',
-                        data: [95, 80, 20, 100, 20],
-                        borderColor: '#d97706',
-                        backgroundColor: 'rgba(217, 119, 6, 0.15)',
-                        borderWidth: 2
-                    },
-                    {
-                        label: 'MR (Bouchez)',
-                        data: [85, 100, 10, 40, 15],
-                        borderColor: '#1d4ed8',
-                        backgroundColor: 'rgba(29, 78, 216, 0.15)',
-                        borderWidth: 2
-                    },
-                    {
-                        label: 'Vooruit (Rousseau)',
-                        data: [50, 20, 95, 30, 90],
-                        borderColor: '#dc2626',
-                        backgroundColor: 'rgba(220, 38, 38, 0.15)',
-                        borderWidth: 2
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
-                },
-                scales: {
-                    r: {
-                        angleLines: { color: '#e2e8f0' },
-                        grid: { color: '#f1f5f9' },
-                        pointLabels: { font: { size: 10, weight: 'bold' } },
-                        ticks: { display: false, backdropColor: 'transparent' },
-                        suggestedMin: 0,
-                        suggestedMax: 100
-                    }
-                }
-            }
-        });
-
-        // 3. CPAS Cost Transfer Bar Chart
-        const ctxCpas = document.getElementById('cpasCostChart').getContext('2d');
-        new Chart(ctxCpas, {
-            type: 'bar',
-            data: {
-                labels: ['2025', '2026 (Année Vagues 1-3)', '2027', '2028', '2029 (Fin Législature)'],
-                datasets: [
-                    {
-                        label: 'Part Couverte par Subvention Fédérale (Dégressive)',
-                        data: [120, 250, 210, 180, 160],
-                        backgroundColor: '#94a3b8'
-                    },
-                    {
-                        label: 'Surcoût Net à la Charge des Communes / CPAS Wallons',
-                        data: [20, 110, 220, 310, 340],
-                        backgroundColor: '#dc2626'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) { return context.dataset.label + ': ' + context.parsed.y + ' M€'; }
-                        }
-                    }
-                },
-                scales: {
-                    x: { stacked: true, grid: { color: '#f1f5f9' } },
-                    y: {
-                        stacked: true,
-                        title: { display: true, text: 'Millions € (Coût RIS Wallonie)', font: { size: 11 } },
-                        grid: { color: '#f1f5f9' }
-                    }
-                }
-            }
-        });
-
-        // Run initial calculation
-        calculateCapitalGainsTax();
-    });
-</script>
+        // Initialize on load
+        window.onload = function() {
+            renderDeficitChart();
+            calculateCPAS();
+            calculateTax();
+            updateStability();
+        };
+    </script>
+</body>
+</html>

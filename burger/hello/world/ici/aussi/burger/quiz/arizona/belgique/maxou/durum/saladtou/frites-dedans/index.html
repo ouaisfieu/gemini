@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observatoire Politique Arizona 2025-2026 | Analyse Critique & Signaux de Rupture</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nva: '#d97706',      <!-- Amber/Yellow -->
+                        mr: '#1d4ed8',       <!-- Blue -->
+                        vooruit: '#dc2626',  <!-- Red -->
+                        cdv: '#ea580c',      <!-- Orange -->
+                        engages: '#059669',  <!-- Green -->
+                        slateDark: '#0f172a',
+                        cardBg: '#ffffff',
+                        creamBg: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        /* Custom scrollbar for clean visual appearance */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Slate & Amber Friction (Warm Slate, Deep Navy, Amber/Terracotta Accent, Soft Cream/Grey background) -->
+    <!-- Application Structure Plan:
+        1. Sticky Header & Live Status Bar: Gives immediate snapshot of political tension (88% Crisis Index), key metrics, and nav tabs.
+        2. View 1 - Baromètre & Vue d'Ensemble: Executive dashboard with macro metrics, interactive stability calculator, deficit trajectory chart, and key alerts.
+        3. View 2 - Architecture & Particratie: Ideological breakdown of the 5 coalition parties, N-VA confederalism strategy radar, and governance Ultimatums.
+        4. View 3 - Étau Budgétaire & Audit Cour des Comptes: Analysis of the 23.3B€ budget gap, EU Excessive Deficit Procedure, and Cour des Comptes debunking of gov receipts.
+        5. View 4 - Démantèlement Social & Transfert CPAS: Timeline of 6 unemployment exclusion waves, CPAS financial transfer calculator, and pension malus rules.
+        6. View 5 - Fracture Fiscale & Veto TVA: Interactive Capital Gains Tax simulator (calculating 'photo moment' exemptions & brackets) + TVA vs Cuts deadlock.
+        7. View 6 - Mobilisation Sociale & Front Commun: Filterable calendar of Autumn 2026 strikes and 'Commune Colère' citizen-labor movement.
+        8. View 7 - Scénarios de Rupture & Signaux d'Alerte: 3 detailed collapse scenarios (Douzièmes provisoires, Regional revolt, Sovereign N-VA pivot) with warning checklist.
+    -->
+    <!-- Visualization & Content Choices:
+        - Deficit Trajectory: Line Chart comparing Status Quo vs Arizona Plan vs EU Ceiling.
+        - Ideological Divergence: Radar Chart comparing N-VA, MR, Vooruit, CD&V/Engagés on key policy axes.
+        - CPAS Cost Impact: Bar Chart showing annual cost transfer to municipalities across Wallonia & Brussels.
+        - Capital Gains Tax Simulator: Interactive JS logic demonstrating exemptions and tax rates for private vs substantial shareholders (>20%).
+        - Dynamic Crisis Index Slider: Interactive widget allowing users to adjust political variables and observe failure probability.
+        - NO SVG or Mermaid JS used. Visual icons implemented using UTF-8 Unicode symbols and Tailwind CSS styling.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Top Status Banner -->
+    <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <span class="font-bold tracking-wide uppercase text-red-400">Statut Réseau Politique (Automne 2026) :</span>
+                <span>Tension Systémique Maximale — Échéance Budgétaire 13 Octobre 2026</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400 text-xs">
+                <span>Gouvernement De Wever (N-VA / MR / Vooruit / CD&V / Engagés)</span>
+                <span class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 text-slate-300 font-mono">PDE UE : Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-slate-900 text-amber-500 flex items-center justify-center font-black text-xl shadow-inner border border-amber-500/30">
+                        AZ
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 leading-tight">Observatoire Coalition Arizona</h1>
+                        <p class="text-xs text-slate-500">Analyse Critique & Dynamiques de Rupture (2025-2026)</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden lg:flex space-x-1 text-sm font-medium" id="main-nav">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn px-3 py-2 rounded-md text-amber-700 bg-amber-50 font-semibold border-b-2 border-amber-600 transition">Vue d'Ensemble</button>
+                    <button onclick="switchTab('architecture')" id="nav-architecture" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Particratie & Idéologie</button>
+                    <button onclick="switchTab('budget')" id="nav-budget" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Étau Budgétaire & Audit</button>
+                    <button onclick="switchTab('social')" id="nav-social" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Impact Social & CPAS</button>
+                    <button onclick="switchTab('fiscal')" id="nav-fiscal" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Fracture Fiscale & TVA</button>
+                    <button onclick="switchTab('strikes')" id="nav-strikes" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Riposte Sociale</button>
+                    <button onclick="switchTab('scenarios')" id="nav-scenarios" class="tab-btn px-3 py-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Signaux de Rupture</button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden">
+                    <select onchange="switchTab(this.value)" class="bg-slate-100 border border-slate-300 text-slate-800 text-sm rounded-lg p-2 font-medium">
+                        <option value="overview">Vue d'Ensemble</option>
+                        <option value="architecture">Particratie & Idéologie</option>
+                        <option value="budget">Étau Budgétaire & Audit</option>
+                        <option value="social">Impact Social & CPAS</option>
+                        <option value="fiscal">Fracture Fiscale & TVA</option>
+                        <option value="strikes">Riposte Sociale</option>
+                        <option value="scenarios">Signaux de Rupture</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= SECTION 1: VUE D'ENSEMBLE & BAROMÈTRE ================= -->
+        <section id="tab-overview" class="space-y-6">
+            <!-- Introduction block -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <span class="text-amber-600">📌</span> Décodage Synthetique de la Crise Politico-Économique Belge
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Installé le 3 février 2025 sous la conduite de Bart De Wever (N-VA), le gouvernement fédéral « Arizona » réunit la N-VA, le MR, Vooruit, le CD&V et Les Engagés. En cet automne 2026, l'exécutif fait face à une triple impasse : une <strong>procédure européenne pour déficit excessif</strong> exigeant 23,3 milliards d'euros d'économie d'ici 2029, un <strong>conflit idéologique irréconciliable</strong> sur la fiscalité (hausse de TVA vs impôt sur les plus-values), et une <strong>mobilisation citoyenne et syndicale d'ampleur historique</strong>. Ce tableau de bord offre une exploration analytique complète et interactive des dynamiques et risques d'effondrement de cette majorité.
+                </p>
+            </div>
+
+            <!-- Key Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-400 transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Trou Budgétaire (2029)</p>
+                            <h3 class="text-2xl font-black text-slate-900 mt-1">42 Mrd €</h3>
+                        </div>
+                        <span class="p-2 bg-red-100 text-red-700 rounded-lg text-lg">📉</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">Déficit estimé à politique constante (6% du PIB)

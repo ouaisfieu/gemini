@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observatoire Budgétaire Belge - Rapport & Simulateur 23 Mds €</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f3f9',
+                            100: '#d9e2ec',
+                            700: '#1b2a4a',
+                            800: '#0f172a',
+                            900: '#0b1120',
+                        },
+                        belgian: {
+                            red: '#e11d48',
+                            gold: '#d97706',
+                            dark: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+        /* Custom scrollbar for tab containers */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased leading-relaxed flex flex-col min-h-screen">
+
+    <!-- Chosen Palette: Warm Professional Slate (Slate, Indigo, Emerald, Rose, Amber) -->
+    <!-- Application Structure Plan: Designed as an interactive 5-tab executive dashboard. Section 1 covers Macroeconomic & Debt framing. Section 2 details EU Governance & the High Council of Finance paradox. Section 3 analyzes Primary Spending & Social Shocks (including DULBEA unemployment cascade model). Section 4 breaks down Tax Strategy & "Super Nota" Tax Shift. Section 5 provides an interactive "23 Billion Euro Budget Balancer" allowing users to build a budget package and analyze the macroeconomic trade-offs in real time. This non-linear thematic flow transforms dense fiscal text into an explorable decision tool. -->
+    <!-- Visualization & Content Choices: 
+    - Debt & Deficit Evolution (2024-2031) -> Chart.js Combined Line/Bar Chart -> Interaction: Hover tooltips & metric toggle -> Allows visualizing the "snowball effect" and trajectory gap.
+    - Net Spending Ceiling vs Projection -> Chart.js Bar Chart -> Interaction: EU vs Real trend comparison -> Highlights the High Council of Finance paradox.
+    - Unemployment 2-Year Cap Impact (DULBEA Model) -> Dynamic Interactive Flow Diagram & Dynamic Bar Chart -> Breakdown of 89,112 beneficiaries shifting to Job/RIS/Invalidity -> Shows how €813M gross savings yield only €20M net federal gain and €200M municipal deficit.
+    - Interactive Budget Simulator (23B Target) -> Custom Vanilla JS State Manager + Chart.js Gauge/Progress Bar -> Interactive Sliders & Toggles -> Enables users to test policy scenarios and balance the €23 billion effort by 2029 while monitoring social & economic feedback loops. 
+    - NO SVG graphics used. NO Mermaid JS used. Canvas and HTML/CSS structure used exclusively. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="flex space-x-1">
+                        <span class="w-3 h-6 bg-slate-900 rounded-sm"></span>
+                        <span class="w-3 h-6 bg-amber-500 rounded-sm"></span>
+                        <span class="w-3 h-6 bg-rose-600 rounded-sm"></span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg md:text-xl tracking-tight text-white">Observatoire Budgétaire Belge</h1>
+                        <p class="text-xs text-slate-400 hidden sm:block">Conclave de Septembre & Trajectoire 2025-2031 (23 Mds €)</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-2 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded border border-rose-500/30">PDE UE Activée</span>
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">Moody's : A1 (Dégradé)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-slate-800 border-t border-slate-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-1 overflow-x-auto no-scrollbar py-2 text-xs md:text-sm font-medium">
+                    <button onclick="switchTab('macro')" id="tab-macro" class="tab-btn px-4 py-2 rounded-md transition-all duration-150 whitespace-nowrap bg-indigo-600 text-white shadow">
+                        📊 1. Cadrage & Dette
+                    </button>
+                    <button onclick="switchTab('gouvernance')" id="tab-gouvernance" class="tab-btn px-4 py-2 rounded-md transition-all duration-150 whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700">
+                        🇪🇺 2. Gouvernance & Paradoxe CSF
+                    </button>
+                    <button onclick="switchTab('depenses')" id="tab-depenses" class="tab-btn px-4 py-2 rounded-md transition-all duration-150 whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700">
+                        🏥 3. Dépenses & Modèle DULBEA
+                    </button>
+                    <button onclick="switchTab('fiscalite')" id="tab-fiscalite" class="tab-btn px-4 py-2 rounded-md transition-all duration-150 whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700">
+                        💶 4. Tax Shift & "Super Nota"
+                    </button>
+                    <button onclick="switchTab('simulateur')" id="tab-simulateur" class="tab-btn px-4 py-2 rounded-md transition-all duration-150 whitespace-nowrap text-slate-300 hover:text-white hover:bg-slate-700 bg-emerald-700/60 hover:bg-emerald-600">
+                        🧮 5. Simulateur 23 Mds €
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= SECTION 1: CADRAGE MACRO & DETTE ================= -->
+        <section id="section-macro" class="tab-content space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">1. Cadrage Macroéconomique et Viabilité de la Dette Souveraine</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Cette section analyse l'équation macroéconomique complexe de la Belgique à l'approche du conclave budgétaire de septembre. 
+                    Confrontée à une croissance modérée (0,7% à 1,3%), une inflation persistante tirée par les services et une hausse continue de la charge de la dette (OLO à 10 ans &gt; 4,1%), la Belgique s'expose à l'effet "boule de neige". Explorez les indicateurs clés et l'évolution projected du déficit et de la dette brute jusqu'en 2031.
+                </p>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-semibold text-slate-500 uppercase">Effort Requis (2029)</div>
+                    <div class="text-2xl font-extrabold text-rose-600 mt-1">23,0 Mds €</div>
+                    <div class="text-xs text-slate-500 mt-1">Période d'ajustement 7 ans (2025-2031)</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-semibold text-slate-500 uppercase">Déficit Public 2025</div>
+                    <div class="text-2xl font-extrabold text-amber-600 mt-1">-5,2 % PIB</div>
+                    <div class="text-xs text-slate-500 mt-1">Dérive vers -6,3 % en 2031 (spontané)</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-semibold text-slate-500 uppercase">Dette Publique 2025</div>
+                    <div class="text-2xl font-extrabold text-slate-800 mt-1">107,9 % PIB</div>
+                    <div class="text-xs text-slate-500 mt-1">Projection 2031 : 122,0 % PIB</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs font-semibold text-slate-500 uppercase">Charge d'Intérêts (2028)</div>
+                    <div class="text-2xl font-extrabold text-indigo-600 mt-1">3,3 % PIB</div>
+                    <div class="text-xs text-slate-500 mt-1">En hausse depuis 2,4 % en 2025</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Chart & Analytical Commentary -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-slate-900">Trajectoire du Solde Budgétaire et de la Dette Brute (% PIB)</h3>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">Source : Bureau du Plan / BNB / Com. EU</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="macroChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100">
+                        * Note: À politique inchangée, la dette publique franchit les 117% en 2029 et 122% en 2031, poussée par l'effet boule de neige des taux d'intérêt (OLO &gt; 4,1%).
+                    </div>
+                </div>
+
+                <!-- Strategic Commentary Box -->
+                <div class="bg-slate-900 text-white p-6 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 text-amber-400 mb-3">
+                            <span class="text-lg">⚠️</span>
+                            <h3 class="font-bold text-base">Pression des Agences de Notation</h3>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            L'agence **Moody's** a révisé la note souveraine de la Belgique de <strong class="text-white">Aa3 à A1</strong> avec perspective stable. Cette décision reflète les incertitudes sur la capacité politique à exécuter les réformes structurelles.
+                        </p>
+                        <ul class="text-xs text-slate-300 space-y-2.5 mb-4">
+                            <li class="flex items-start">
+                                <span class="text-rose-400 mr-2">•</span>
+                                <span><strong>Effet Domino Régional :</strong> Dégradation immédiate de la Région wallonne à Baa1, augmentant son coût de refinancement.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-amber-400 mr-2">•</span>
+                                <span><strong>Bons d'État :</strong> L'Agence de la Dette diversifie via l'épargne privée (2,75% sur 1 an, 3,70% sur 10 ans) pour contenir les spreads face au Bund allemand.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigo-400 mr-2">•</span>
+                                <span><strong>Productivité en berne :</strong> L'OCDE alerte sur le ralentissement des gains de productivité et le manque de compétences.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs text-slate-400">
+                        💡 <strong>Impératif :</strong> L'assainissement net de 23 Mds € est indispensable pour éviter une hausse incontrôlée du spread souverain.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Macro Data Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                    <h3 class="font-bold text-slate-900 text-sm">Tableau Synthétique des Projections Macroéconomiques (2024 - 2027)</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs md:text-sm">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-4">Indicateur</th>
+                                <th class="py-3 px-4">2024 (Estimé)</th>
+                                <th class="py-3 px-4">2025 (Projeté)</th>
+                                <th class="py-3 px-4">2026 (Projeté)</th>
+                                <th class="py-3 px-4">2027 (Projeté)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700">
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium text-slate-900">Croissance du PIB réel (%)</td>
+                                <td class="py-3 px-4">1,0 % - 1,4 %</td>
+                                <td class="py-3 px-4">1,3 %</td>
+                                <td class="py-3 px-4 text-rose-600 font-semibold">0,7 % - 1,0 %</td>
+                                <td class="py-3 px-4">0,9 % - 1,1 %</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium text-slate-900">Inflation (IPC, %)</td>
+                                <td class="py-3 px-4">3,1 %</td>
+                                <td class="py-3 px-4">3,0 %</td>
+                                <td class="py-3 px-4 font-semibold text-amber-600">3,4 %</td>
+                                <td class="py-3 px-4">2,6 %</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium text-slate-900">Taux de chômage (%)</td>
+                                <td class="py-3 px-4">6,0 %</td>
+                                <td class="py-3 px-4">6,2 %</td>
+                                <td class="py-3 px-4">6,5 % - 6,6 %</td>
+                                <td class="py-3 px-4">6,5 %</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 bg-rose-50/40">
+                                <td class="py-3 px-4 font-medium text-rose-900">Solde budgétaire (% PIB)</td>
+                                <td class="py-3 px-4 text-rose-700">-4,4 % - -4,5 %</td>
+                                <td class="py-3 px-4 text-rose-700 font-bold">-5,2 %</td>
+                                <td class="py-3 px-4 text-rose-700 font-bold">-5,0 % - -5,2 %</td>
+                                <td class="py-3 px-4 text-rose-700 font-bold">-5,1 % - -5,4 %</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-medium text-slate-900">Dette publique brute (% PIB)</td>
+                                <td class="py-3 px-4">106,0 %</td>
+                                <td class="py-3 px-4">107,4 % - 107,9 %</td>
+                                <td class="py-3 px-4">109,8 % - 110,5 %</td>
+                                <td class="py-3 px-4 font-bold text-slate-900">112,8 %</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: GOUVERNANCE UE & PARADOXE CSF ================= -->
+        <section id="section-gouvernance" class="tab-content hidden space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">2. La Nouvelle Gouvernance Européenne et le Paradoxe du CSF</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Le nouveau cadre économique européen remplace les réductions brutes par la <strong>règle de croissance des dépenses primaires nettes</strong> et l'Analyse de Soutenabilité de la Dette (DSA). La Belgique bénéficie d'une trajectoire d'ajustement sur 7 ans (jusqu'en 2031). Néanmoins, les travaux de la section « Besoins de financement » du Conseil Supérieur des Finances (CSF) mettent en lumière une faille méthodologique majeure : la norme de dépense européenne à elle seule laisse un déficit résiduel massif de 20 Mds € en 2029.
+                </p>
+            </div>
+
+            <!-- Spending Norm Ceiling Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Chart Container -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-900 text-base mb-2">Plafond UE de Croissance des Dépenses Nettes (%)</h3>
+                    <p class="text-xs text-slate-500 mb-4">Trajectoire contraignante approuvée par le Conseil de l'UE pour la Belgique (2025-2029)</p>
+                    <div class="chart-container">
+                        <canvas id="euSpendingChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Explanation Box -->
+                <div class="bg-indigo-900 text-white p-6 rounded-xl border border-indigo-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 text-indigo-300 mb-3">
+                            <span class="text-xl">🔍</span>
+                            <h3 class="font-bold text-lg text-white">Le Paradoxe du Conseil Supérieur des Finances</h3>
+                        </div>
+                        <p class="text-xs text-indigo-100 leading-relaxed mb-4">
+                            En appliquant strictement la norme européenne de croissance des dépenses primaires nettes (limitée à 2,1 % d'ici 2029), la Belgique devrait théoriquement sortir de la Procédure pour Déficit Excessif.
+                        </p>
+                        <div class="bg-indigo-950/70 p-4 rounded-lg border border-indigo-700/50 space-y-3 mb-4">
+                            <div class="text-xs font-bold text-rose-300 uppercase">Le Problème Structurel :</div>
+                            <p class="text-xs text-slate-200">
+                                La Commission Européenne surestime l'élasticité naturelle des recettes fiscales belges à politique inchangée. Le CSF démontre qu'en se basant uniquement sur la norme de dépense, <strong>le déficit résiduel dépassera encore 20 Mds € en 2029</strong> !
+                            </p>
+                        </div>
+                        <p class="text-xs text-indigo-200">
+                            <strong>Conclusion Stratégique :</strong> La maîtrise des dépenses est indispensable mais notoirement insuffisante. Le conclave doit impérativement activer des mesures fiscales discrétionnaires majeures.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-indigo-700/60 text-xs text-indigo-300">
+                        ⚖️ Répartition de l'effort : Entité I (Fédéral + Sécurité Sociale) vs Entité II (Régions & Communautés).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact on Regions (Entité II) & LSF -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-900 text-base mb-3">Impact Asymétrique sur l'Entité II et la Loi Spéciale de Financement (LSF)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="font-semibold text-slate-800 text-sm mb-1">Fédération Wallonie-Bruxelles</div>
+                        <p class="text-xs text-slate-600 mb-2">Dotation TVA (70% des recettes) freinée par la baisse de la "clé élève" démographique.</p>
+                        <ul class="text-xs text-slate-700 space-y-1 bg-white p-2 rounded border border-slate-200">
+                            <li>• Objectif : Solde SEC à -1,2 Md € en 2029.</li>
+                            <li>• Minerval supérieur porté à 1 194 € (progressif).</li>
+                            <li>• Moratoire culturel jusqu'en 2028.</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="font-semibold text-slate-800 text-sm mb-1">Région Wallonne</div>
+                        <p class="text-xs text-slate-600 mb-2">Sous la pression directe de la dégradation par Moody's (Baa1).</p>
+                        <ul class="text-xs text-slate-700 space-y-1 bg-white p-2 rounded border border-slate-200">
+                            <li>• Trajectoire d'assainissement accélérée.</li>
+                            <li>• Resserrement des investissements non-PNRR.</li>
+                            <li>• Responsabilisation cotisations pensions.</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="font-semibold text-slate-800 text-sm mb-1">Région Bruxelles-Capitale</div>
+                        <p class="text-xs text-slate-600 mb-2">Déficit structurel élevé et charges d'infrastructure lourdes.</p>
+                        <ul class="text-xs text-slate-700 space-y-1 bg-white p-2 rounded border border-slate-200">
+                            <li>• Cible : Équilibre SEC d'ici 2030.</li>
+                            <li>• Coupes programmées de 1,2 Md €.</li>
+                            <li>• Révision des aides régionales.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: DEPENSES & SHOCS SOCIAUX ================= -->
+        <section id="section-depenses" class="tab-content hidden space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">3. Analyse Critique des Dépenses Primaires et Chocs Sociaux</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Les dépenses de protection sociale et de santé représentent la majeure partie du budget primaire fédéral. Face au mur démographique (dépenses sociales passant de 25,7% à 27,2% du PIB d'ici 2050), le gouvernement tente d'actionner deux leviers majeurs : la rationalisation ciblée de l'INAMI (470,7 M€ d'économies en 2026) et la limitation de l'assurance chômage à 24 mois. Cette section détaille l'analyse ex-ante de l'Université Libre de Bruxelles (DULBEA) démontrant l'effet "vases communicants" et le transfert de charges vers les CPAS communaux.
+                </p>
+            </div>
+
+            <!-- Health Care (INAMI) Rationalization -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Soins de Santé (INAMI) : Budget 2026 &amp; Plan d'Économies (470,7 M€)</h3>
+                        <p class="text-xs text-slate-500">Budget global INAMI 2026 : 46,775 Mds € (+3,2% d'indexation). Économies structurelles requises.</p>
+                    </div>
+                    <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">Objectif 2026 : -470,7 M€</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="font-bold text-slate-800 text-sm mb-2 flex items-center justify-between">
+                            <span>💊 Secteur Pharmaceutique</span>
+                            <span class="text-rose-600 font-bold">-228 M€</span>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2">
+                            <li class="flex justify-between border-b pb-1">
+                                <span>Ticket modérateur min. (2€ plein / 1€ VIPO)</span>
+                                <span class="font-semibold text-slate-700">Mesure d'accès</span>
+                            </li>
+                            <li class="flex justify-between border-b pb-1">
+                                <span>Déclassement antiacides vers catégorie Cx</span>
+                                <span class="font-semibold text-rose-600">-53,9 M€</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Réforme facturation médicaments hôpitaux</span>
+                                <span class="font-semibold text-slate-700">Prix publics ↓</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="font-bold text-slate-800 text-sm mb-2 flex items-center justify-between">
+                            <span>🩺 Prestations Médicales &amp; Imagerie</span>
+                            <span class="text-rose-600 font-bold">-150 M€</span>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2">
+                            <li class="flex justify-between border-b pb-1">
+                                <span>Restriction scanners colonne (Spécialistes)</span>
+                                <span class="font-semibold text-slate-700">Anti-surprescription</span>
+                            </li>
+                            <li class="flex justify-between border-b pb-1">
+                                <span>Révision honoraires/marges biologie clinique</span>
+                                <span class="font-semibold text-rose-600">Tarifs révisés</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Réforme de l'assistance opératoire</span>
+                                <span class="font-semibold text-slate-700">Rationalisation</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
+                    ⚠️ <strong>Perspective 2027 :</strong> Les projections imposent 171 M€ d'économies supplémentaires alors que la demande d'investissements nouveaux des hôpitaux et prestataires dépasse 728 M€.
+                </div>
+            </div>
+
+            <!-- UNEMPLOYMENT DULBEA MODEL (Interactive Highlight) -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="mb-4">
+                    <span class="text-xs font-bold px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded uppercase">Étude Critique DULBEA (ULB)</span>
+                    <h3 class="font-bold text-slate-900 text-lg mt-1">Limitation du Chômage à 2 Ans : Le Paradoxe des Vases Communicants</h3>
+                    <p class="text-xs text-slate-600 mt-1">
+                        Analyse du transfert de charge lié à l'exclusion potentielle de <strong>89 112 chômeurs de longue durée</strong> au 1er janvier 2026.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Dynamic Waterfall / Cascade Flow -->
+                    <div class="space-y-3">
+                        <div class="text-xs font-bold text-slate-700 uppercase">Répartition des 89 112 Chômeurs Exclus :</div>
+                        
+                        <!-- Emploi -->
+                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                            <div class="flex justify-between text-xs font-bold text-emerald-900">
+                                <span>💼 Retour à l'Emploi (28,5 %)</span>
+                                <span>25 400 personnes</span>
+                            </div>
+                            <div class="w-full bg-emerald-200 h-2 rounded-full mt-1.5 overflow-hidden">
+                                <div class="bg-emerald-600 h-2" style="width: 28.5%"></div>
+                            </div>
+                            <p class="text-[11px] text-emerald-700 mt-1">Reconstitution de cotisations sociales et réintégration active.</p>
+                        </div>
+
+                        <!-- CPAS / RIS -->
+                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <div class="flex justify-between text-xs font-bold text-amber-900">
+                                <span>🏛️ Transfert RIS / CPAS (33,8 %)</span>
+                                <span>30 122 personnes</span>
+                            </div>
+                            <div class="w-full bg-amber-200 h-2 rounded-full mt-1.5 overflow-hidden">
+                                <div class="bg-amber-600 h-2" style="width: 33.8%"></div>
+                            </div>
+                            <p class="text-[11px] text-amber-700 mt-1">Basculement vers l'aide sociale communale (Revenu d'Intégration Sociale).</p>
+                        </div>
+
+                        <!-- INAMI Invalidité -->
+                        <div class="p-3 bg-rose-50 border border-rose-200 rounded-lg">
+                            <div class="flex justify-between text-xs font-bold text-rose-900">
+                                <span>🏥 Transfert Invalidité / Mutuelle (37,7 %)</span>
+                                <span>33 590 personnes</span>
+                            </div>
+                            <div class="w-full bg-rose-200 h-2 rounded-full mt-1.5 overflow-hidden">
+                                <div class="bg-rose-600 h-2" style="width: 37.7%"></div>
+                            </div>
+                            <p class="text-[11px] text-rose-700 mt-1">Glissement vers les indemnités de maladie longue durée due à la précarité de santé.</p>
+                        </div>
+                    </div>
+
+                    <!-- Financial Cascade Result -->
+                    <div class="bg-slate-900 text-white p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-amber-400 uppercase mb-2">Bilan Financier Macroéconomique</div>
+                            <div class="space-y-3 text-xs">
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-slate-300">Économie brute ONEM (Fédéral) :</span>
+                                    <span class="font-bold text-emerald-400 text-sm">+813 M€</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-slate-300">Surcoût Invalidité (INAMI Fédéral) :</span>
+                                    <span class="font-bold text-rose-400 text-sm">-550 M€</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-slate-300">Surcoût Subvention RIS (Fédéral 55-85%) :</span>
+                                    <span class="font-bold text-rose-400 text-sm">-242 M€</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-1 font-bold text-sm bg-slate-800 p-2.5 rounded border border-slate-700">
+                                    <span class="text-amber-300">Gain Net pour l'État Fédéral :</span>
+                                    <span class="text-emerald-400 text-base">+20 M€ / an</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-rose-950/80 border border-rose-800 rounded-lg text-xs">
+                            <strong class="text-rose-300">🔴 Le Choc Communal :</strong> 
+                            Les CPAS doivent assumer la part non subventionnée du RIS et les frais de personnel. 
+                            <strong>Charge nette additionnelle pour les communes : ~200 M€ / an</strong>, principalement à Bruxelles et en Wallonie.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Defense vs Welfare Tension -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-900 text-base mb-2">Défense Nationale ("Sécurité Dure") vs État-Providence ("Sécurité Douce")</h3>
+                <p class="text-xs text-slate-600 mb-4">
+                    La Belgique s'est engagée auprès de l'OTAN à faire passer son budget militaire de 1,25% à <strong>2,0% du PIB d'ici 2029</strong> (Vision Stratégique &amp; Plan STAR), soit une dépense incrémentale d'environ <strong>4 Mds € / an</strong>.
+                </p>
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700">
+                    💡 <strong>Arbitrage Stratégique :</strong> Financer le réarmement en pleine période de consolidation européenne contraint l'État à couper plus sévèrement dans le fonctionnement des ministères ou dans la sécurité sociale, exacerbant les tensions politiques au sein du conclave.
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: TAX SHIFT & SUPER NOTA ================= -->
+        <section id="section-fiscalite" class="tab-content hidden space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">4. Stratégie Fiscale, Compétitivité et "Super Nota"</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Pour soutenir le pouvoir d'achat et encourager l'emploi tout en préservant la compétitivité-coût des entreprises (norme salariale à 0%), le gouvernement prépare une réforme de l'Impôt des Personnes Physiques (IPP) appelée "Super Nota" ou projet "Arizona". D'un coût brut de 10 à 12 Mds €, cette baisse de la fiscalité sur le travail doit impérativement être compensée par un <strong>Tax Shift</strong> vers la fiscalité indirecte (TVA), la taxation du capital et le gel invisible des dépenses fiscales.
+                </p>
+            </div>
+
+            <!-- Tax Shift Components Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- IPP Reform & Indexation Cap -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 text-base border-b pb-2">1. Allègement sur le Travail &amp; Encadrement des Salaires</h3>
+                    
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900">Réforme IPP "Super Nota" (Coût : -10 à -12 Mds €)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-1 mt-1">
+                                <li>Hausse de la quotité exemptée de 10 570 € vers 12 000 € d'ici 2029.</li>
+                                <li>Élargissement des tranches moyennes pour éviter l'effet du taux à 45%.</li>
+                                <li>Renforcement du bonus à l'emploi (+100 € à +130 € nets/mois au salaire minimum).</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-amber-50 rounded border border-amber-200">
+                            <span class="font-bold text-amber-900">Double Plafonnement de l'Indexation (Gain : +880 M€ d'ici 2029)</span>
+                            <p class="text-amber-800 mt-1">
+                                En 2026 et 2028, l'indexation de la tranche de salaire brut &gt; 4 000 € (et allocations &gt; 2 000 €) est plafonnée à maximum 2%. Les employeurs reversent 50% de ce gain financier à l'ONSS.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax Shift Compensations -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 text-base border-b pb-2">2. Compensations Fiscaux &amp; Nouvelles Rentes</h3>
+                    
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900">Harmonisation des Taux de TVA</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-1 mt-1">
+                                <li>Hôtellerie, culture &amp; sport : passage du taux réduit de 6% à 12%.</li>
+                                <li>Phytopharmacie &amp; engrais : passage de 12% à 21%.</li>
+                                <li>Horeca : alignement des plats à emporter et boissons non-alcoolisées à 12%.</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900">Taxation du Capital &amp; Dividendes (Gain : +600 M€)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-1 mt-1">
+                                <li>Taxe de 3% sur les plus-values financières (&gt; 10 M€ de portefeuille).</li>
+                                <li>Précompte sur régimes VVPRbis et réserves de liquidation porté de 15% à 18%.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Tax Gain: Tax Expenditure Freeze -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-900 text-base mb-2">Le Gel des Dépenses Fiscales : L'Inflation comme Levier Occulte</h3>
+                <p class="text-xs text-slate-600 mb-4">
+                    Un des leviers d'assainissement les plus efficaces consiste à <strong>ne pas indexer les plafonds d'avantages fiscaux</strong>. Face à une inflation cumulative élevée, cette désindexation augmente furtivement l'assiette imposable réelle.
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                        <div class="text-slate-500 font-medium">Épargne-Pension</div>
+                        <div class="font-bold text-slate-800 text-sm mt-1">Geld à 1 050 €</div>
+                        <div class="text-[10px] text-slate-500">Réduction 30% bloquée</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                        <div class="text-slate-500 font-medium">Épargne Long Terme</div>
+                        <div class="font-bold text-slate-800 text-sm mt-1">Geld à 2 450 €</div>
+                        <div class="text-[10px] text-slate-500">Non indexé</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                        <div class="text-slate-500 font-medium">Exonération Dividendes</div>
+                        <div class="font-bold text-slate-800 text-sm mt-1">Geld à 833 €</div>
+                        <div class="text-[10px] text-slate-500">Précompte dû au-delà</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                        <div class="text-slate-500 font-medium">Lutte Contre la Fraude</div>
+                        <div class="font-bold text-emerald-600 text-sm mt-1">1,0 Md € visé</div>
+                        <div class="text-[10px] text-slate-500">600M€ fiscal / 400M€ social</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: SIMULATEUR INTERACTIF ================= -->
+        <section id="section-simulateur" class="tab-content hidden space-y-6">
+            <!-- Intro Paragraph -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">5. Simulateur d'Assainissement Budgétaire (Objectif 23 Mds €)</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Testez vous-même les arbitrages du conclave de septembre ! Ajustez les curseurs et réformes ci-dessous pour composer votre propre plan d'assainissement d'ici 2029. Observez en temps réel si vous parvenez à boucler l'objectif de 23 Mds €, tout en surveillant l'impact sur le déficit (% PIB) et la friction sociale.
+                </p>
+            </div>
+
+            <!-- Dashboard Control & Gauge Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Live Results Gauge Column -->
+                <div class="lg:col-span-1 bg-slate-900 text-white p-6 rounded-xl border border-slate-800 flex flex-col justify-between sticky top-20 h-fit space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Progression de l'Assainissement</span>
+                            <span id="sim-status-badge" class="px-2 py-0.5 text-xs font-bold bg-rose-500/20 text-rose-300 rounded border border-rose-500/30">Insuffisant</span>
+                        </div>
+
+                        <!-- Big Counter -->
+                        <div class="text-center py-4 bg-slate-850 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400">Effort Brut Réalisé</div>
+                            <div id="sim-total-effort" class="text-4xl font-black text-amber-400 my-1">0,00 Mds €</div>
+                            <div class="text-xs text-slate-400">sur les <strong class="text-white">23,0 Mds €</strong> requis</div>
+                        </div>
+
+                        <!-- Dynamic Progress Bar -->
+                        <div class="mt-4">
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                                <div id="sim-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-3 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Derived Metrics -->
+                        <div class="space-y-3 mt-6 text-xs">
+                            <div class="flex justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">Écart Restant à Combler :</span>
+                                <span id="sim-gap-remaining" class="font-bold text-rose-400">23,00 Mds €</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">Déficit Projeté 2029 :</span>
+                                <span id="sim-projected-deficit" class="font-bold text-amber-300">-5,7 % PIB</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">Indice de Friction Sociale :</span>
+                                <span id="sim-social-friction" class="font-bold text-slate-200">Faible</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Impact Communes (CPAS) :</span>
+                                <span id="sim-cpas-impact" class="font-bold text-slate-200">Neutre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="resetSimulator()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-lg transition-colors border border-slate-700">
+                        🔄 Réinitialiser le Simulateur
+                    </button>
+                </div>
+
+                <!-- Sliders & Toggles Panel -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                    <h3 class="font-bold text-slate-900 text-base border-b pb-3">Sélection des Mesures d'Assainissement</h3>
+
+                    <!-- Category A: Dépenses & Sécurité Sociale -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-bold text-indigo-700 uppercase tracking-wider bg-indigo-50 p-2 rounded">
+                            A. Volet Dépenses &amp; Sécurité Sociale
+                        </div>
+
+                        <!-- Reforme Chomage -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-lg border border-slate-200 gap-2">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900">Limitation du Chômage à 2 ans (DULBEA)</div>
+                                <div class="text-[11px] text-slate-500">Gain net fédéral +20M€, mais +200M€ de report sur CPAS communaux.</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sim-toggle-chomage" onchange="calculateSimulation()" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- Cuts INAMI Slider -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-900">Rationalisation Santé / INAMI</span>
+                                <span id="sim-val-inami" class="font-bold text-indigo-600">0,47 Md €</span>
+                            </div>
+                            <input type="range" id="sim-slider-inami" min="0" max="2.0" step="0.05" value="0.47" oninput="calculateSimulation()" class="w-full accent-indigo-600 cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>0 Md (Pas de coupes)</span>
+                                <span>0.47 Md (Plan 2026)</span>
+                                <span>2.0 Mds (Rigueur extrême)</span>
+                            </div>
+                        </div>
+
+                        <!-- Defense Expenditure Toggle -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-lg border border-slate-200 gap-2">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900">Mise à Niveau Défense (OTAN 2% PIB d'ici 2029)</div>
+                                <div class="text-[11px] text-rose-600">Alourdit le besoin d'économie net de 4,0 Mds € supplémentaires.</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sim-toggle-defense" onchange="calculateSimulation()" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- Spending Reviews / Administration -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-900">Efficience de l'État &amp; Spending Reviews</span>
+                                <span id="sim-val-spending" class="font-bold text-indigo-600">1,00 Md €</span>
+                            </div>
+                            <input type="range" id="sim-slider-spending" min="0" max="3.0" step="0.1" value="1.0" oninput="calculateSimulation()" class="w-full accent-indigo-600 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Category B: Fiscalité & Recettes -->
+                    <div class="space-y-4">
+                        <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider bg-emerald-50 p-2 rounded">
+                            B. Volet Fiscalité &amp; Tax Shift
+                        </div>
+
+                        <!-- Super Nota Tax Cut Slider (Negative) -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <div>
+                                    <span class="font-bold text-slate-900">Réforme IPP "Super Nota" (Baisse d'impôt travail)</span>
+                                    <span class="text-[10px] text-slate-500 block">Création de pouvoir d'achat (Coût budgétaire direct)</span>
+                                </div>
+                                <span id="sim-val-ipp" class="font-bold text-rose-600">-10,00 Mds €</span>
+                            </div>
+                            <input type="range" id="sim-slider-ipp" min="-12.0" max="0" step="0.5" value="-10.0" oninput="calculateSimulation()" class="w-full accent-rose-600 cursor-pointer">
+                        </div>
+
+                        <!-- Plafonnement Indexation Toggle -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-lg border border-slate-200 gap-2">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900">Double Plafonnement Indexation (&gt; 4 000 €)</div>
+                                <div class="text-[11px] text-slate-500">Cotisation spécifique ONSS 50% sur gains employeurs (+880 M€).</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sim-toggle-index" onchange="calculateSimulation()" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- TVA Harmonization Toggle -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-lg border border-slate-200 gap-2">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900">Harmonisation TVA (6%-&gt;12% / 12%-&gt;21%)</div>
+                                <div class="text-[11px] text-slate-500">Rehaussement Horeca/culture/sport et chimie agricole (+1,2 Md €).</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sim-toggle-tva" onchange="calculateSimulation()" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- Capital Gains Tax Toggle -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-lg border border-slate-200 gap-2">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900">Taxe Plus-values (3% &gt;10M€) &amp; VVPRbis (18%)</div>
+                                <div class="text-[11px] text-slate-500">Mobilisation de rentes financières (+600 M€).</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sim-toggle-capital" onchange="calculateSimulation()" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+
+                        <!-- Tax Expenditures Freeze Slider -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-900">Gel des Dépenses Fiscales (Épargne/Dividendes)</span>
+                                <span id="sim-val-freeze" class="font-bold text-emerald-600">1,50 Md €</span>
+                            </div>
+                            <input type="range" id="sim-slider-freeze" min="0" max="3.0" step="0.1" value="1.5" oninput="calculateSimulation()" class="w-full accent-emerald-600 cursor-pointer">
+                        </div>
+
+                        <!-- Fraud Target Slider -->
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-900">Lutte contre la Fraude Fiscale &amp; Sociale</span>
+                                <span id="sim-val-fraud" class="font-bold text-emerald-600">1,00 Md €</span>
+                            </div>
+                            <input type="range" id="sim-slider-fraud" min="0" max="2.0" step="0.1" value="1.0" oninput="calculateSimulation()" class="w-full accent-emerald-600 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-semibold text-slate-200">Observatoire du Conclave Budgétaire Belge</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Basé sur les rapports du Bureau fédéral du Plan, BNB, OCDE, Conseil Supérieur des Finances et DULBEA (ULB).</p>
+            </div>
+            <div class="flex space-x-4 text-slate-400">
+                <span>Rapport de Synthèse 2026-2031</span>
+                <span>•</span>
+                <span>Procédure Déficit Excessif UE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Tab Navigation Logic
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Reset active button styling
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                btn.classList.add('text-slate-300', 'hover:bg-slate-700');
+            });
+
+            // Show selected tab content
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+
+            // Style active button
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+            activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-700');
+
+            // Re-render charts if tab becomes visible
+            if (tabId === 'macro' && window.macroChartObj) window.macroChartObj.resize();
+            if (tabId === 'gouvernance' && window.euChartObj) window.euChartObj.resize();
+        }
+
+        // Chart 1 Initialization: Macro & Debt Trajectory
+        function initMacroChart() {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            window.macroChartObj = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031'],
+                    datasets: [
+                        {
+                            label: 'Dette Brute (% PIB)',
+                            data: [106.0, 107.9, 110.5, 112.8, 114.9, 117.0, 119.5, 122.0],
+                            borderColor: '#0f172a',
+                            backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'yDebt',
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Solde Budgétaire Spontané (% PIB)',
+                            data: [-4.5, -5.2, -5.1, -5.4, -5.5, -5.7, -6.0, -6.3],
+                            borderColor: '#e11d48',
+                            backgroundColor: '#e11d48',
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                            yAxisID: 'yDeficit',
+                            borderWidth: 2.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        yDebt: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Dette (% PIB)', font: { size: 11 } },
+                            min: 100,
+                            max: 130
+                        },
+                        yDeficit: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Déficit (% PIB)', font: { size: 11 } },
+                            min: -8,
+                            max: 0,
+                            grid: { drawOnChartArea: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2 Initialization: EU Net Spending Norm
+        function initEUChart() {
+            const ctx = document.getElementById('euSpendingChart').getContext('2d');
+            window.euChartObj = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['2025', '2026', '2027', '2028', '2029'],
+                    datasets: [
+                        {
+                            label: 'Plafond Croissance Dépenses Nettes UE (%)',
+                            data: [3.6, 2.5, 2.5, 2.1, 2.1],
+                            backgroundColor: '#4f46e5',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Croissance Spontanée Dépenses Primaires (%)',
+                            data: [4.8, 4.2, 3.9, 3.8, 3.7],
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Taux de croissance nominal (%)', font: { size: 11 } },
+                            beginAtZero: true,
+                            max: 6
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // Simulator Logic
+        function calculateSimulation() {
+            // Get values
+            const chomageToggle = document.getElementById('sim-toggle-chomage').checked;
+            const inamiVal = parseFloat(document.getElementById('sim-slider-inami').value);
+            const defenseToggle = document.getElementById('sim-toggle-defense').checked;
+            const spendingVal = parseFloat(document.getElementById('sim-slider-spending').value);
+
+            const ippVal = parseFloat(document.getElementById('sim-slider-ipp').value);
+            const indexToggle = document.getElementById('sim-toggle-index').checked;
+            const tvaToggle = document.getElementById('sim-toggle-tva').checked;
+            const capitalToggle = document.getElementById('sim-toggle-capital').checked;
+            const freezeVal = parseFloat(document.getElementById('sim-slider-freeze').value);
+            const fraudVal = parseFloat(document.getElementById('sim-slider-fraud').value);
+
+            // Dynamic Labels Update
+            document.getElementById('sim-val-inami').innerText = inamiVal.toFixed(2) + ' Md €';
+            document.getElementById('sim-val-spending').innerText = spendingVal.toFixed(2) + ' Md €';
+            document.getElementById('sim-val-ipp').innerText = ippVal.toFixed(2) + ' Mds €';
+            document.getElementById('sim-val-freeze').innerText = freezeVal.toFixed(2) + ' Md €';
+            document.getElementById('sim-val-fraud').innerText = fraudVal.toFixed(2) + ' Md €';
+
+            // Total Calculation (in Billions)
+            let totalEffort = 0;
+
+            if (chomageToggle) totalEffort += 0.02; // DULBEA net federal gain
+            totalEffort += inamiVal;
+            if (defenseToggle) totalEffort -= 4.00; // Defense cost
+            totalEffort += spendingVal;
+
+            totalEffort += ippVal; // negative cost
+            if (indexToggle) totalEffort += 0.88;
+            if (tvaToggle) totalEffort += 1.20;
+            if (capitalToggle) totalEffort += 0.60;
+            totalEffort += freezeVal;
+            totalEffort += fraudVal;
+
+            // Target is 23.0 Mds
+            const target = 23.0;
+            const gap = target - totalEffort;
+            const progress = Math.max(0, Math.min(100, (totalEffort / target) * 100));
+
+            // UI Displays
+            document.getElementById('sim-total-effort').innerText = totalEffort.toFixed(2) + ' Mds €';
+            document.getElementById('sim-progress-bar').style.width = progress + '%';
+
+            const gapEl = document.getElementById('sim-gap-remaining');
+            if (gap <= 0) {
+                gapEl.innerText = '0,00 Mds € (Objectif Atteint !)';
+                gapEl.className = 'font-bold text-emerald-400';
+            } else {
+                gapEl.innerText = gap.toFixed(2) + ' Mds €';
+                gapEl.className = 'font-bold text-rose-400';
+            }
+
+            // Deficit Projection 2029 (Base spontaneous is -5.7% PIB ≈ 34 Mds deficit; GDP ≈ 600 Mds)
+            // 1% GDP ≈ 6.0 Mds €
+            const baseDeficitPercent = -5.7;
+            const projectedDeficit = baseDeficitPercent + (totalEffort / 6.0);
+            const defEl = document.getElementById('sim-projected-deficit');
+            defEl.innerText = projectedDeficit.toFixed(2) + ' % PIB';
+
+            if (projectedDeficit >= -3.0) {
+                defEl.className = 'font-bold text-emerald-400';
+            } else if (projectedDeficit >= -4.5) {
+                defEl.className = 'font-bold text-amber-300';
+            } else {
+                defEl.className = 'font-bold text-rose-400';
+            }
+
+            // Status Badge
+            const badge = document.getElementById('sim-status-badge');
+            if (totalEffort >= 23.0) {
+                badge.innerText = 'Conforme UE (23Mds)';
+                badge.className = 'px-2 py-0.5 text-xs font-bold bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30';
+            } else if (totalEffort >= 15.0) {
+                badge.innerText = 'Effort Partiel';
+                badge.className = 'px-2 py-0.5 text-xs font-bold bg-amber-500/20 text-amber-300 rounded border border-amber-500/30';
+            } else {
+                badge.innerText = 'Insuffisant';
+                badge.className = 'px-2 py-0.5 text-xs font-bold bg-rose-500/20 text-rose-300 rounded border border-rose-500/30';
+            }
+
+            // Qualitative Indicators
+            const socialEl = document.getElementById('sim-social-friction');
+            if (inamiVal > 1.2 || !indexToggle) {
+                socialEl.innerText = 'Très Élevée ⚡';
+                socialEl.className = 'font-bold text-rose-400';
+            } else if (inamiVal > 0.5 || chomageToggle) {
+                socialEl.innerText = 'Modérée ⚠️';
+                socialEl.className = 'font-bold text-amber-300';
+            } else {
+                socialEl.innerText = 'Faible';
+                socialEl.className = 'font-bold text-emerald-400';
+            }
+
+            const cpasEl = document.getElementById('sim-cpas-impact');
+            if (chomageToggle) {
+                cpasEl.innerText = '-200 M€ / an (Critique)';
+                cpasEl.className = 'font-bold text-rose-400';
+            } else {
+                cpasEl.innerText = 'Neutre';
+                cpasEl.className = 'font-bold text-slate-300';
+            }
+        }
+
+        function resetSimulator() {
+            document.getElementById('sim-toggle-chomage').checked = false;
+            document.getElementById('sim-slider-inami').value = 0.47;
+            document.getElementById('sim-toggle-defense').checked = true;
+            document.getElementById('sim-slider-spending').value = 1.0;
+
+            document.getElementById('sim-slider-ipp').value = -10.0;
+            document.getElementById('sim-toggle-index').checked = true;
+            document.getElementById('sim-toggle-tva').checked = true;
+            document.getElementById('sim-toggle-capital').checked = true;
+            document.getElementById('sim-slider-freeze').value = 1.5;
+            document.getElementById('sim-slider-fraud').value = 1.0;
+
+            calculateSimulation();
+        }
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initMacroChart();
+            initEUChart();
+            calculateSimulation();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Room - Cartographie de la Zone Grise</title>
+    <style>
+        /* Thème sombre "War Room" */
+        body {
+            background-color: #03080c;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* En-tête */
+        .header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            border-bottom: 1px solid #00ffcc;
+            background: rgba(0, 30, 30, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            z-index: 10;
+        }
+
+        /* Conteneur de la carte / radar */
+        .map-container {
+            flex: 2;
+            position: relative;
+            border-right: 1px solid #00ffcc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #051a1f 0%, #03080c 100%);
+        }
+
+        /* Effet de radar en arrière-plan */
+        .radar {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 50%;
+            background: repeating-radial-gradient(rgba(0, 255, 204, 0.05) 0, rgba(0, 255, 204, 0.05) 10%, transparent 10%, transparent 20%);
+        }
+        .radar::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffcc);
+            transform-origin: 0 50%;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Style des acteurs (nœuds) */
+        .node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: rgba(0,0,0,0.7);
+            z-index: 5;
+        }
+        .node:hover {
+            transform: scale(1.15);
+        }
+
+        /* Couleurs des factions */
+        .hostile { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 15px rgba(255, 51, 51, 0.5); }
+        .defensive { border-color: #3388ff; color: #3388ff; box-shadow: 0 0 15px rgba(51, 136, 255, 0.5); }
+        
+        /* Positions arbitraires simulant une carte mondiale */
+        #node-russia { top: 25%; left: 65%; }
+        #node-china { top: 45%; left: 82%; }
+        #node-iran { top: 55%; left: 60%; }
+        #node-eu { top: 40%; left: 45%; }
+        #node-nato { top: 35%; left: 25%; }
+
+        /* Panneau d'informations latéral */
+        .panel {
+            flex: 1;
+            padding: 80px 20px 20px 20px;
+            background: #020508;
+            overflow-y: auto;
+        }
+        .panel h2 {
+            color: #fff;
+            border-bottom: 1px dashed #00ffcc;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .comment-box {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid #00ffcc;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 250px;
+            line-height: 1.6;
+        }
+        .actor-title {
+            color: #fff;
+            margin-top: 0;
+            font-size: 1.5em;
+            text-transform: uppercase;
+        }
+        .highlight {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h3>Commandement Stratégique - Cartographie des Menaces Hybrides</h3>
+    </div>
+
+    <!-- Interface Carte / Radar -->
+    <div class="map-container">
+        <div class="radar"></div>
+        
+        <!-- Points de données géopolitiques -->
+        <div class="node hostile" id="node-russia" onclick="updateDashboard('russia')">RUS</div>
+        <div class="node hostile" id="node-china" onclick="updateDashboard('china')">CHN</div>
+        <div class="node hostile" id="node-iran" onclick="updateDashboard('iran')">IRN</div>
+        
+        <div class="node defensive" id="node-eu" onclick="updateDashboard('eu')">UE</div>
+        <div class="node defensive" id="node-nato" onclick="updateDashboard('nato')">OTAN</div>
+    </div>
+
+    <!-- Interface des Commentaires -->
+    <div class="panel">
+        <h2>Rapport de Renseignement</h2>
+        <div class="comment-box" id="info-box">
+            <em>// EN ATTENTE DE SÉLECTION DE CIBLE...</em><br><br>
+            Veuillez cliquer sur une entité sur la carte tactique pour afficher les doctrines, les vecteurs privilégiés et les commentaires opérationnels.
+        </div>
+    </div>
+
+    <script>
+        // Base de données alimentée par les rapports stratégiques
+        const stakeholdersData = {
+            russia: {
+                name: "Fédération de Russie",
+                concept: "Maskirovka, guerre informationnelle (FIMI), pas de doctrine unifiée.",
+                vectors: "Proxies armés (ex: groupe Wagner), cyberattaques, sabotage d'infrastructures (ex: câbles sous-marins).",
+                comment: "Utilise des actions hétérogènes pour brouiller la frontière entre guerre et paix. Sa stratégie cherche à diviser la société adverse et à semer le doute en évitant l'attribution directe."
+            },
+            china: {
+                name: "République Populaire de Chine",
+                concept: "Guerre hors limites (1999), Trois Guerres (loi, psychologie, médias).",
+                vectors: "Lawfare (guerre juridique), milices maritimes (navires civils), coercition économique globale.",
+                comment: "Emploie massivement des opérations sous le seuil armé (ex: navires de pêche en mer de Chine) pour imposer des faits accomplis juridiques et territoriaux, en exploitant les vulnérabilités de l'interdépendance économique."
+            },
+            iran: {
+                name: "République Islamique d'Iran",
+                concept: "Défense en profondeur et asymétrique.",
+                vectors: "Réseau de proxies (Hezbollah, Houthis), essaims de drones, groupes cyber (APT33).",
+                comment: "Pallie une infériorité conventionnelle en externalisant la menace via des milices régionales. L'objectif est de projeter une capacité de nuisance loin de ses frontières avec déniabilité."
+            },
+            eu: {
+                name: "Union Européenne",
+                concept: "Boussole stratégique (2022), Résilience civile.",
+                vectors: "Boîte à outils hybride, DSA, Directive NIS2, Sanctions économiques ciblées.",
+                comment: "Son approche est avant tout normative et de régulation. L'UE cherche à augmenter le coût réputationnel des attaques (EUvsDisinfo) et à durcir physiquement et numériquement ses entités critiques."
+            },
+            nato: {
+                name: "OTAN",
+                concept: "Défense intégrée, Dissuasion par interdiction.",
+                vectors: "Équipes CHST, Baltic Sentry, Flanc Est renforcé.",
+                comment: "Entretient une ambiguïté volontaire sur le déclenchement de l'Article 5 face aux menaces hybrides. L'Alliance finance activement des centres d'excellence et développe des parades face à la guerre cognitive."
+            }
+        };
+
+        // Fonction d'interaction de la War Room
+        function updateDashboard(actorId) {
+            const data = stakeholdersData[actorId];
+            const infoBox = document.getElementById('info-box');
+            
+            // Animation type "machine à écrire" ou flash instantané pour le style
+            infoBox.style.opacity = 0;
+            
+            setTimeout(() => {
+                infoBox.innerHTML = `
+                    <h3 class="actor-title">${data.name}</h3>
+                    <p><span class="highlight">CONCEPT DIRECTEUR :</span><br> ${data.concept}</p>
+                    <p><span class="highlight">VECTEURS D'OPÉRATION :</span><br> ${data.vectors}</p>
+                    <hr style="border:0; border-top: 1px dashed #00ffcc; margin: 15px 0;">
+                    <p><span class="highlight">ANALYSE TACTIQUE :</span><br> ${data.comment}</p>
+                `;
+                infoBox.style.opacity = 1;
+                infoBox.style.transition = "opacity 0.5s ease-in";
+            }, 200);
+        }
+    </script>
+</body>
+</html>
